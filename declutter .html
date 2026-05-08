@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#1e293b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Расхламление">
+<title>Расхламление</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f1f5f9;min-height:100vh;max-width:480px;margin:0 auto}
+.hdr{background:#1e293b;padding:12px 16px;position:sticky;top:0;z-index:100}
+.hdr-row{display:flex;justify-content:space-between;align-items:center}
+.hdr h1{color:#fff;font-size:15px;font-weight:700}
+.hdr-sub{color:#94a3b8;font-size:11px;margin-top:2px}
+.btn-sm{background:#334155;border:none;color:#94a3b8;padding:6px 11px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+.zone-scroll{display:flex;gap:8px;padding:12px 16px 8px;overflow-x:auto;scrollbar-width:none}
+.zone-scroll::-webkit-scrollbar{display:none}
+.zone-tab{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1px solid #e2e8f0;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;color:#64748b;white-space:nowrap;transition:all .15s}
+.zone-tab.active{background:#3b82f6;border-color:#3b82f6;color:#fff;font-weight:600}
+.zone-tab .badge{display:inline-block;background:#ef4444;color:#fff;border-radius:10px;font-size:10px;padding:0 5px;margin-left:4px;line-height:16px}
+.zone-tab.active .badge{background:rgba(255,255,255,.3)}
+.content{padding:0 12px 100px}
+.fab{position:fixed;bottom:20px;right:16px;width:52px;height:52px;background:#3b82f6;border:none;border-radius:50%;color:#fff;font-size:26px;cursor:pointer;box-shadow:0 4px 12px rgba(59,130,246,.4);display:flex;align-items:center;justify-content:center;z-index:99;transition:transform .1s}
+.fab:active{transform:scale(.93)}
+.empty{text-align:center;padding:48px 24px;color:#94a3b8}
+.empty .em{font-size:48px;margin-bottom:12px}
+.empty p{font-size:13px;line-height:1.5}
+.hint{background:#f1f5f9;border-radius:10px;padding:10px 14px;font-size:12px;color:#64748b;margin-top:12px;text-align:left}
+.form-wrap{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.form-wrap input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e2e8f0;font-size:14px;margin-bottom:10px;outline:none;font-family:inherit;background:#fff}
+.form-wrap input:focus{border-color:#3b82f6}
+.form-title{font-weight:700;font-size:14px;color:#1e293b;margin-bottom:12px}
+/* Photo buttons */
+.photo-btns{display:flex;gap:8px;margin-bottom:10px}
+.photo-btn{flex:1;padding:11px 8px;border-radius:10px;border:1px solid #e2e8f0;background:#f8fafc;font-size:13px;cursor:pointer;font-family:inherit;color:#64748b;text-align:center}
+.photo-btn:active{background:#f1f5f9}
+/* Photo preview grid */
+.photos-grid{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.photo-thumb{position:relative;width:80px;height:80px}
+.photo-thumb img{width:80px;height:80px;object-fit:cover;border-radius:8px}
+.photo-del{position:absolute;top:-6px;right:-6px;width:20px;height:20px;background:#ef4444;border:none;border-radius:50%;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.row-btns{display:flex;gap:8px}
+.btn-primary{flex:1;padding:11px;border-radius:10px;border:none;background:#3b82f6;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-ghost{padding:11px 16px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-size:14px;cursor:pointer;font-family:inherit}
+/* Card photos */
+.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-photos{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;scrollbar-width:none}
+.card-photos::-webkit-scrollbar{display:none}
+.card-photos img{width:120px;height:100px;object-fit:cover;border-radius:8px;flex-shrink:0}
+.card-photos img:only-child{width:100%;height:160px}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.card-name{font-weight:600;font-size:14px;color:#1e293b}
+.card-desc{font-size:12px;color:#64748b;margin-top:2px}
+.card-badge{border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;white-space:nowrap;border-width:1px;border-style:solid}
+.btn-del{padding:4px 9px;border-radius:8px;border:1px solid #fee2e2;background:#fff;color:#ef4444;font-size:13px;cursor:pointer;margin-left:6px}
+.dec-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.dec-btn{padding:4px 11px;border-radius:20px;font-size:12px;cursor:pointer;border-width:1px;border-style:solid;font-family:inherit;transition:all .1s}
+.btn-avito{width:100%;padding:10px;border-radius:10px;border:none;background:#f59e0b;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-avito:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed}
+.avito-box{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px;margin-top:10px}
+.avito-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.avito-lbl{font-size:12px;font-weight:700;color:#92400e}
+.btn-copy{padding:4px 12px;border-radius:8px;border:1px solid #fcd34d;background:#fff;color:#92400e;font-size:12px;cursor:pointer;font-family:inherit}
+.btn-copy.ok{background:#22c55e;color:#fff;border-color:#22c55e}
+.avito-pre{font-size:12px;color:#451a03;white-space:pre-wrap;line-height:1.6;font-family:inherit}
+.stats-wrap{padding:0 12px 100px}
+.stats-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.stats-card h3{font-weight:700;font-size:14px;color:#1e293b;margin-bottom:12px}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f8fafc}
+.stat-row:last-child{border:none}
+.stat-num{border-radius:20px;padding:3px 14px;font-size:13px;font-weight:700;border-width:1px;border-style:solid}
+.avito-item{padding:10px 0;border-bottom:1px solid #f8fafc}
+.avito-item:last-child{border:none}
+.avito-item-name{font-weight:600;font-size:13px;color:#1e293b}
+.avito-item-prev{font-size:11px;color:#64748b;margin-top:3px;line-height:1.5}
+.notif{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.notif.show{opacity:1}
+.save-badge{position:fixed;top:8px;right:60px;background:#22c55e;color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;z-index:200;opacity:0;transition:opacity .3s}
+.save-badge.show{opacity:1}
+.settings-wrap{padding:0 12px 100px}
+.settings-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.settings-card h3{font-weight:700;font-size:14px;color:#1e293b;margin-bottom:8px}
+.settings-card p{font-size:12px;color:#64748b;margin-bottom:12px;line-height:1.5}
+.settings-card input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e2e8f0;font-size:13px;outline:none;font-family:inherit;background:#fff;margin-bottom:10px}
+.settings-card input:focus{border-color:#3b82f6}
+.key-status{font-size:12px;padding:6px 12px;border-radius:8px;margin-bottom:10px}
+.key-status.ok{background:#f0fdf4;color:#16a34a}
+.key-status.no{background:#fef2f2;color:#dc2626}
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="notif" id="notif"></div>
+<div class="save-badge" id="saveBadge">💾 Сохранено</div>
+
+<script>
+function getApiKey(){return localStorage.getItem("dcl_apikey")||"";}
+
+const ZONES=[
+  {id:"room",label:"🛏 Комната",icon:"🛏",hint:"Смотри глазами гостя: что лишнее?"},
+  {id:"wardrobe",label:"👕 Шкаф",icon:"👕",hint:"Доставай всё на кровать — сортируй кучей"},
+  {id:"dresser",label:"🗄 Комод",icon:"🗄",hint:"Каждый ящик — отдельная сессия"},
+  {id:"bed",label:"📦 Ящик кровати",icon:"📦",hint:"Достань всё — там обычно залежи давно забытого"},
+  {id:"notes",label:"📓 Тетради",icon:"📓",hint:"Ценное — сфоткай страницы → тетрадь выброси"},
+  {id:"storage",label:"🏚 Кладовка",icon:"🏚",hint:"Открывала ли это за последний год?"},
+  {id:"balcony",label:"🌿 Балкон",icon:"🌿",hint:"Всё что просто «стоит» — кандидат на выброс"},
+  {id:"kitchen",label:"🍳 Кухня",icon:"🍳",hint:"Не используется >6 мес? Дубли посуды и техники?"},
+  {id:"bath",label:"🪥 Ванная",icon:"🪥",hint:"Просроченная косметика, дубли — сразу выброс"},
+  {id:"shoes",label:"👟 Обувь",icon:"👟",hint:"Сезон, состояние, когда последний раз носила?"},
+  {id:"avito",label:"💰 На продажу",icon:"💰",hint:"Добавь фото — сгенерирую текст объявления"},
+];
+
+const DECS=[
+  {id:"keep",label:"Оставить",color:"#16a34a",bg:"#f0fdf4"},
+  {id:"sell",label:"Продать",color:"#d97706",bg:"#fffbeb"},
+  {id:"donate",label:"Отдать",color:"#7c3aed",bg:"#f5f3ff"},
+  {id:"trash",label:"Выброс",color:"#dc2626",bg:"#fef2f2"},
+  {id:"later",label:"Позже",color:"#6b7280",bg:"#f9fafb"},
+];
+
+function loadItems(){
+  try{const s=localStorage.getItem("dcl_v2");return s?JSON.parse(s):{};}
+  catch(e){return{};}
+}
+
+function saveItemsFull(){
+  try{
+    localStorage.setItem("dcl_v2",JSON.stringify(S.items));
+    showSaveBadge();
+  }catch(e){
+    // Переполнен — сохраняем без фото
+    try{
+      const noPhoto={};
+      for(const z in S.items){
+        noPhoto[z]=S.items[z].map(i=>({...i,photos:[]}));
+      }
+      localStorage.setItem("dcl_v2",JSON.stringify(noPhoto));
+      showSaveBadge();
+      notify("Сохранено (фото — только в этой сессии)");
+    }catch(e2){notify("Ошибка сохранения");}
+  }
+}
+
+let S={screen:"items",zone:"room",items:loadItems(),showForm:false,formPhotos:[]};
+
+function showSaveBadge(){
+  const el=document.getElementById("saveBadge");
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),1500);
+}
+
+function notify(msg){
+  const el=document.getElementById("notif");
+  el.textContent=msg;el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),2200);
+}
+
+function all(){return Object.values(S.items).flat();}
+function zItems(){return S.items[S.zone]||[];}
+function tots(){return DECS.reduce((a,d)=>{a[d.id]=all().filter(i=>i.dec===d.id).length;return a},{});}
+
+async function genAvito(item){
+  const r=await fetch("https://api.rutronix.ai/v1/messages",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer "+getApiKey(),
+      "anthropic-version":"2023-06-01"
+    },
+    body:JSON.stringify({
+      model:"claude-haiku-4-5",
+      max_tokens:1000,
+      messages:[{role:"user",content:`Напиши объявление для Авито.\nТовар: ${item.name}\nОписание: ${item.desc||"нет"}\nСостояние: ${item.cond||"б/у, хорошее"}\n\nФормат строго:\nЗАГОЛОВОК: (до 50 символов)\nОПИСАНИЕ: (3–4 предложения честно, без воды)\nЦЕНА: (в рублях)\nТЕГИ: #тег1 #тег2 #тег3`}]
+    })
+  });
+  const d=await r.json();
+  return d.content?.[0]?.text||"Ошибка генерации. Попробуй ещё раз.";
+}
+
+function compressPhoto(file,cb){
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement("canvas");
+      const MAX=900;
+      let w=img.width,h=img.height;
+      if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+      if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext("2d").drawImage(img,0,0,w,h);
+      cb(canvas.toDataURL("image/jpeg",0.78));
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function upd(id,patch){
+  for(const z in S.items){
+    const idx=S.items[z].findIndex(i=>i.id===id);
+    if(idx>=0){S.items[z][idx]={...S.items[z][idx],...patch};break;}
+  }
+  saveItemsFull();render();
+}
+
+function del(id){
+  for(const z in S.items) S.items[z]=S.items[z].filter(i=>i.id!==id);
+  saveItemsFull();render();
+}
+
+function removeFormPhoto(idx){
+  S.formPhotos.splice(idx,1);
+  render();
+}
+
+function renderHeader(){
+  const a=all(),t=tots();
+  return `<div class="hdr">
+    <div class="hdr-row">
+      <div><h1>🏠 Расхламление</h1>
+        <div class="hdr-sub">${a.length} предм. · продать ${t.sell||0} · выбросить ${t.trash||0}</div>
+      </div>
+      <button class="btn-sm" style="margin-right:6px" onclick="S.screen='settings';render()">⚙️</button><button class="btn-sm" onclick="goBack()">
+        ${S.screen==='stats'||S.screen==='settings'?'◀ Назад':'📊 Итоги'}
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderZoneTabs(){
+  return `<div class="zone-scroll">${ZONES.map(z=>{
+    const cnt=(S.items[z.id]||[]).length;
+    return `<button class="zone-tab${S.zone===z.id?" active":""}"
+      onclick="S.zone='${z.id}';S.showForm=false;render()">
+      ${z.label}${cnt>0?`<span class="badge">${cnt}</span>`:""}
+    </button>`;
+  }).join("")}</div>`;
+}
+
+function renderForm(){
+  const zInfo=ZONES.find(z=>z.id===S.zone);
+  const thumbs=S.formPhotos.map((p,i)=>`
+    <div class="photo-thumb">
+      <img src="${p}" alt="">
+      <button class="photo-del" onclick="removeFormPhoto(${i})">×</button>
+    </div>`).join("");
+  return `<div class="form-wrap" id="addForm">
+    <div class="form-title">+ Добавить предмет</div>
+    ${zInfo.hint?`<div class="hint" style="margin-bottom:12px">💡 ${zInfo.hint}</div>`:""}
+    <input type="file" id="fPhotoGallery" accept="image/*" multiple style="display:none">
+    <input type="file" id="fPhotoCamera" accept="image/*" capture="environment" style="display:none">
+    <div class="photo-btns">
+      <button class="photo-btn" id="btnGallery">🖼 Галерея</button>
+      <button class="photo-btn" id="btnCamera">📷 Камера</button>
+    </div>
+    ${thumbs?`<div class="photos-grid">${thumbs}</div>`:""}
+    <input id="fName" placeholder="Название *" type="text" autocomplete="off">
+    <input id="fDesc" placeholder="Описание (необязательно)" type="text" autocomplete="off">
+    <input id="fCond" placeholder="Состояние (напр: б/у 1 раз)" type="text" autocomplete="off">
+    <div class="row-btns">
+      <button class="btn-primary" onclick="submitForm()">Добавить</button>
+      <button class="btn-ghost" onclick="S.showForm=false;S.formPhotos=[];render()">Отмена</button>
+    </div>
+  </div>`;
+}
+
+function renderCard(item){
+  const dec=DECS.find(d=>d.id===item.dec);
+  const isSell=item.dec==="sell"||item.zone==="avito";
+  const photos=item.photos||[];
+  return `<div class="card">
+    ${photos.length>0?`<div class="card-photos">${photos.map(p=>`<img src="${p}" alt="">`).join("")}</div>`:""}
+    <div class="card-head">
+      <div style="flex:1;min-width:0">
+        <div class="card-name">${esc(item.name)}</div>
+        ${item.desc?`<div class="card-desc">${esc(item.desc)}</div>`:""}
+        ${item.cond?`<div class="card-desc">Состояние: ${esc(item.cond)}</div>`:""}
+        ${photos.length>1?`<div class="card-desc">📷 ${photos.length} фото</div>`:""}
+      </div>
+      <div style="display:flex;align-items:center;flex-shrink:0;margin-left:8px">
+        ${dec?`<span class="card-badge" style="background:${dec.bg};color:${dec.color};border-color:${dec.color}44">${dec.label}</span>`:""}
+        <button class="btn-del" onclick="del('${item.id}')">✕</button>
+      </div>
+    </div>
+    <div class="dec-row">
+      ${DECS.map(d=>`<button class="dec-btn" onclick="upd('${item.id}',{dec:'${d.id}'})"
+        style="background:${item.dec===d.id?d.bg:"#fff"};color:${item.dec===d.id?d.color:"#94a3b8"};
+               border-color:${item.dec===d.id?d.color:"#e2e8f0"};font-weight:${item.dec===d.id?700:400}">
+        ${d.label}</button>`).join("")}
+    </div>
+    ${isSell?`<button class="btn-avito" id="avbtn_${item.id}" onclick="doAvito('${item.id}')">
+      ${item.avitoText?"🔄 Перегенерировать":"📝 Текст для Авито"}
+    </button>`:""}
+    ${item.avitoText?`<div class="avito-box">
+      <div class="avito-head">
+        <span class="avito-lbl">✅ Объявление готово</span>
+        <button class="btn-copy" id="cp_${item.id}" onclick="copyAvito('${item.id}')">Копировать</button>
+      </div>
+      <pre class="avito-pre" id="pre_${item.id}">${esc(item.avitoText)}</pre>
+    </div>`:""}
+  </div>`;
+}
+
+function renderItems(){
+  const items=zItems();
+  const zInfo=ZONES.find(z=>z.id===S.zone);
+  let body="";
+  if(S.showForm) body+=renderForm();
+  if(items.length===0&&!S.showForm){
+    body+=`<div class="empty">
+      <div class="em">${zInfo.icon}</div>
+      <p>Нажми + чтобы добавить первый предмет</p>
+      ${zInfo.hint?`<div class="hint">💡 ${zInfo.hint}</div>`:""}
+    </div>`;
+  } else {
+    body+=items.map(renderCard).join("");
+  }
+  return `${renderHeader()}${renderZoneTabs()}
+    <div class="content">${body}</div>
+    ${!S.showForm?`<button class="fab" onclick="S.showForm=true;render();setTimeout(()=>document.getElementById('fName')?.focus(),100)">+</button>`:""}`;
+}
+
+function renderStats(){
+  const a=all(),t=tots();
+  const sellReady=a.filter(i=>i.dec==="sell"&&i.avitoText);
+  return `${renderHeader()}
+    <div class="stats-wrap">
+      <div class="stats-card">
+        <h3>По решениям (${a.length} всего)</h3>
+        ${DECS.map(d=>`<div class="stat-row">
+          <span style="color:${d.color};font-weight:500;font-size:14px">${d.label}</span>
+          <span class="stat-num" style="background:${d.bg};color:${d.color};border-color:${d.color}44">${t[d.id]||0}</span>
+        </div>`).join("")}
+      </div>
+      <div class="stats-card">
+        <h3>По зонам</h3>
+        ${ZONES.filter(z=>(S.items[z.id]||[]).length>0).map(z=>`
+          <div class="stat-row">
+            <span style="font-size:13px">${z.label}</span>
+            <span style="color:#64748b;font-size:13px">${(S.items[z.id]||[]).length} шт.</span>
+          </div>`).join("")}
+        ${a.length===0?`<div style="color:#94a3b8;font-size:13px;padding:8px 0">Пока пусто</div>`:""}
+      </div>
+      ${sellReady.length>0?`<div class="stats-card">
+        <h3 style="color:#92400e">💰 Готовые объявления (${sellReady.length})</h3>
+        ${sellReady.map(i=>`<div class="avito-item">
+          <div class="avito-item-name">${esc(i.name)}</div>
+          <div class="avito-item-prev">${esc((i.avitoText||"").slice(0,130))}...</div>
+        </div>`).join("")}
+      </div>`:""}
+      <div class="stats-card" style="text-align:center">
+        <button onclick="if(confirm('Очистить все данные?')){localStorage.removeItem('dcl_v2');S.items={};render()}"
+          style="padding:8px 20px;border-radius:10px;border:1px solid #fee2e2;background:#fff;color:#ef4444;font-size:13px;cursor:pointer;font-family:inherit">
+          🗑 Очистить все данные
+        </button>
+      </div>
+    </div>`;
+}
+
+
+function renderSettings(){
+  const key=getApiKey();
+  return `${renderHeader()}
+    <div class="settings-wrap">
+      <div class="settings-card">
+        <h3>🔑 API-ключ RuTronix</h3>
+        <p>Нужен для генерации текста объявлений на Авито. Получи ключ на сайте <b>rutronix.ai</b> → личный кабинет → API.</p>
+        <div class="key-status ${key?"ok":"no"}">${key?"✅ Ключ сохранён":"❌ Ключ не введён — генерация не работает"}</div>
+        <input id="apiKeyInput" type="password" placeholder="Вставь ключ сюда" value="${key?"●".repeat(20):""}">
+        <div style="display:flex;gap:8px">
+          <button class="btn-primary" onclick="saveApiKey()">Сохранить</button>
+          ${key?`<button class="btn-ghost" onclick="if(confirm('Удалить ключ?')){localStorage.removeItem('dcl_apikey');render()}">Удалить</button>`:""}
+        </div>
+      </div>
+      <div class="settings-card">
+        <h3>ℹ️ Как получить ключ</h3>
+        <p>1. Открой <b>rutronix.ai</b><br>2. Зарегистрируйся или войди<br>3. Перейди в раздел API<br>4. Скопируй ключ и вставь выше</p>
+      </div>
+    </div>`;
+}
+
+function saveApiKey(){
+  const inp=document.getElementById("apiKeyInput");
+  if(!inp)return;
+  const val=inp.value.trim();
+  if(!val||val.startsWith("●")){notify("Введи новый ключ");return;}
+  localStorage.setItem("dcl_apikey",val);
+  notify("✅ Ключ сохранён!");
+  render();
+}
+
+function goBack(){S.screen=S.screen==="stats"||S.screen==="settings"?"items":"stats";render();}
+function render(){
+  document.getElementById("root").innerHTML=S.screen==="stats"?renderStats():S.screen==="settings"?renderSettings():renderItems();
+  attachFormEvents();
+}
+
+function processFiles(files){
+  Array.from(files).forEach(f=>{
+    compressPhoto(f,data=>{
+      S.formPhotos.push(data);
+      render();
+    });
+  });
+}
+
+function attachFormEvents(){
+  const gallery=document.getElementById("fPhotoGallery");
+  const camera=document.getElementById("fPhotoCamera");
+  const btnG=document.getElementById("btnGallery");
+  const btnC=document.getElementById("btnCamera");
+
+  if(btnG&&gallery){
+    btnG.addEventListener("click",()=>gallery.click());
+    gallery.addEventListener("change",e=>processFiles(e.target.files));
+  }
+  if(btnC&&camera){
+    btnC.addEventListener("click",()=>camera.click());
+    camera.addEventListener("change",e=>processFiles(e.target.files));
+  }
+  const fn=document.getElementById("fName");
+  if(fn) fn.addEventListener("keydown",e=>{if(e.key==="Enter")submitForm();});
+}
+
+function submitForm(){
+  const name=document.getElementById("fName")?.value?.trim();
+  if(!name){document.getElementById("fName")?.focus();return;}
+  const desc=document.getElementById("fDesc")?.value||"";
+  const cond=document.getElementById("fCond")?.value||"";
+  const id=Date.now()+"_"+Math.random().toString(36).slice(2);
+  const item={
+    id,name,desc,cond,
+    photos:[...S.formPhotos],
+    zone:S.zone,
+    dec:S.zone==="avito"?"sell":null,
+    avitoText:null,
+  };
+  S.items[S.zone]=[...(S.items[S.zone]||[]),item];
+  S.showForm=false;S.formPhotos=[];
+  saveItemsFull();
+  render();
+  notify("✓ Добавлено: "+name);
+}
+
+async function doAvito(id){
+  if(!getApiKey()){S.screen="settings";render();notify("Сначала введи API-ключ в настройках");return;}
+  const btn=document.getElementById("avbtn_"+id);
+  if(!btn)return;
+  btn.disabled=true;btn.textContent="Генерирую...";
+  let item;
+  for(const z in S.items){const f=S.items[z].find(i=>i.id===id);if(f){item=f;break;}}
+  if(!item){if(btn){btn.disabled=false;}return;}
+  try{
+    const text=await genAvito(item);
+    upd(id,{avitoText:text});
+    notify("✅ Объявление готово!");
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent="Ошибка — попробовать снова";}
+  }
+}
+
+function copyAvito(id){
+  const pre=document.getElementById("pre_"+id);
+  const btn=document.getElementById("cp_"+id);
+  if(!pre||!btn)return;
+  navigator.clipboard.writeText(pre.textContent).then(()=>{
+    btn.textContent="✓ Скопировано!";btn.classList.add("ok");
+    setTimeout(()=>{btn.textContent="Копировать";btn.classList.remove("ok");},2500);
+    notify("📋 Текст скопирован!");
+  });
+}
+
+function esc(s){
+  if(!s)return"";
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+render();
+</script>
+</body>
+</html>
+
+

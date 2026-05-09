@@ -177,11 +177,16 @@ function rShoeCard(sh){
 }
 
 function rStor(){
-  var all=S.stor;
-  var o=hdr("📦 Хранение",all.length+" мест");
+  var q=(S.ssearch||"").toLowerCase().trim();
+  var all=q?S.stor.filter(function(st){
+    return (st.name||"").toLowerCase().includes(q)||(st.loc||"").toLowerCase().includes(q)||(st.cont||"").toLowerCase().includes(q)||(st.ilist||"").toLowerCase().includes(q);
+  }):S.stor;
+  var o=hdr("📦 Хранение",S.stor.length+" мест");
   o+='<div class="wrap">';
+  if(!S.form) o+='<div style="padding:8px 12px 4px"><div style="display:flex;align-items:center;background:#f1f5f9;border-radius:10px;padding:8px 12px;gap:8px"><span>🔍</span><input style="border:none;background:transparent;width:100%;font-size:14px;outline:none;font-family:inherit" placeholder="Поиск по содержимому..." value="'+((S.ssearch||"")+"")+'" oninput="S.ssearch=this.value;R()"></div></div>';
   if(S.form&&S.ftype==="stor") o+=rStorForm();
-  if(!all.length&&!S.form) o+='<div class="empty"><div class="emi">📦</div><p>Добавь ящик, шкаф или полку</p></div>';
+  if(!S.stor.length&&!S.form) o+='<div class="empty"><div class="emi">📦</div><p>Добавь ящик, шкаф или полку</p></div>';
+  else if(q&&!all.length) o+='<div class="empty"><div class="emi">🔍</div><p>Ничего не найдено</p></div>';
   else o+=all.map(rStorCard).join("");
   o+='</div>';
   if(!S.form) o+='<button class="fab" onclick="S.form=true;S.ftype=\'stor\';S.fphotos=[];S.eid=null;R()">+</button>';
@@ -196,8 +201,12 @@ function rStorCard(st){
   if(ph.length) o+='<div class="cphotos">'+ph.map(function(p){return '<img src="'+p+'">';}).join("")+'</div>';
   o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(st.name)+'</div>'+(st.loc?'<div class="cdesc">📍 '+esc(st.loc)+'</div>':'')+'</div><div style="display:flex;gap:4px"><button class="bsm" onclick="S.eid=\''+st.id+'\';R()">✏️</button><button class="bdel" onclick="delStor(\''+st.id+'\')">✕</button></div></div>';
   if(st.cont) o+='<div class="cdesc" style="margin-bottom:10px;white-space:pre-wrap">'+esc(st.cont)+'</div>';
-  o+='<button id="stb_'+st.id+'" onclick="doStorAdv(\''+st.id+'\')" style="width:100%;padding:10px;border-radius:10px;border:none;background:#6366f1;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:'+(st.adv?"8":"0")+'px">'+(st.adv?"🔄 Обновить совет":"🤖 Совет по организации")+'</button>';
+  o+='<div style="display:flex;gap:6px;margin-bottom:'+(st.adv||st.ilist?"8":"0")+'px">';
+  o+='<button id="stb_'+st.id+'" onclick="doStorAdv(\''+st.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#6366f1;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">'+(st.adv?"🔄 Совет":"🤖 Совет")+'</button>';
+  if(ph.length) o+='<button id="ilb_'+st.id+'" onclick="doStorList(\''+st.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#0ea5e9;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📋 Список вещей</button>';
+  o+='</div>';
   if(st.adv) o+='<div class="adv"><h3>💡 Совет</h3><div class="adv-txt">'+esc(st.adv)+'</div></div>';
+  if(st.ilist) o+='<div class="adv" style="background:#e0f2fe"><h3>📋 Список вещей</h3><div class="adv-txt" style="white-space:pre-wrap">'+esc(st.ilist)+'</div></div>';
   return o+'</div>';
 }
 

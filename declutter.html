@@ -971,17 +971,21 @@ function parseAvito(text){
   var cur="";
   lines.forEach(function(l){
     var m;
-    if((m=l.match(/^ЗАГОЛОВОК:\s*(.*)/i))){res.title=m[1].trim();cur="title";}
-    else if((m=l.match(/^ОПИСАНИЕ:\s*(.*)/i))){res.desc=m[1].trim();cur="desc";}
-    else if((m=l.match(/^ЦЕНА:\s*(.*)/i))){res.price=m[1].trim();cur="price";}
-    else if((m=l.match(/^ТЕГИ:\s*(.*)/i))){res.tags=m[1].trim();cur="tags";}
-    else if((m=l.match(/^СОВЕТ:\s*(.*)/i))){res.tip=m[1].trim();cur="tip";}
-    else if(l.trim()){
-      if(cur==="desc")res.desc+=(res.desc?" ":"")+l.trim();
-      else if(cur==="tip")res.tip+=(res.tip?" ":"")+l.trim();
+    // Match both "ЗАГОЛОВОК: text" and "# ЗАГОЛОВОК:" (with optional **)
+    var clean=l.replace(/^#+\s+/,'').replace(/\*\*/g,'').trim();
+    if((m=clean.match(/^ЗАГОЛОВОК:?\s*(.*)/i))){res.title=m[1].trim();cur="title";}
+    else if((m=clean.match(/^ОПИСАНИЕ:?\s*(.*)/i))){res.desc=m[1].trim();cur="desc";}
+    else if((m=clean.match(/^ЦЕНА:?\s*(.*)/i))){res.price=m[1].trim();cur="price";}
+    else if((m=clean.match(/^ТЕГИ:?\s*(.*)/i))){res.tags=m[1].trim();cur="tags";}
+    else if((m=clean.match(/^СОВЕТ:?\s*(.*)/i))){res.tip=m[1].trim();cur="tip";}
+    else if(clean){
+      if(cur==="title"&&!res.title)res.title=clean;
+      else if(cur==="desc")res.desc+=(res.desc?"\n":"")+clean;
+      else if(cur==="price")res.price+=(res.price?" ":"")+clean;
+      else if(cur==="tags")res.tags+=(res.tags?" ":"")+clean;
+      else if(cur==="tip")res.tip+=(res.tip?" ":"")+clean;
     }
   });
-  // if parsing failed, return null to show raw
   if(!res.title&&!res.price) return null;
   return res;
 }

@@ -141,9 +141,9 @@ function esc(s){if(!s)return"";return(""+s).replace(/&/g,"&amp;").replace(/</g,"
 function md2html(s){
   if(!s)return"";
   // tables
-  s=s.replace(/^(\|.+\|)\r?\n\|[-|: ]+\|\r?\n((?:\|.+\|[\r\n]?)*)/gm,function(m,hdr,rows){
+  s=s.replace(/^(\|.+\|)\r?\n\|[-|: ]+\|\r?\n((?:\|.+\|?[\r\n]?)*)/gm,function(m,hdr,rows){
     var ths=hdr.replace(/^\||\|$/g,"").split("|").map(function(c){return "<th>"+c.trim()+"</th>";}).join("");
-    var trs=rows.trim().split("\n").map(function(r){return "<tr>"+r.replace(/^\||\|$/g,"").split("|").map(function(c){return "<td>"+c.trim()+"</td>";}).join("")+"</tr>";}).join("");
+    var trs=rows.trim().split("\n").map(function(r){r=r.trim();if(!r)return "";return "<tr>"+r.replace(/^\||\|?$/g,"").split("|").map(function(c){return "<td>"+c.replace(/\*\*/g,"").trim()+"</td>";}).join("")+"</tr>";}).join("");
     return '<table style="width:100%;border-collapse:collapse;font-size:13px;margin:8px 0">'+
       '<thead><tr style="background:#e0f2fe">'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
   });

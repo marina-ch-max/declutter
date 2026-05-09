@@ -93,6 +93,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="svbadge" id="svbadge">Сохранено</div>
 <script>
 var ACT=[{id:"keep",l:"Оставить",c:"#16a34a",b:"#f0fdf4"},{id:"sell",l:"Продать",c:"#d97706",b:"#fffbeb"},{id:"donate",l:"Отдать",c:"#7c3aed",b:"#f5f3ff"},{id:"later",l:"Разобрать",c:"#6b7280",b:"#f9fafb"},{id:"trash",l:"Выброс",c:"#dc2626",b:"#fef2f2"}];
+var ACT_DONE=[{id:"sold",l:"✅ Продано",c:"#15803d",b:"#dcfce7"},{id:"given",l:"✅ Отдано",c:"#6d28d9",b:"#ede9fe"},{id:"trashed",l:"🗑 Выброшено",c:"#9ca3af",b:"#f3f4f6"}];
 var SEA=[{id:"all",l:"Все"},{id:"summer",l:"Лето"},{id:"winter",l:"Зима"},{id:"demi",l:"Демисезон"},{id:"sport",l:"Спорт"}];
 var TIPS_SECTIONS=[
   {sec:"🚀 Как начать",color:"#6366f1",tips:[
@@ -181,10 +182,12 @@ function hdr(t,s){return '<div class="hdr"><div class="hdr-row"><div><h1>'+t+'</
 function fps(){var th=S.fphotos.map(function(p,i){return '<div class="pthumb"><img src="'+p+'"><button class="pdel" onclick="S.fphotos.splice('+i+',1);R()">×</button></div>';}).join("");return '<input type="file" id="fg" accept="image/*" multiple style="display:none"><input type="file" id="fc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bg">🖼 Галерея</button><button class="pbtn" id="bc">📷 Камера</button></div>'+(th?'<div class="pgrid">'+th+'</div>':'');}
 
 function rItems(){
-  var all=S.items,sell=0,don=0,tr=0,lat=0;
-  all.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;else if(i.s==="later")lat++;});
-  var fl=[{id:"all",l:"Все("+all.length+")"},{id:"sell",l:"Продать("+sell+")"},{id:"donate",l:"Отдать("+don+")"},{id:"later",l:"Разобрать("+lat+")"}];
-  var shown=S.ifl==="all"?all:all.filter(function(i){return i.s===S.ifl;});
+  var all=S.items,sell=0,don=0,tr=0,lat=0,done=0;
+  var doneIds=["sold","given","trashed"];
+  all.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;else if(i.s==="later")lat++;else if(doneIds.indexOf(i.s)>=0)done++;});
+  var active=all.filter(function(i){return doneIds.indexOf(i.s)<0;});
+  var fl=[{id:"all",l:"Все("+(all.length-done)+")"},{id:"sell",l:"Продать("+sell+")"},{id:"donate",l:"Отдать("+don+")"},{id:"later",l:"Разобрать("+lat+")"},{id:"done",l:"✅ Готово("+done+")"}];
+  var shown=S.ifl==="all"?active:S.ifl==="done"?all.filter(function(i){return doneIds.indexOf(i.s)>=0;}):all.filter(function(i){return i.s===S.ifl;});
   var o=hdr("📋 Вещи дома",all.length+" вещей · продать "+sell+" · отдать "+don+" · выброс "+tr);
   o+='<div class="fsbar" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">'+fl.map(function(f){return '<button class="ft'+(S.ifl===f.id?" act":"")+'" onclick="S.ifl=\''+f.id+'\';R()">'+f.l+'</button>';}).join("")+'<button class="ft" onclick="S.scr=\'allitems\';S.gquery=\'\';R()" style="margin-left:auto;background:#f1f5f9;color:#475569">🗂 Список</button></div>';
   o+='<button class="aibtn" onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()"><span style="font-size:24px">🤖</span><div><div style="font-size:13px;font-weight:700">Совет по организации</div><div style="font-size:11px;opacity:.8">Загрузи фото — ИИ подскажет как хранить</div></div></button>';
@@ -206,7 +209,16 @@ function rItemCard(it){
   if(ph.length) o+='<div class="cphotos">'+ph.map(function(p){return '<img src="'+p+'">';}).join("")+'</div>';
   var stlnk=null;if(it.stor_id){for(var j=0;j<S.stor.length;j++){if(S.stor[j].id===it.stor_id){stlnk=S.stor[j];break;}}}
   o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(it.name)+'</div>'+(it.desc?'<div class="cdesc">'+esc(it.desc)+'</div>':'')+(it.cond?'<div class="cdesc">Сост: '+esc(it.cond)+'</div>':'')+(stlnk?'<div class="cdesc" style="color:#0ea5e9">📦 '+esc(stlnk.name)+(stlnk.loc?' · '+esc(stlnk.loc):'')+'</div>':'')+'</div><div style="display:flex;align-items:center;margin-left:8px">'+(a?'<span class="cbadge" style="background:'+a.b+';color:'+a.c+';border-color:'+a.c+'44">'+a.l+'</span>':'')+'<button class="bsm" style="margin-left:4px" onclick="S.eid=\''+it.id+'\';R()">✏️</button><button class="bdel" onclick="delItem(\''+it.id+'\')">✕</button></div></div>';
-  o+='<div class="drow">'+ACT.map(function(a){return '<button class="db" onclick="setS(\''+it.id+'\',\''+a.id+'\')" style="background:'+(it.s===a.id?a.b:"#fff")+';color:'+(it.s===a.id?a.c:"#94a3b8")+';border-color:'+(it.s===a.id?a.c:"#e2e8f0")+';font-weight:'+(it.s===a.id?700:400)+'">'+a.l+'</button>';}).join("")+'</div>';
+  var isDone=["sold","given","trashed"].indexOf(it.s)>=0;
+  if(!isDone){
+    o+='<div class="drow">'+ACT.map(function(a){return '<button class="db" onclick="setS(\''+it.id+'\',\''+a.id+'\')" style="background:'+(it.s===a.id?a.b:"#fff")+';color:'+(it.s===a.id?a.c:"#94a3b8")+';border-color:'+(it.s===a.id?a.c:"#e2e8f0")+';font-weight:'+(it.s===a.id?700:400)+'">'+a.l+'</button>';}).join("")+'</div>';
+    if(it.s==="sell") o+='<div style="display:flex;gap:6px;margin-top:6px"><button onclick="setS(\''+it.id+'\',\'sold\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Продано!</button></div>';
+    if(it.s==="donate") o+='<div style="display:flex;gap:6px;margin-top:6px"><button onclick="setS(\''+it.id+'\',\'given\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #ddd6fe;background:#f5f3ff;color:#6d28d9;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Отдано!</button></div>';
+    if(it.s==="trash") o+='<div style="display:flex;gap:6px;margin-top:6px"><button onclick="setS(\''+it.id+'\',\'trashed\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #e5e7eb;background:#f9fafb;color:#6b7280;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Выброшено</button></div>';
+  } else {
+    var da=null;for(var k=0;k<ACT_DONE.length;k++){if(ACT_DONE[k].id===it.s){da=ACT_DONE[k];break;}}
+    o+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span style="font-size:12px;font-weight:600;color:'+(da?da.c:"#6b7280")+'">'+( da?da.l:"Завершено")+'</span><button onclick="setS(\''+it.id+'\',null)" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;cursor:pointer;font-family:inherit">↩ Вернуть</button></div>';
+  }
   if(it.s==="sell") o+='<button class="bavito" id="ab_'+it.id+'" onclick="doAvito(\''+it.id+'\')">'+(it.av?"🔄 Перегенерировать":"📝 Текст для Авито")+'</button>';
   if(it.s==="sell"&&it.av){
     var av=parseAvito(it.av);
@@ -281,6 +293,7 @@ function rStorCard(st){
   var stBadge=st.status==="ok"?'<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#dcfce7;color:#16a34a;font-weight:600;white-space:nowrap">✅ Порядок</span>':st.status==="messy"?'<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#fef9c3;color:#ca8a04;font-weight:600;white-space:nowrap">⚠️ Разобрать</span>':'';
   o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(st.name)+'</div>'+(st.loc?'<div class="cdesc">📍 '+esc(st.loc)+'</div>':'')+(stBadge?'<div style="margin-top:4px">'+stBadge+'</div>':'')+'</div><div style="display:flex;gap:4px;align-items:flex-start"><button class="bsm" onclick="toggleStatus(\''+st.id+'\')" title="Статус">'+(st.status==="ok"?"✅":st.status==="messy"?"⚠️":"🔘")+'</button><button class="bsm" onclick="S.eid=\''+st.id+'\';R()">✏️</button><button class="bdel" onclick="delStor(\''+st.id+'\')">✕</button></div></div>';
   if(st.cont) o+='<div class="cdesc" style="margin-bottom:10px;white-space:pre-wrap">'+esc(st.cont)+'</div>';
+  if(!ph.length) o+='<div style="background:#f0f9ff;border-radius:8px;padding:8px 10px;font-size:12px;color:#0369a1;margin-bottom:8px">📷 Добавь фото — разблокируются AI-список вещей и совет по организации</div>';
   o+='<div style="display:flex;gap:6px;margin-bottom:'+(st.adv||st.ilist?"8":"0")+'px">';
   o+='<button id="stb_'+st.id+'" onclick="doStorAdv(\''+st.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#6366f1;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">'+(st.adv?"🔄 Совет":"🤖 Совет")+'</button>';
   if(ph.length) o+='<button id="ilb_'+st.id+'" onclick="doStorList(\''+st.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#0ea5e9;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📋 Список</button>';
@@ -300,7 +313,9 @@ function rTips(){
   var secMap={start:0,maintain:1,systems:2,rooms:3,motiv:4};
   var o=hdr("💡 Советы","");
   // progress block
-  o+='<div class="wrap"><div class="motiv">';
+  o+='<div class="wrap">';
+  o+='<div style="display:flex;gap:8px;margin-bottom:12px"><button onclick="S.scr=\'set\';R()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:13px;color:#475569;cursor:pointer;font-family:inherit">📤 Синхронизация</button><button onclick="S.scr=\'help\';R()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:13px;color:#475569;cursor:pointer;font-family:inherit">📖 Инструкция</button></div>';
+  o+='<div class="motiv">';
   if(done>0){
     var pct=t?Math.round(done/t*100):0;
     o+='<h2>💪 Отличный прогресс!</h2>';
@@ -393,20 +408,20 @@ function rSearch(){
     o+='<div style="font-size:12px;font-weight:700;color:#6366f1;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📋 Вещи ('+ri.length+')</div>';
     ri.forEach(function(it){
       var sl=null;if(it.stor_id){for(var j=0;j<S.stor.length;j++){if(S.stor[j].id===it.stor_id){sl=S.stor[j];break;}}}
-      o+='<div class="card" style="padding:10px 12px;margin-bottom:8px"><div class="cname">'+esc(it.name)+'</div>'+(it.desc?'<div class="cdesc">'+esc(it.desc)+'</div>':'')+(sl?'<div class="cdesc" style="color:#0ea5e9">📦 '+esc(sl.name)+(sl.loc?' · '+esc(sl.loc):'')+'</div>':'')+'</div>';
+      o+='<div class="card" style="padding:10px 12px;margin-bottom:8px;cursor:pointer" onclick="goTo(\'items\',\''+it.id+'\')"><div class="cname">'+esc(it.name)+'</div>'+(it.desc?'<div class="cdesc">'+esc(it.desc)+'</div>':'')+(sl?'<div class="cdesc" style="color:#0ea5e9">📦 '+esc(sl.name)+(sl.loc?' · '+esc(sl.loc):'')+'</div>':'')+'<div style="font-size:11px;color:#a5b4fc;margin-top:3px">→ перейти</div></div>';
     });
   }
   if(rs.length){
     o+='<div style="font-size:12px;font-weight:700;color:#f59e0b;margin-bottom:8px;margin-top:8px;text-transform:uppercase;letter-spacing:.5px">👟 Обувь ('+rs.length+')</div>';
     rs.forEach(function(sh){
-      o+='<div class="card" style="padding:10px 12px;margin-bottom:8px"><div class="cname">'+esc(sh.name)+'</div><div class="stags">'+(sh.person?'<span class="stag">👤 '+esc(sh.person)+'</span>':'')+(sh.size?'<span class="stag">📏 '+esc(sh.size)+'</span>':'')+(sh.loc?'<span class="stag">📍 '+esc(sh.loc)+'</span>':'')+'</div></div>';
+      o+='<div class="card" style="padding:10px 12px;margin-bottom:8px;cursor:pointer" onclick="goTo(\'shoes\',\''+sh.id+'\')"><div class="cname">'+esc(sh.name)+'</div><div class="stags">'+(sh.person?'<span class="stag">👤 '+esc(sh.person)+'</span>':'')+(sh.size?'<span class="stag">📏 '+esc(sh.size)+'</span>':'')+(sh.loc?'<span class="stag">📍 '+esc(sh.loc)+'</span>':'')+'</div><div style="font-size:11px;color:#a5b4fc;margin-top:3px">→ перейти</div></div>';
     });
   }
   if(rst.length){
     o+='<div style="font-size:12px;font-weight:700;color:#0ea5e9;margin-bottom:8px;margin-top:8px;text-transform:uppercase;letter-spacing:.5px">📦 Хранение ('+rst.length+')</div>';
     rst.forEach(function(st){
       var lines=st.ilist?st.ilist.split('\n').filter(function(l){return l.toLowerCase().includes(q);}).slice(0,3):[];
-      o+='<div class="card" style="padding:10px 12px;margin-bottom:8px"><div class="cname">'+esc(st.name)+'</div>'+(st.loc?'<div class="cdesc">📍 '+esc(st.loc)+'</div>':'')+(lines.length?'<div class="cdesc" style="color:#0ea5e9;margin-top:4px">'+lines.map(function(l){return esc(l.trim());}).join(' · ')+'</div>':'')+'</div>';
+      o+='<div class="card" style="padding:10px 12px;margin-bottom:8px;cursor:pointer" onclick="goTo(\'storage\',\''+st.id+'\')"><div class="cname">'+esc(st.name)+'</div>'+(st.loc?'<div class="cdesc">📍 '+esc(st.loc)+'</div>':'')+(lines.length?'<div class="cdesc" style="color:#0ea5e9;margin-top:4px">'+lines.map(function(l){return esc(l.trim());}).join(' · ')+'</div>':'')+'<div style="font-size:11px;color:#7dd3fc;margin-top:3px">→ перейти</div></div>';
     });
   }
   return o+'</div>';
@@ -559,6 +574,7 @@ function importFromPaste(){
   }catch(e){ntf("Ошибка: не удалось прочитать код");}
 }
 
+function checkOnboard(){if(!localStorage.getItem('dcl_onboarded')&&!location.hash){S.scr='onboard';}}
 function checkImportHash(){
   var h=location.hash;
   if(h&&h.indexOf("#import=")===0){
@@ -579,7 +595,8 @@ function checkImportHash(){
 
 function R(){
   var h="";
-  if(S.scr==="set") h=rSet();
+  if(S.scr==="onboard") h=rOnboard();
+  else if(S.scr==="set") h=rSet();
   else if(S.scr==="org") h=rOrg();
   else if(S.scr==="search") h=rSearch();
   else if(S.scr==="qrimp") h=rQrImport();
@@ -789,6 +806,7 @@ function cpAv(id){var pre=g("pre_"+id),btn=g("cp_"+id);if(!pre||!btn)return;navi
 function svPh(id){var it=null;for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){it=S.items[i];break;}}if(!it||!it.photos||!it.photos.length)return;it.photos.forEach(function(d,i){var a=document.createElement("a");a.href=d;a.download="avito_"+(it.name||"photo").replace(/\W/g,"_")+"_"+(i+1)+".jpg";document.body.appendChild(a);a.click();document.body.removeChild(a);});ntf("Сохраняю фото...");}
 function saveKey(){var v=gv("aki").trim();if(!v||v[0]==="●"){ntf("Введи новый ключ");return;}localStorage.setItem("dcl_apikey",v);ntf("Ключ сохранён!");R();}
 
+checkOnboard();
 checkImportHash();
 R();
 </script>

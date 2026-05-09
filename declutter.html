@@ -112,7 +112,7 @@ function uid(){return Date.now()+"_"+Math.random().toString(36).slice(2);}
 function ntf(m){var e=document.getElementById("notif");e.textContent=m;e.classList.add("show");setTimeout(function(){e.classList.remove("show");},2200);}
 function badge(){var e=document.getElementById("svbadge");e.classList.add("show");setTimeout(function(){e.classList.remove("show");},1500);}
 function compress(file,cb){var r=new FileReader();r.onload=function(ev){var img=new Image();img.onload=function(){var c=document.createElement("canvas"),MAX=900,w=img.width,h=img.height;if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);cb(c.toDataURL("image/jpeg",0.78));};img.src=ev.target.result;};r.readAsDataURL(file);}
-var S={tab:"items",ifl:"all",sfl:"all",items:ld("dcl2_items",[]),shoes:ld("dcl2_shoes",[]),stor:ld("dcl2_stor",[]),form:false,ftype:null,fphotos:[],eid:null,scr:"main",ophotos:[],oadv:null,oload:false};
+var S={tab:"items",ifl:"all",sfl:"all",items:ld("dcl2_items",[]),shoes:ld("dcl2_shoes",[]),stor:ld("dcl2_stor",[]),form:false,ftype:null,fphotos:[],eid:null,scr:"main",ophotos:[],oadv:null,oload:false,ssearch:""};
 function svi(){sv("dcl2_items",S.items);badge();}
 function svs(){sv("dcl2_shoes",S.shoes);badge();}
 function svst(){sv("dcl2_stor",S.stor);badge();}
@@ -293,6 +293,14 @@ function doOrg(){
   api(pts(S.ophotos,pr),1000,function(t){S.oadv=t;S.oload=false;R();ntf("Совет готов!");},function(e){S.oload=false;R();ntf("Ошибка: "+e);});
 }
 
+function doStorList(id){
+  if(!key()){S.scr="set";R();ntf("Сначала введи API-ключ");return;}
+  var btn=document.getElementById("ilb_"+id);if(btn){btn.disabled=true;btn.textContent="Анализирую...";}
+  var st=null;for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){st=S.stor[i];break;}}
+  if(!st||!st.photos||!st.photos.length){ntf("Сначала добавь фото к месту хранения");return;}
+  var pr="Посмотри внимательно на фото этого места хранения.\n\nСоставь подробный список ВСЕХ предметов которые ты видишь.\nФормат: каждый предмет с новой строки, начиная с •\nПиши по-русски. Только список, без пояснений и вступления.\nЕсли видишь стопку или группу похожих вещей — перечисли их.";
+  api(pts(st.photos,pr),800,function(t){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].ilist=t;break;}}svst();R();ntf("Список готов!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
+}
 function cpAv(id){var pre=g("pre_"+id),btn=g("cp_"+id);if(!pre||!btn)return;navigator.clipboard.writeText(pre.textContent).then(function(){btn.textContent="✓ Скопировано!";btn.classList.add("ok");setTimeout(function(){btn.textContent="Копировать";btn.classList.remove("ok");},2500);ntf("Текст скопирован!");});}
 function svPh(id){var it=null;for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){it=S.items[i];break;}}if(!it||!it.photos||!it.photos.length)return;it.photos.forEach(function(d,i){var a=document.createElement("a");a.href=d;a.download="avito_"+(it.name||"photo").replace(/\W/g,"_")+"_"+(i+1)+".jpg";document.body.appendChild(a);a.click();document.body.removeChild(a);});ntf("Сохраняю фото...");}
 function saveKey(){var v=gv("aki").trim();if(!v||v[0]==="●"){ntf("Введи новый ключ");return;}localStorage.setItem("dcl_apikey",v);ntf("Ключ сохранён!");R();}

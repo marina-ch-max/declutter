@@ -108,6 +108,36 @@ function ld(k,d){try{var s=localStorage.getItem(k);return s?JSON.parse(s):d;}cat
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function key(){return localStorage.getItem("dcl_apikey")||"";}
 function esc(s){if(!s)return"";return(""+s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function md2html(s){
+  if(!s)return"";
+  // tables
+  s=s.replace(/^(\|.+\|)\n\|[-| :]+\|\n((?:\|.+\|\n?)*)/gm,function(m,hdr,rows){
+    var ths=hdr.replace(/^\||\|$/g,"").split("|").map(function(c){return "<th>"+c.trim()+"</th>";}).join("");
+    var trs=rows.trim().split("\n").map(function(r){return "<tr>"+r.replace(/^\||\|$/g,"").split("|").map(function(c){return "<td>"+c.trim()+"</td>";}).join("")+"</tr>";}).join("");
+    return '<table style="width:100%;border-collapse:collapse;font-size:13px;margin:8px 0">'+
+      '<thead><tr style="background:#e0f2fe">'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
+  });
+  // headings
+  s=s.replace(/^### (.+)$/gm,"<h4 style='margin:10px 0 4px;font-size:14px;color:#1e293b'>$1</h4>");
+  s=s.replace(/^## (.+)$/gm,"<h3 style='margin:12px 0 6px;font-size:15px;color:#1e293b'>$1</h3>");
+  s=s.replace(/^# (.+)$/gm,"<h2 style='margin:8px 0 6px;font-size:16px;color:#1e293b'>$1</h2>");
+  // bold
+  s=s.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
+  // bullet lists
+  s=s.replace(/((?:^[-*] .+\n?)+)/gm,function(m){
+    var items=m.trim().split("\n").map(function(l){return "<li>"+l.replace(/^[-*] /,"")+"</li>";}).join("");
+    return '<ul style="margin:6px 0;padding-left:18px;font-size:13px">'+items+'</ul>';
+  });
+  // numbered lists
+  s=s.replace(/((?:^\d+\. .+\n?)+)/gm,function(m){
+    var items=m.trim().split("\n").map(function(l){return "<li>"+l.replace(/^\d+\. /,"")+"</li>";}).join("");
+    return '<ol style="margin:6px 0;padding-left:18px;font-size:13px">'+items+'</ol>';
+  });
+  // line breaks
+  s=s.replace(/\n{2,}/g,"</p><p style='margin:6px 0'>");
+  s=s.replace(/\n/g,"<br>");
+  return "<p style='margin:0'>"+s+"</p>";
+}
 function uid(){return Date.now()+"_"+Math.random().toString(36).slice(2);}
 function ntf(m){var e=document.getElementById("notif");e.textContent=m;e.classList.add("show");setTimeout(function(){e.classList.remove("show");},2200);}
 function badge(){var e=document.getElementById("svbadge");e.classList.add("show");setTimeout(function(){e.classList.remove("show");},1500);}
@@ -127,7 +157,7 @@ function rItems(){
   var fl=[{id:"all",l:"Все("+all.length+")"},{id:"sell",l:"Продать("+sell+")"},{id:"donate",l:"Отдать("+don+")"},{id:"later",l:"Разобрать("+lat+")"}];
   var shown=S.ifl==="all"?all:all.filter(function(i){return i.s===S.ifl;});
   var o=hdr("📋 Вещи дома",all.length+" вещей · продать "+sell+" · отдать "+don+" · выброс "+tr);
-  o+='<div class="fsbar">'+fl.map(function(f){return '<button class="ft'+(S.ifl===f.id?" act":"")+'" onclick="S.ifl=\''+f.id+'\';R()">'+f.l+'</button>';}).join("")+'</div>';
+  o+='<div class="fsbar" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">'+fl.map(function(f){return '<button class="ft'+(S.ifl===f.id?" act":"")+'" onclick="S.ifl=\''+f.id+'\';R()">'+f.l+'</button>';}).join("")+'<button class="ft" onclick="S.scr=\'allitems\';S.gquery=\'\';R()" style="margin-left:auto;background:#f1f5f9;color:#475569">🗂 Список</button></div>';
   o+='<button class="aibtn" onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()"><span style="font-size:24px">🤖</span><div><div style="font-size:13px;font-weight:700">Совет по организации</div><div style="font-size:11px;opacity:.8">Загрузи фото — ИИ подскажет как хранить</div></div></button>';
   o+='<div class="wrap" style="padding-top:12px">';
   if(S.form&&S.ftype==="item") o+=rItemForm();
@@ -209,7 +239,7 @@ function rStorCard(st){
   o+='<button id="stb_'+st.id+'" onclick="doStorAdv(\''+st.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#6366f1;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">'+(st.adv?"🔄 Совет":"🤖 Совет")+'</button>';
   if(ph.length) o+='<button id="ilb_'+st.id+'" onclick="doStorList(\''+st.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#0ea5e9;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📋 Список</button>';
   o+='</div>';
-  if(st.adv) o+='<div class="adv"><h3>💡 Совет</h3><div class="adv-txt">'+esc(st.adv)+'</div></div>';
+  if(st.adv) o+='<div class="adv"><h3>💡 Совет</h3><div class="adv-txt">'+md2html(st.adv)+'</div></div>';
   if(st.ilist){
     if(S.editIlist===st.id) o+='<div class="adv" style="background:#e0f2fe"><h3>📋 Список вещей <button onclick="S.editIlist=null;R()" style="float:right;background:none;border:none;cursor:pointer;font-size:12px;color:#64748b">✕ Закрыть</button></h3><textarea id="ilt_'+st.id+'" style="width:100%;min-height:120px;border:1px solid #bae6fd;border-radius:8px;padding:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box">'+esc(st.ilist)+'</textarea><div style="display:flex;gap:8px;margin-top:8px"><button onclick="saveIlist(\''+st.id+'\')" style="flex:1;padding:8px;border-radius:8px;border:none;background:#0ea5e9;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Сохранить</button><button onclick="S.editIlist=null;R()" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:13px;cursor:pointer;font-family:inherit">Отмена</button></div></div>';
     else o+='<div class="adv" style="background:#e0f2fe"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">📋 Список вещей</h3><button onclick="S.editIlist=\''+st.id+'\';R()" style="background:none;border:1px solid #7dd3fc;border-radius:6px;padding:3px 8px;font-size:12px;cursor:pointer;color:#0ea5e9">✏️ Изменить</button></div><div class="adv-txt" style="white-space:pre-wrap">'+esc(st.ilist)+'</div></div>';
@@ -231,8 +261,35 @@ function rOrg(){
   var th=S.ophotos.map(function(p,i){return '<div class="pthumb"><img src="'+p+'"><button class="pdel" onclick="S.ophotos.splice('+i+',1);R()">×</button></div>';}).join("");
   var o='<div class="hdr"><div class="hdr-row"><div><h1>🤖 Совет по организации</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div>';
   o+='<div class="wrap"><div class="fwrap"><div class="ftitle">Загрузи фото пространства</div><input type="file" id="og" accept="image/*" multiple style="display:none"><input type="file" id="oc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bog">🖼 Галерея</button><button class="pbtn" id="boc">📷 Камера</button></div>'+(hp?'<div class="pgrid">'+th+'</div>':'')+'<input id="octx" placeholder="Уточни задачу (необязательно)" autocomplete="off"><button class="bprim" '+(!hp||S.oload?"disabled":"")+' onclick="doOrg()" style="width:100%;padding:11px">'+(S.oload?"Анализирую...":"🤖 Получить совет")+'</button></div>';
-  if(S.oadv) o+='<div class="adv"><h3>💡 Совет</h3><div class="adv-txt">'+esc(S.oadv)+'</div></div>';
+  if(S.oadv) o+='<div class="adv"><h3>💡 Совет</h3><div class="adv-txt">'+md2html(S.oadv)+'</div></div>';
   return o+'</div>';
+}
+
+function rAllItems(){
+  var q=(S.gquery||"").toLowerCase().trim();
+  var all=q?S.items.filter(function(it){return(it.name||"").toLowerCase().includes(q)||(it.desc||"").toLowerCase().includes(q);})
+           :S.items;
+  var o='<div class="hdr"><div class="hdr-row"><div><h1>📋 Все вещи</h1><div class="hdr-sub">'+S.items.length+' вещей</div></div><button class="bsm" onclick="S.scr=\'main\';S.gquery=\'\';R()">✕</button></div></div>';
+  o+='<div style="padding:8px 12px 0"><div style="display:flex;align-items:center;background:#f1f5f9;border-radius:10px;padding:8px 12px;gap:8px"><span>🔍</span><input id="aiq" style="border:none;background:transparent;width:100%;font-size:14px;outline:none;font-family:inherit" placeholder="Фильтр по названию..." value="'+esc(S.gquery||"")+'" oninput="S.gquery=this.value;R()"></div></div>';
+  o+='<div style="padding:8px 12px 80px">';
+  if(!all.length) o+='<div class="empty"><div class="emi">📋</div><p>'+(q?"Ничего не найдено":"Нет вещей")+'</p></div>';
+  all.forEach(function(it){
+    var stlnk=null;if(it.stor_id){for(var j=0;j<S.stor.length;j++){if(S.stor[j].id===it.stor_id){stlnk=S.stor[j];break;}}}
+    var ACT2=[{id:"sell",l:"Продать",b:"#fef3c7",c:"#d97706"},{id:"donate",l:"Отдать",b:"#dbeafe",c:"#2563eb"},{id:"trash",l:"Выброс",b:"#fee2e2",c:"#dc2626"},{id:"later",l:"Разобрать",b:"#f3f4f6",c:"#6b7280"}];
+    var act=null;for(var k=0;k<ACT2.length;k++){if(ACT2[k].id===it.s){act=ACT2[k];break;}}
+    var ph=it.photos||[];
+    o+='<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;align-items:flex-start">';
+    if(ph.length) o+='<div style="flex-shrink:0;width:72px;height:72px;border-radius:10px;overflow:hidden"><img src="'+ph[0]+'" style="width:100%;height:100%;object-fit:cover"></div>';
+    else o+='<div style="flex-shrink:0;width:72px;height:72px;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:28px">📦</div>';
+    o+='<div style="flex:1;min-width:0">';
+    o+='<div style="font-size:15px;font-weight:600;color:#1e293b;margin-bottom:3px">'+esc(it.name)+'</div>';
+    if(it.desc) o+='<div style="font-size:12px;color:#64748b;margin-bottom:3px">'+esc(it.desc)+'</div>';
+    if(stlnk) o+='<div style="font-size:12px;color:#0ea5e9;margin-bottom:3px">📦 '+esc(stlnk.name)+(stlnk.loc?' · <span style="color:#94a3b8">'+esc(stlnk.loc)+'</span>':'')+'</div>';
+    if(act) o+='<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:'+act.b+';color:'+act.c+';font-weight:600">'+act.l+'</span>';
+    o+='</div></div>';
+  });
+  o+='</div>';
+  return o+nav();
 }
 
 function rSearch(){
@@ -298,12 +355,15 @@ function R(){
   if(S.scr==="set") h=rSet();
   else if(S.scr==="org") h=rOrg();
   else if(S.scr==="search") h=rSearch();
+  else if(S.scr==="allitems") h=rAllItems();
   else if(S.tab==="items") h=rItems();
   else if(S.tab==="shoes") h=rShoes();
   else if(S.tab==="storage") h=rStor();
   else if(S.tab==="tips") h=rTips();
   document.getElementById("root").innerHTML=h;
   ev();
+  if(S.scr==="search"){var _gs=document.getElementById("gsq");if(_gs){var _gl=S.gquery?S.gquery.length:0;_gs.focus();try{_gs.setSelectionRange(_gl,_gl);}catch(e){}}}
+  if(S.scr==="allitems"){var _ai=document.getElementById("aiq");if(_ai){var _al=S.gquery?S.gquery.length:0;_ai.focus();try{_ai.setSelectionRange(_al,_al);}catch(e){}}}
 }
 
 function ev(){

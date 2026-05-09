@@ -141,7 +141,7 @@ function esc(s){if(!s)return"";return(""+s).replace(/&/g,"&amp;").replace(/</g,"
 function md2html(s){
   if(!s)return"";
   // tables
-  s=s.replace(/^(\|.+\|)\n\|[-| :]+\|\n((?:\|.+\|\n?)*)/gm,function(m,hdr,rows){
+  s=s.replace(/^(\|.+\|)\r?\n\|[-|: ]+\|\r?\n((?:\|.+\|[\r\n]?)*)/gm,function(m,hdr,rows){
     var ths=hdr.replace(/^\||\|$/g,"").split("|").map(function(c){return "<th>"+c.trim()+"</th>";}).join("");
     var trs=rows.trim().split("\n").map(function(r){return "<tr>"+r.replace(/^\||\|$/g,"").split("|").map(function(c){return "<td>"+c.trim()+"</td>";}).join("")+"</tr>";}).join("");
     return '<table style="width:100%;border-collapse:collapse;font-size:13px;margin:8px 0">'+
@@ -322,7 +322,7 @@ function rTips(){
   var t=S.items.length,sell=0,don=0,tr=0,done=0;
   S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;});
   done=sell+don+tr;
-  var tabs=[{id:"start",l:"🚀 Старт"},{id:"maintain",l:"🔄 Поддержание"},{id:"systems",l:"📦 Системы"},{id:"rooms",l:"🏠 Комнаты"},{id:"motiv",l:"💪 Мотивация"},{id:"saved",l:"💾 Сохранённые"+(S.savedOrg.length?" ("+S.savedOrg.length+")":"")}];
+  var tabs=[{id:"start",l:"🚀 Старт"},{id:"maintain",l:"🔄 Поддержание"},{id:"systems",l:"📦 Системы"},{id:"rooms",l:"🏠 Комнаты"},{id:"motiv",l:"💪 Мотивация"}];
   var secMap={start:0,maintain:1,systems:2,rooms:3,motiv:4};
   var o=hdr("💡 Советы","");
   // progress block
@@ -337,10 +337,16 @@ function rTips(){
     o+='<h2>🌱 Готова начать?</h2><p>Один разобранный ящик — уже победа. Начни прямо сейчас.</p>';
   }
   o+='<div class="prow"><div class="pitem"><div class="pnum">'+t+'</div><div class="plbl">Всего</div></div><div class="pitem"><div class="pnum">'+sell+'</div><div class="plbl">Продать</div></div><div class="pitem"><div class="pnum">'+don+'</div><div class="plbl">Отдать</div></div><div class="pitem"><div class="pnum">'+tr+'</div><div class="plbl">Выброс</div></div></div></div>';
+  // AI organizer card
+  o+='<div onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:14px;padding:14px 16px;margin-bottom:12px;cursor:pointer">';
+  o+='<div style="font-size:32px">🤖</div>';
+  o+='<div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">AI-организатор</div><div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:2px">Анализирует весь дом и даёт план</div></div>';
+  o+='<div style="color:rgba(255,255,255,.7);font-size:20px">›</div>';
+  o+='</div>';
   // tab bar
   o+='<div style="display:flex;overflow-x:auto;gap:6px;padding:0 0 8px;scrollbar-width:none">'+tabs.map(function(tb){var act=S.tipsTab===tb.id;return '<button onclick="S.tipsTab=\''+tb.id+'\';R()" style="flex-shrink:0;padding:7px 14px;border-radius:20px;border:none;background:'+(act?"#6366f1":"#f1f5f9")+';color:'+(act?"#fff":"#475569")+';font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">'+tb.l+'</button>';}).join("")+'</div>';
   // content
-  if(S.tipsTab==="saved"){
+  if(false){
     if(!S.savedOrg.length){
       o+='<div class="empty"><div class="emi">💾</div><p>Нет сохранённых советов.<br>Генерируй советы по пространству<br>и сохраняй понравившиеся.</p></div>';
     } else {
@@ -361,25 +367,28 @@ function rTips(){
     if(sec){
       o+='<div style="padding:4px 0 8px;font-size:11px;font-weight:700;color:'+sec.color+';text-transform:uppercase;letter-spacing:.5px">'+sec.sec+'</div>';
       o+=sec.tips.map(function(tip){
-  var isOpen=S.tipShopOpen===tip.t;
-  var tEsc=tip.t.replace(/'/g,"\'");
-  var h='<div class="tip-card">';
-  h+='<div style="font-size:28px;margin-bottom:8px">'+tip.e+'</div>';
-  h+='<div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:6px">'+tip.t+'</div>';
-  h+='<div style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:10px">'+tip.x+'</div>';
-  if(isOpen){
-    h+='<div style="display:flex;gap:6px;align-items:center;margin-top:4px">';
-    h+='<input id="tip_shop_inp" placeholder="Что купить..." style="flex:1;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;outline:none">';
-    h+='<button onclick="addShopFromTip(\'+tEsc+\')" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">+ В список</button>';
-    h+='<button onclick="S.tipShopOpen=null;R()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:8px;padding:8px;font-size:13px;cursor:pointer;font-family:inherit">✕</button>';
-    h+='</div>';
-  } else {
-    h+='<button onclick="toggleTipShop(\'+tEsc+\')" style="background:#f0fdf4;color:#15803d;border:1px dashed #86efac;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit">🛒 В список покупок</button>';
-  }
-  h+='</div>';
-  return h;
+  return '<div class="tip-card">'
+    +'<div style="font-size:28px;margin-bottom:8px">'+tip.e+'</div>'
+    +'<div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:6px">'+tip.t+'</div>'
+    +'<div style="font-size:13px;color:#64748b;line-height:1.6">'+tip.x+'</div>'
+    +'</div>';
 }).join("");
     }
+  }
+  if(S.savedOrg.length>0){
+    o+='<div style="margin-top:16px;border-top:1px solid #e2e8f0;padding-top:16px">';
+    o+='<div style="font-size:13px;font-weight:700;color:#6366f1;margin-bottom:10px">💾 Сохранённые советы ('+S.savedOrg.length+')</div>';
+    o+=S.savedOrg.map(function(a){
+      return '<div class="card" style="margin-bottom:10px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+        +'<div style="font-size:11px;color:#94a3b8">'+a.date+'</div>'
+        +'<button onclick="delSavedOrg(\''+a.id+'\')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px;padding:0">✕</button>'
+        +'</div>'
+        +(a.title?'<div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:6px">'+esc(a.title)+'</div>':'')
+        +'<div class="adv-txt">'+md2html(a.text)+'</div>'
+        +'</div>';
+    }).join('');
+    o+='</div>';
   }
   o+='</div>';
   return o+nav();
@@ -391,7 +400,14 @@ function rOrg(){
   var o='<div class="hdr"><div class="hdr-row"><div><h1>🤖 Совет по организации</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div>';
   o+='<div class="wrap"><div class="fwrap"><div class="ftitle">Загрузи фото пространства</div><input type="file" id="og" accept="image/*" multiple style="display:none"><input type="file" id="oc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bog">🖼 Галерея</button><button class="pbtn" id="boc">📷 Камера</button></div>'+(hp?'<div class="pgrid">'+th+'</div>':'')+'<input id="octx" placeholder="Уточни задачу: какая комната, цель, проблема..." autocomplete="off"><button class="bprim" '+(!hp||S.oload?"disabled":"")+' onclick="doOrg()" style="flex:1;padding:11px">'+(S.oload?"Анализирую...":"🤖 Получить совет")+'</button>'+(!hp?'':'<button onclick="openPrompt(\'org\',\'\')" title="Промт для Claude.ai" style="padding:10px 14px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:16px;cursor:pointer">📋</button>')+'</div></div>';
   if(S.oadv){
-    o+='<div class="adv"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0">💡 Совет</h3><button onclick="saveOrgAdvice()" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💾 Сохранить</button></div><div class="adv-txt">'+md2html(S.oadv)+'</div></div>';
+    o+='<div class="adv"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0">💡 Совет</h3><button onclick="saveOrgAdvice()" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💾 Сохранить</button></div><div class="adv-txt">'+md2html(S.oadv)+'</div>'
+      +'<div style="margin-top:12px;border-top:1px solid #fde68a;padding-top:12px">'
+      +'<div style="font-size:12px;font-weight:600;color:#92400e;margin-bottom:8px">🛒 Добавить в список покупок</div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<input id="org_shop_inp" placeholder="Что купить из рекомендаций..." style="flex:1;border:1px solid #fde68a;border-radius:8px;padding:9px 10px;font-size:13px;font-family:inherit;outline:none;background:#fffbeb">'
+      +'<button onclick="addShopFromOrg()" style="background:#f59e0b;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">+ В список</button>'
+      +'</div></div>'
+      +'</div>';
   }
   return o+'</div>';
 }
@@ -412,8 +428,8 @@ function rOnboard(){
   '<div style="background:#ede9fe;border-radius:14px;padding:16px;text-align:center"><div style="font-size:28px">🗄️</div><div style="font-size:13px;color:#5b21b6;font-weight:600;margin-top:6px">Хранение</div><div style="font-size:12px;color:#8b5cf6">шкафы, полки, ящики</div></div>'+
   '<div style="background:#fff1f2;border-radius:14px;padding:16px;text-align:center"><div style="font-size:28px">💡</div><div style="font-size:13px;color:#9f1239;font-weight:600;margin-top:6px">Советы</div><div style="font-size:12px;color:#f43f5e">и AI-организатор</div></div>'+
   '</div>'+
-  '<button onclick="localStorage.setItem(\'dcl_onboarded\',\'1\');S.scr=\'main\';R();" style="width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit">✨ Начать</button>'+
-  '<button onclick="S.scr=\'main\';localStorage.setItem(\'dcl_onboarded\',\'1\');R();" style="width:100%;background:transparent;color:#6b7280;border:none;padding:10px;font-size:14px;cursor:pointer;margin-top:4px;font-family:inherit">Пропустить</button>'+
+  '<button onclick="localStorage.setItem(\'dcl_onboarded\',\'1\');S.scr=\'main\';S.tab=\'tips\';R();" style="width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit">✨ Начать</button>'+
+  '<button onclick="S.scr=\'main\';S.tab=\'tips\';localStorage.setItem(\'dcl_onboarded\',\'1\');R();" style="width:100%;background:transparent;color:#6b7280;border:none;padding:10px;font-size:14px;cursor:pointer;margin-top:4px;font-family:inherit">Пропустить</button>'+
   '</div>';
 }
 
@@ -494,6 +510,15 @@ function rAllItems(){
 }
 
 function svShop(){localStorage.setItem('dcl_shopping',JSON.stringify(S.shopping));}
+function addShopFromOrg(){
+  var el=document.getElementById('org_shop_inp');
+  var name=el?el.value.trim():'';
+  if(!name){ntf('Введи название покупки');return;}
+  S.shopping.push({id:'sh'+Date.now(),name:name,storId:'',note:'Из AI-анализа',bought:false,created:Date.now()});
+  svShop();
+  if(el) el.value='';
+  ntf('Добавлено в 🛒 Покупки!');
+}
 function addShopFromTip(tipTitle){
   var el=document.getElementById('tip_shop_inp');
   var name=el?el.value.trim():'';
@@ -886,8 +911,8 @@ function doStorAdv(id){
   var btn=g("stb_"+id);if(btn){btn.disabled=true;btn.textContent="Анализирую...";}
   var st=null;for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){st=S.stor[i];break;}}
   if(!st)return;
-  var pr="Ты сертифицированный организатор пространства (professional organizer).\n\nМесто хранения: "+st.name+"\nЛокация: "+(st.loc||"не указано")+"\nСодержимое: "+(st.cont||"не описано")+(st.photos&&st.photos.length?"\n\nВнимательно изучи фото места хранения: оцени текущее состояние, занятость пространства, доступность вещей.":"")+"\n\nДай структурированные советы по организации этого места. Используй заголовки ##:\n## 🔍 Текущая проблема\n## ✅ Как организовать (конкретные шаги)\n## 📦 Что докупить (органайзеры, коробки, крючки)\n## ⚡ Быстрый старт (что сделать прямо сейчас за 10 минут)\n\nПиши конкретно и практично. На русском.";
-  api(pts(st.photos||[],pr),800,function(t){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].adv=t;break;}}svst();R();ntf("Совет готов!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
+  var pr="Ты сертифицированный организатор пространства (professional organizer).\n\nМесто хранения: "+st.name+"\nЛокация: "+(st.loc||"не указано")+"\nСодержимое: "+(st.cont||"не описано")+(st.photos&&st.photos.length?"\n\nВнимательно изучи фото места хранения: оцени текущее состояние, занятость пространства, доступность вещей.":"")+"\n\nДай структурированные советы по организации этого места. Используй заголовки ##:\n## 🔍 Текущая проблема\n## ✅ Как организовать (конкретные шаги)\n## 📦 Что докупить\nОформи как таблицу с колонками: Предмет | Назначение | Примерная цена (3-5 строк)\n## ⚡ Быстрый старт (что сделать прямо сейчас за 10 минут)\n\nПиши конкретно и практично. Таблицу завершай полностью. На русском.";
+  api(pts(st.photos||[],pr),1500,function(t){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].adv=t;break;}}svst();R();ntf("Совет готов!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
 }
 
 function doOrg(){
@@ -904,7 +929,7 @@ function doStorList(id){
   var btn=document.getElementById("ilb_"+id);if(btn){btn.disabled=true;btn.textContent="Анализирую...";}
   var st=null;for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){st=S.stor[i];break;}}
   if(!st||!st.photos||!st.photos.length){ntf("Сначала добавь фото к месту хранения");return;}
-  var pr="Внимательно изучи фото места хранения. Твоя задача — составить максимально полный инвентарный список.\n\nПравила:\n• Перечисли КАЖДЫЙ видимый предмет отдельной строкой\n• Начинай каждую строку с •\n• Если видишь несколько одинаковых — укажи количество: • Книги (≈8 шт)\n• Описывай точнее: не 'вещи', а 'синяя толстовка', 'зарядный кабель'\n• Если видишь стопки/груды — попробуй угадать содержимое\n• Только список, без вступления и пояснений\n\nПиши по-русски.";
+  var pr="Внимательно изучи фото места хранения. Составь инвентарный список предметов.\n\nПравила:\n• Каждый предмет — отдельная строка, начинай с •\n• Называй ПРЕДМЕТ ЦЕЛИКОМ, не его части и детали: пиши 'лампа', а не 'лампа, абажур, провод, выключатель'\n• Не перечисляй поверхности конструкций: 'шкаф' а не 'боковая стенка шкафа'\n• Мелкие однородные вещи объединяй: 'набор инструментов' вместо перечисления каждого\n• Если одинаковых несколько — укажи количество: • Книги (≈8 шт)\n• Только список, без вступления и комментариев\n\nПиши по-русски.";
   api(pts(st.photos,pr),800,function(t){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].ilist=t;break;}}svst();R();ntf("Список готов!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
 }
 function buildPrompt(type,id){

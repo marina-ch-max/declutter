@@ -360,7 +360,25 @@ function rTips(){
     var sec=TIPS_SECTIONS[secIdx];
     if(sec){
       o+='<div style="padding:4px 0 8px;font-size:11px;font-weight:700;color:'+sec.color+';text-transform:uppercase;letter-spacing:.5px">'+sec.sec+'</div>';
-      o+=sec.tips.map(function(tip){return '<div class="tip-card"><div style="font-size:28px;margin-bottom:8px">'+tip.e+'</div><div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:6px">'+tip.t+'</div><div style="font-size:13px;color:#64748b;line-height:1.6">'+tip.x+'</div></div>';}).join("");
+      o+=sec.tips.map(function(tip){
+  var isOpen=S.tipShopOpen===tip.t;
+  var tEsc=tip.t.replace(/'/g,"\'");
+  var h='<div class="tip-card">';
+  h+='<div style="font-size:28px;margin-bottom:8px">'+tip.e+'</div>';
+  h+='<div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:6px">'+tip.t+'</div>';
+  h+='<div style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:10px">'+tip.x+'</div>';
+  if(isOpen){
+    h+='<div style="display:flex;gap:6px;align-items:center;margin-top:4px">';
+    h+='<input id="tip_shop_inp" placeholder="Что купить..." style="flex:1;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;outline:none">';
+    h+='<button onclick="addShopFromTip(\'+tEsc+\')" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">+ В список</button>';
+    h+='<button onclick="S.tipShopOpen=null;R()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:8px;padding:8px;font-size:13px;cursor:pointer;font-family:inherit">✕</button>';
+    h+='</div>';
+  } else {
+    h+='<button onclick="toggleTipShop(\'+tEsc+\')" style="background:#f0fdf4;color:#15803d;border:1px dashed #86efac;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit">🛒 В список покупок</button>';
+  }
+  h+='</div>';
+  return h;
+}).join("");
     }
   }
   o+='</div>';
@@ -476,6 +494,21 @@ function rAllItems(){
 }
 
 function svShop(){localStorage.setItem('dcl_shopping',JSON.stringify(S.shopping));}
+function addShopFromTip(tipTitle){
+  var el=document.getElementById('tip_shop_inp');
+  var name=el?el.value.trim():'';
+  if(!name) name=tipTitle||'Покупка';
+  S.shopping.push({id:'sh'+Date.now(),name:name,storId:'',note:tipTitle?'Совет: '+tipTitle:'',bought:false,created:Date.now()});
+  svShop();
+  if(el) el.value='';
+  S.tipShopOpen=null;
+  ntf('Добавлено в 🛒 Покупки!');
+  R();
+}
+function toggleTipShop(tipTitle){
+  S.tipShopOpen=(S.tipShopOpen===tipTitle)?null:tipTitle;
+  R();
+}
 function addShopItem(storId){
   var el=document.getElementById('shi_'+storId);
   var nel=document.getElementById('shn_'+storId);

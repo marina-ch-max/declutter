@@ -94,16 +94,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 var ACT=[{id:"keep",l:"Оставить",c:"#16a34a",b:"#f0fdf4"},{id:"sell",l:"Продать",c:"#d97706",b:"#fffbeb"},{id:"donate",l:"Отдать",c:"#7c3aed",b:"#f5f3ff"},{id:"later",l:"Разобрать",c:"#6b7280",b:"#f9fafb"},{id:"trash",l:"Выброс",c:"#dc2626",b:"#fef2f2"}];
 var SEA=[{id:"all",l:"Все"},{id:"summer",l:"Лето"},{id:"winter",l:"Зима"},{id:"demi",l:"Демисезон"},{id:"sport",l:"Спорт"}];
-var TIPS=[
-  {e:"✨",t:"Одно входит — одно выходит",x:"Купила новую вещь? Сразу отдай старую. Так количество вещей не растёт."},
-  {e:"📅",t:"Правило 6 месяцев",x:"Не пользовалась 6 месяцев? Скорее всего не понадобится. Отдай."},
-  {e:"💝",t:"Приносит ли радость?",x:"Метод Кондо: если не чувствуешь радости держа в руках — отпусти."},
-  {e:"📦",t:"Сортируй по категориям",x:"Собери вещи одного типа вместе — обычно их в 3 раза больше чем кажется."},
-  {e:"⏱",t:"15 минут в день",x:"15 минут ежедневно дают ощутимый результат за месяц. Поставь таймер."},
-  {e:"📸",t:"Сфотографируй и выброси",x:"Памятная вещь? Фото сохранит воспоминание, а место освободится."},
-  {e:"🧺",t:"Коробка на выход",x:"Поставь коробку у двери. Увидела лишнее — сразу туда. Наполнилась — в пункт приёма."},
-  {e:"💰",t:"Правило 20/20",x:"До 2000р и можно купить за 20 минут — выбрасывай. Не храни на всякий случай."}
+var TIPS_SECTIONS=[
+  {sec:"🚀 Как начать",color:"#6366f1",tips:[
+    {e:"🎯",t:"Начни с одного ящика",x:"Не пытайся разобрать всё сразу. Выбери один ящик, тумбочку или коробку. Завершённый маленький шаг лучше незавершённого большого."},
+    {e:"⏱",t:"Таймер 20 минут",x:"Поставь таймер на 20 минут и разбирай только пока он идёт. Потом стоп — независимо от результата. Мозг меньше сопротивляется ограниченному времени."},
+    {e:"📦",t:"Три коробки",x:"Подпиши три коробки: ОСТАВИТЬ / ОТДАТЬ / ВЫБРОС. Каждую вещь кладёшь в одну из них — не откладываешь 'подумаю позже'."},
+    {e:"📸",t:"Сфотографируй ДО",x:"Сделай фото беспорядка перед началом. Потом сравнишь — это главная мотивация продолжать."},
+    {e:"🗂",t:"Собери по категориям",x:"Собери ВСЕ вещи одного типа в одно место (все свитеры, все кабели, все книги). Обычно их в 3× больше чем казалось — это и есть повод расстаться с лишним."}
+  ]},
+  {sec:"🔄 Как поддерживать",color:"#0ea5e9",tips:[
+    {e:"✨",t:"Одно входит — одно выходит",x:"Купила новую вещь? Сразу найди старую на замену и отдай. Жёсткое правило, которое не даёт вещам накапливаться снова."},
+    {e:"🛏",t:"Вечерний ритуал 5 минут",x:"Каждый вечер 5 минут: положи всё на свои места. Мелочь, которая не даёт хаосу накапливаться неделями."},
+    {e:"📅",t:"Разбор раз в квартал",x:"Раз в 3 месяца — небольшой осмотр: что не использовалась? Сезонная ревизия занимает 1 вечер и освежает пространство."},
+    {e:"🧺",t:"Коробка на выход",x:"Постоянная коробка у двери — заметила лишнее, сразу туда. Наполнилась — в пункт приёма или на Авито. Без лишних размышлений."},
+    {e:"🏠",t:"Каждая вещь знает своё место",x:"Если вещь не имеет конкретного места — она будет лежать где попало. Назначь место каждой вещи и возвращай её туда."}
+  ]},
+  {sec:"📦 Системы хранения",color:"#f59e0b",tips:[
+    {e:"💝",t:"Метод КонМари",x:"Мари Кондо: держи в руках каждую вещь и спроси 'приносит ли радость?'. Если нет — поблагодари и отпусти. Работает особенно с одеждой."},
+    {e:"🗃",t:"Вертикальное хранение",x:"Складывай одежду вертикально (как файлы в папке), а не стопкой. Видно всё сразу, не надо перебирать. Метод КонМари для ящиков."},
+    {e:"🔲",t:"Зонирование",x:"Разбей пространство на зоны по функции: зона сна, работы, хранения. Вещи хранятся там, где используются — ключи у двери, инструменты в мастерской."},
+    {e:"📏",t:"Правило прозрачности",x:"Непрозрачные коробки — враг порядка. Используй прозрачные контейнеры или подпиши каждую коробку снаружи. Не должно быть 'ящика тайн'."},
+    {e:"💰",t:"Правило 20/20",x:"Вещь стоит меньше 2000р и купить можно за 20 минут? Выбрасывай смело. Не храни 'на всякий случай' то, что легко заменить."},
+    {e:"🔝",t:"Частота → высота",x:"Часто используемое — на уровне глаз и рук. Редко — наверх или вниз. Сезонное — в самые труднодоступные места. Простой принцип, который реально работает."}
+  ]},
+  {sec:"🏠 По комнатам",color:"#16a34a",tips:[
+    {e:"🛏",t:"Спальня: только для сна",x:"Уберите из спальни рабочие вещи, документы, лишнюю технику. Прикроватная тумбочка — только самое нужное: книга, телефон, лампа. Спальня = отдых."},
+    {e:"🍳",t:"Кухня: принцип станций",x:"Станция варки (у плиты — кастрюли, масло), станция нарезки (у доски — ножи), станция напитков (у чайника — кружки). Всё у места использования."},
+    {e:"🚪",t:"Прихожая: 30 секунд",x:"Ты должна разуться и повесить куртку за 30 секунд. Если это сложно — слишком много вещей. Оставь только то, что нужно прямо сейчас, остальное — в шкаф."},
+    {e:"🚿",t:"Ванная: минимализм",x:"Косметика и средства — только то, что используешь каждую неделю. Остальное — в отдельную коробку. Поверхности должны быть почти пустыми."},
+    {e:"📚",t:"Детская: уровни хранения",x:"Игрушки и вещи ребёнка — на его уровне роста. Он сам убирает то, до чего может дотянуться. Сверху — редко используемое или 'на вырост'."}
+  ]},
+  {sec:"💪 Мотивация",color:"#ec4899",tips:[
+    {e:"🎉",t:"Разбор = деньги",x:"Каждая вещь на Авито — это реальные рубли. 20 вещей по 500р = 10 000р. Смотри на разбор как на подработку, а не уборку."},
+    {e:"📅",t:"Правило 6 месяцев",x:"Не трогала 6 месяцев? Скорее всего не понадоб ится никогда. Это не грустно — это освобождение места для жизни."},
+    {e:"🌱",t:"Меньше вещей — больше времени",x:"На уборку 50 предметов уходит в 5 раз меньше времени чем на 250. Избавляясь от лишнего, ты дариш себе часы свободного времени каждую неделю."},
+    {e:"🧠",t:"Порядок снижает стресс",x:"Исследования показывают: захламлённое пространство повышает уровень кортизола. Чистое пространство буквально снижает тревожность."},
+    {e:"✅",t:"Отмечай прогресс",x:"Записывай: сколько вещей ушло, сколько заработала, сколько места освободилось. Прогресс мотивирует лучше любых советов."}
+  ]}
 ];
+var TIPS=[];TIPS_SECTIONS.forEach(function(s){s.tips.forEach(function(t){TIPS.push(t);});});
 function ld(k,d){try{var s=localStorage.getItem(k);return s?JSON.parse(s):d;}catch(e){return d;}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function key(){return localStorage.getItem("dcl_apikey")||"";}
@@ -142,7 +171,7 @@ function uid(){return Date.now()+"_"+Math.random().toString(36).slice(2);}
 function ntf(m){var e=document.getElementById("notif");e.textContent=m;e.classList.add("show");setTimeout(function(){e.classList.remove("show");},2200);}
 function badge(){var e=document.getElementById("svbadge");e.classList.add("show");setTimeout(function(){e.classList.remove("show");},1500);}
 function compress(file,cb){var r=new FileReader();r.onload=function(ev){var img=new Image();img.onload=function(){var c=document.createElement("canvas"),MAX=900,w=img.width,h=img.height;if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);cb(c.toDataURL("image/jpeg",0.78));};img.src=ev.target.result;};r.readAsDataURL(file);}
-var S={tab:"items",ifl:"all",sfl:"all",items:ld("dcl2_items",[]),shoes:ld("dcl2_shoes",[]),stor:ld("dcl2_stor",[]),form:false,ftype:null,fphotos:[],eid:null,scr:"main",ophotos:[],oadv:null,oload:false,ssearch:"",gquery:"",editIlist:null};
+var S={tab:"items",ifl:"all",sfl:"all",items:ld("dcl2_items",[]),shoes:ld("dcl2_shoes",[]),stor:ld("dcl2_stor",[]),savedOrg:ld("dcl_savedorg",[]),form:false,ftype:null,fphotos:[],eid:null,scr:"main",ophotos:[],oadv:null,oload:false,ssearch:"",gquery:"",editIlist:null,tipsTab:"start"};
 function svi(){sv("dcl2_items",S.items);badge();}
 function svs(){sv("dcl2_shoes",S.shoes);badge();}
 function svst(){sv("dcl2_stor",S.stor);badge();}
@@ -247,21 +276,60 @@ function rStorCard(st){
   return o+'</div>';
 }
 function rTips(){
-  var t=S.items.length,sell=0,don=0,tr=0;
+  var t=S.items.length,sell=0,don=0,tr=0,done=0;
   S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;});
-  var done=sell+don+tr;
+  done=sell+don+tr;
+  var tabs=[{id:"start",l:"🚀 Старт"},{id:"maintain",l:"🔄 Поддержание"},{id:"systems",l:"📦 Системы"},{id:"rooms",l:"🏠 Комнаты"},{id:"motiv",l:"💪 Мотивация"},{id:"saved",l:"💾 Сохранённые"+(S.savedOrg.length?" ("+S.savedOrg.length+")":"")}];
+  var secMap={start:0,maintain:1,systems:2,rooms:3,motiv:4};
   var o=hdr("💡 Советы","");
-  o+='<div class="wrap"><div class="motiv"><h2>Твой прогресс</h2><p>'+(done>0?"Уже решила судьбу "+done+" вещей!":"Начни с одного ящика.")+'</p><div class="prow"><div class="pitem"><div class="pnum">'+t+'</div><div class="plbl">Всего</div></div><div class="pitem"><div class="pnum">'+sell+'</div><div class="plbl">Продать</div></div><div class="pitem"><div class="pnum">'+don+'</div><div class="plbl">Отдать</div></div><div class="pitem"><div class="pnum">'+tr+'</div><div class="plbl">Выброс</div></div></div></div>';
-  o+=TIPS.map(function(t){return '<div class="tip-card"><div style="font-size:28px;margin-bottom:8px">'+t.e+'</div><div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:6px">'+t.t+'</div><div style="font-size:13px;color:#64748b;line-height:1.6">'+t.x+'</div></div>';}).join("");
-  return o+'</div>'+nav();
+  // progress block
+  o+='<div class="wrap"><div class="motiv">';
+  if(done>0){
+    var pct=t?Math.round(done/t*100):0;
+    o+='<h2>💪 Отличный прогресс!</h2>';
+    o+='<p>Уже решила судьбу <strong>'+done+'</strong> вещей из '+t+' — это <strong>'+pct+'%</strong>!</p>';
+  } else {
+    o+='<h2>🌱 Готова начать?</h2><p>Один разобранный ящик — уже победа. Начни прямо сейчас.</p>';
+  }
+  o+='<div class="prow"><div class="pitem"><div class="pnum">'+t+'</div><div class="plbl">Всего</div></div><div class="pitem"><div class="pnum">'+sell+'</div><div class="plbl">Продать</div></div><div class="pitem"><div class="pnum">'+don+'</div><div class="plbl">Отдать</div></div><div class="pitem"><div class="pnum">'+tr+'</div><div class="plbl">Выброс</div></div></div></div>';
+  // tab bar
+  o+='<div style="display:flex;overflow-x:auto;gap:6px;padding:0 0 8px;scrollbar-width:none">'+tabs.map(function(tb){var act=S.tipsTab===tb.id;return '<button onclick="S.tipsTab=\''+tb.id+'\';R()" style="flex-shrink:0;padding:7px 14px;border-radius:20px;border:none;background:'+(act?"#6366f1":"#f1f5f9")+';color:'+(act?"#fff":"#475569")+';font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">'+tb.l+'</button>';}).join("")+'</div>';
+  // content
+  if(S.tipsTab==="saved"){
+    if(!S.savedOrg.length){
+      o+='<div class="empty"><div class="emi">💾</div><p>Нет сохранённых советов.<br>Генерируй советы по пространству<br>и сохраняй понравившиеся.</p></div>';
+    } else {
+      o+=S.savedOrg.map(function(a){
+        return '<div class="card" style="margin-bottom:12px">'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+          '<div style="font-size:12px;color:#94a3b8">'+a.date+'</div>'+
+          '<button onclick="delSavedOrg(\''+a.id+'\')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:18px;padding:0">✕</button>'+
+          '</div>'+
+          (a.title?'<div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:8px">'+esc(a.title)+'</div>':'')+
+          '<div class="adv-txt">'+md2html(a.text)+'</div>'+
+          '</div>';
+      }).join("");
+    }
+  } else {
+    var secIdx=secMap[S.tipsTab]||0;
+    var sec=TIPS_SECTIONS[secIdx];
+    if(sec){
+      o+='<div style="padding:4px 0 8px;font-size:11px;font-weight:700;color:'+sec.color+';text-transform:uppercase;letter-spacing:.5px">'+sec.sec+'</div>';
+      o+=sec.tips.map(function(tip){return '<div class="tip-card"><div style="font-size:28px;margin-bottom:8px">'+tip.e+'</div><div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:6px">'+tip.t+'</div><div style="font-size:13px;color:#64748b;line-height:1.6">'+tip.x+'</div></div>';}).join("");
+    }
+  }
+  o+='</div>';
+  return o+nav();
 }
 
 function rOrg(){
   var hp=S.ophotos.length>0;
   var th=S.ophotos.map(function(p,i){return '<div class="pthumb"><img src="'+p+'"><button class="pdel" onclick="S.ophotos.splice('+i+',1);R()">×</button></div>';}).join("");
   var o='<div class="hdr"><div class="hdr-row"><div><h1>🤖 Совет по организации</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div>';
-  o+='<div class="wrap"><div class="fwrap"><div class="ftitle">Загрузи фото пространства</div><input type="file" id="og" accept="image/*" multiple style="display:none"><input type="file" id="oc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bog">🖼 Галерея</button><button class="pbtn" id="boc">📷 Камера</button></div>'+(hp?'<div class="pgrid">'+th+'</div>':'')+'<input id="octx" placeholder="Уточни задачу (необязательно)" autocomplete="off"><button class="bprim" '+(!hp||S.oload?"disabled":"")+' onclick="doOrg()" style="width:100%;padding:11px">'+(S.oload?"Анализирую...":"🤖 Получить совет")+'</button></div>';
-  if(S.oadv) o+='<div class="adv"><h3>💡 Совет</h3><div class="adv-txt">'+md2html(S.oadv)+'</div></div>';
+  o+='<div class="wrap"><div class="fwrap"><div class="ftitle">Загрузи фото пространства</div><input type="file" id="og" accept="image/*" multiple style="display:none"><input type="file" id="oc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bog">🖼 Галерея</button><button class="pbtn" id="boc">📷 Камера</button></div>'+(hp?'<div class="pgrid">'+th+'</div>':'')+'<input id="octx" placeholder="Уточни задачу: какая комната, цель, проблема..." autocomplete="off"><button class="bprim" '+(!hp||S.oload?"disabled":"")+' onclick="doOrg()" style="width:100%;padding:11px">'+(S.oload?"Анализирую...":"🤖 Получить совет")+'</button></div>';
+  if(S.oadv){
+    o+='<div class="adv"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0">💡 Совет</h3><button onclick="saveOrgAdvice()" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💾 Сохранить</button></div><div class="adv-txt">'+md2html(S.oadv)+'</div></div>';
+  }
   return o+'</div>';
 }
 
@@ -347,14 +415,157 @@ function saveIlist(id){
 
 function rSet(){
   var k=key();
-  return '<div class="hdr"><div class="hdr-row"><div><h1>⚙️ Настройки</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div><div class="wrap"><div class="scard"><h3>🔑 API-ключ Anthropic</h3><p>Нужен для AI-функций. Получи на console.anthropic.com — API Keys</p><div class="kstat '+(k?"ok":"no")+'">'+(k?"✅ Ключ сохранён":"❌ Не введён — AI не работает")+'</div><input id="aki" type="password" placeholder="Вставь ключ" value="'+(k?"●●●●●●●●●●●●●●●●●●●●":"")+'"><div style="display:flex;gap:8px"><button class="bprim" onclick="saveKey()">Сохранить</button>'+(k?'<button class="bghost" onclick="if(confirm(\'Удалить?\''+")"+"{"+'localStorage.removeItem(\'dcl_apikey\');R()'+"}"+')">Удалить</button>':'')+'</div></div><div class="scard"><h3>ℹ️ Инструкция</h3><p>1. console.anthropic.com<br>2. Settings → API Keys → Create Key<br>3. Скопируй и вставь выше</p></div><div class="scard" style="text-align:center"><button onclick="if(confirm(\'Очистить ВСЕ данные?\')){[\'dcl2_items\',\'dcl2_shoes\',\'dcl2_stor\'].forEach(function(k){localStorage.removeItem(k);});S.items=[];S.shoes=[];S.stor=[];S.scr=\'main\';R();}" style="padding:8px 20px;border-radius:10px;border:1px solid #fee2e2;background:#fff;color:#ef4444;font-size:13px;cursor:pointer;font-family:inherit">🗑 Очистить все данные</button></div></div>';
+  var syncCard='<div class="scard"><h3>📤 Синхронизация</h3><p>Перенос данных между устройствами</p>'+
+    '<div style="display:flex;flex-direction:column;gap:8px">'+
+    '<div style="font-size:12px;font-weight:600;color:#64748b;margin-top:4px">ПОЛНЫЙ БЭКАП (с фото)</div>'+
+    '<div style="display:flex;gap:8px">'+
+    '<button class="bprim" onclick="exportJSON()" style="flex:1;padding:10px;font-size:13px">⬇️ Скачать .json</button>'+
+    '<label style="flex:1"><button class="bghost" onclick="document.getElementById(\'jimp\').click()" style="width:100%;padding:10px;font-size:13px">⬆️ Загрузить .json</button><input id="jimp" type="file" accept=".json" style="display:none" onchange="importJSON(this)"></label>'+
+    '</div>'+
+    '<div style="font-size:12px;font-weight:600;color:#64748b;margin-top:8px">QR-КОД (без фото, быстро)</div>'+
+    '<div style="display:flex;gap:8px">'+
+    '<button class="bprim" onclick="showQR()" style="flex:1;padding:10px;font-size:13px;background:#0ea5e9">📱 Показать QR</button>'+
+    '<button class="bghost" onclick="S.scr=\'qrimp\';R()" style="flex:1;padding:10px;font-size:13px">📷 Сканировать QR</button>'+
+    '</div>'+
+    '</div></div>';
+  return '<div class="hdr"><div class="hdr-row"><div><h1>⚙️ Настройки</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div><div class="wrap"><div class="scard"><h3>🔑 API-ключ Anthropic</h3><p>Нужен для AI-функций. Получи на console.anthropic.com — API Keys</p><div class="kstat '+(k?"ok":"no")+'">'+(k?"✅ Ключ сохранён":"❌ Не введён — AI не работает")+'</div><input id="aki" type="password" placeholder="Вставь ключ" value="'+(k?"●●●●●●●●●●●●●●●●●●●●":"")+'"><div style="display:flex;gap:8px"><button class="bprim" onclick="saveKey()">Сохранить</button>'+(k?'<button class="bghost" onclick="if(confirm(\'Удалить?\')'+")"+"{"+'localStorage.removeItem(\'dcl_apikey\');R()'+"}"+')">Удалить</button>':'')+'</div></div>'+syncCard+'<div class="scard"><h3>ℹ️ API-ключ — как получить</h3><p>1. Зайди на console.anthropic.com<br>2. Settings → API Keys → Create Key<br>3. Скопируй ключ и вставь выше</p><button onclick="S.scr=\'help\';R()" style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;color:#6366f1;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📖 Полная инструкция по приложению</button></div><div class="scard" style="text-align:center"><button onclick="if(confirm(\'Очистить ВСЕ данные?\')){[\'dcl2_items\',\'dcl2_shoes\',\'dcl2_stor\'].forEach(function(k){localStorage.removeItem(k);});S.items=[];S.shoes=[];S.stor=[];S.scr=\'main\';R();}" style="padding:8px 20px;border-radius:10px;border:1px solid #fee2e2;background:#fff;color:#ef4444;font-size:13px;cursor:pointer;font-family:inherit">🗑 Очистить все данные</button></div></div>';
 }
+
+function saveOrgAdvice(){
+  if(!S.oadv)return;
+  var d=new Date();
+  var dateStr=("0"+d.getDate()).slice(-2)+"."+("0"+(d.getMonth()+1)).slice(-2)+"."+d.getFullYear();
+  var ctx=document.getElementById("octx");
+  var title=ctx&&ctx.value?ctx.value:"Совет от "+dateStr;
+  S.savedOrg.unshift({id:uid(),date:dateStr,title:title,text:S.oadv});
+  sv("dcl_savedorg",S.savedOrg);
+  ntf("Совет сохранён!");
+}
+
+function delSavedOrg(id){
+  if(!confirm("Удалить сохранённый совет?"))return;
+  S.savedOrg=S.savedOrg.filter(function(a){return a.id!==id;});
+  sv("dcl_savedorg",S.savedOrg);
+  R();
+}
+
+
+function exportJSON(){
+  var data={items:S.items,shoes:S.shoes,stor:S.stor,v:2,exported:new Date().toISOString()};
+  var json=JSON.stringify(data);
+  var blob=new Blob([json],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;
+  var d=new Date();
+  a.download="home_backup_"+d.getFullYear()+""+("0"+(d.getMonth()+1)).slice(-2)+""+("0"+d.getDate()).slice(-2)+".json";
+  a.click();
+  URL.revokeObjectURL(url);
+  ntf("Файл скачан!");
+}
+
+function importJSON(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      if(!data.items&&!data.shoes&&!data.stor){ntf("Неверный формат файла");return;}
+      if(!confirm("Загрузить данные? Текущие данные будут заменены.\n"+
+        "Вещей: "+(data.items||[]).length+
+        "\nОбуви: "+(data.shoes||[]).length+
+        "\nМест хранения: "+(data.stor||[]).length))return;
+      if(data.items)S.items=data.items;
+      if(data.shoes)S.shoes=data.shoes;
+      if(data.stor)S.stor=data.stor;
+      svi();svs();svst();R();ntf("Данные загружены ✓");
+    }catch(err){ntf("Ошибка: неверный формат файла");}
+  };
+  reader.readAsText(file);
+  input.value="";
+}
+
+function stripPhotos(arr){
+  return arr.map(function(x){var c=Object.assign({},x);delete c.photos;delete c.av;return c;});
+}
+
+function showQR(){
+  var data={items:stripPhotos(S.items),shoes:stripPhotos(S.shoes),stor:stripPhotos(S.stor),v:2};
+  var json=JSON.stringify(data);
+  var baseUrl=location.origin+location.pathname;
+  var importUrl=baseUrl+"#import="+btoa(unescape(encodeURIComponent(json)));
+  if(importUrl.length>2500){
+    ntf("Данных слишком много для QR. Используй JSON-бэкап.");
+    return;
+  }
+  var qrUrl="https://api.qrserver.com/v1/create-qr-code/?size=260x260&ecc=M&data="+encodeURIComponent(importUrl);
+  var modal=document.createElement("div");
+  modal.style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px";
+  modal.innerHTML='<div style="background:#fff;border-radius:20px;padding:24px;text-align:center;max-width:320px;width:100%">'+
+    '<h3 style="margin:0 0 6px;font-size:16px">📱 QR для другого устройства</h3>'+
+    '<p style="font-size:12px;color:#64748b;margin:0 0 16px">Сканируй камерой — данные загрузятся автоматически<br><span style="color:#f59e0b">⚠️ Фото не переносятся</span></p>'+
+    '<img src="'+qrUrl+'" style="width:260px;height:260px;border-radius:12px">'+
+    '<p style="font-size:11px;color:#94a3b8;margin:12px 0 0">Вещей: '+S.items.length+' · Обуви: '+S.shoes.length+' · Хранение: '+S.stor.length+'</p>'+
+    '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="margin-top:16px;width:100%;padding:10px;border-radius:10px;border:none;background:#6366f1;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Закрыть</button>'+
+    '</div>';
+  document.body.appendChild(modal);
+  modal.onclick=function(e){if(e.target===modal)modal.remove();};
+}
+
+function rQrImport(){
+  return '<div class="hdr"><div class="hdr-row"><div><h1>📷 QR-импорт</h1></div><button class="bsm" onclick="S.scr=\'set\';R()">◀ Назад</button></div></div>'+
+    '<div class="wrap"><div class="scard"><h3>Как это работает</h3>'+
+    '<p style="font-size:13px;line-height:1.6">1. На другом устройстве открой приложение<br>2. ⚙️ → QR-код → Показать QR<br>3. Отсканируй QR камерой телефона<br>4. Браузер откроет ссылку — данные загрузятся автоматически</p>'+
+    '<p style="font-size:13px;color:#f59e0b;margin-top:8px">⚠️ Фото через QR не переносятся. Для полного переноса с фото — используй .json файл.</p>'+
+    '</div>'+
+    '<div class="scard"><h3>Или вставь код вручную</h3>'+
+    '<p style="font-size:12px;color:#64748b">Если сканер не сработал — скопируй URL из QR и вставь сюда</p>'+
+    '<textarea id="qrpaste" style="width:100%;min-height:80px;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:12px;font-family:inherit;box-sizing:border-box;resize:vertical" placeholder="Вставь скопированный URL или код..."></textarea>'+
+    '<button class="bprim" onclick="importFromPaste()" style="width:100%;padding:10px;margin-top:8px">Загрузить</button>'+
+    '</div></div>';
+}
+
+function importFromPaste(){
+  var text=(gv("qrpaste")||"").trim();
+  if(!text){ntf("Вставь код или URL");return;}
+  try{
+    var b64;
+    if(text.includes("#import=")){b64=text.split("#import=")[1];}
+    else{b64=text;}
+    var json=decodeURIComponent(escape(atob(b64)));
+    var data=JSON.parse(json);
+    if(!confirm("Загрузить данные?\nВещей: "+(data.items||[]).length+"\nОбуви: "+(data.shoes||[]).length+"\nХранение: "+(data.stor||[]).length))return;
+    if(data.items)S.items=data.items;
+    if(data.shoes)S.shoes=data.shoes;
+    if(data.stor)S.stor=data.stor;
+    svi();svs();svst();S.scr="main";R();ntf("Данные загружены ✓");
+  }catch(e){ntf("Ошибка: не удалось прочитать код");}
+}
+
+function checkImportHash(){
+  var h=location.hash;
+  if(h&&h.indexOf("#import=")===0){
+    try{
+      var b64=h.slice(8);
+      var json=decodeURIComponent(escape(atob(b64)));
+      var data=JSON.parse(json);
+      history.replaceState(null,"",location.pathname);
+      if(!confirm("Найдены данные для импорта:\nВещей: "+(data.items||[]).length+"\nОбуви: "+(data.shoes||[]).length+"\nМест хранения: "+(data.stor||[]).length+"\n\nЗагрузить? Текущие данные будут заменены."))return;
+      if(data.items)S.items=data.items;
+      if(data.shoes)S.shoes=data.shoes;
+      if(data.stor)S.stor=data.stor;
+      svi();svs();svst();ntf("Данные загружены ✓");
+    }catch(e){history.replaceState(null,"",location.pathname);}
+  }
+}
+
 
 function R(){
   var h="";
   if(S.scr==="set") h=rSet();
   else if(S.scr==="org") h=rOrg();
   else if(S.scr==="search") h=rSearch();
+  else if(S.scr==="qrimp") h=rQrImport();
   else if(S.scr==="allitems") h=rAllItems();
   else if(S.tab==="items") h=rItems();
   else if(S.tab==="shoes") h=rShoes();
@@ -400,7 +611,7 @@ function doAvito(id){
   var it=null;for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){it=S.items[i];break;}}
   if(!it)return;
   var ph=it.photos||[];
-  var pr="Напиши объявление для Авито.\nТовар: "+(it.name||"см. фото")+"\nОписание: "+(it.desc||"нет")+"\nСостояние: "+(it.cond||"б/у, хорошее")+(ph.length?"\n\nНа фото виден товар — используй для описания.":"")+"\n\nФормат строго:\nЗАГОЛОВОК: (до 50 символов)\nОПИСАНИЕ: (3–4 предложения)\nЦЕНА: (в рублях)\nТЕГИ: #тег1 #тег2 #тег3";
+  var pr="Ты опытный продавец на Авито. Напиши продающее объявление.\n\nТовар: "+(it.name||"см. фото")+"\nОписание: "+(it.desc||"—")+"\nСостояние: "+(it.cond||"б/у, хорошее")+(ph.length?"\n\nВнимательно изучи фото: опиши внешний вид, материал, цвет, бренд если виден. Укажи видимые дефекты честно.":"")+"\n\nПри определении цены ориентируйся на:\n- Реальные цены Авито на аналогичный товар\n- Состояние (б/у снижает цену на 30–60% от нового)\n- Популярность и спрос на товар\n\nФормат СТРОГО:\nЗАГОЛОВОК: (до 50 символов, с ключевыми словами для поиска)\nОПИСАНИЕ: (4–5 предложений: что это, состояние, почему продаю, особенности)\nЦЕНА: X XXX ₽ (и укажи диапазон рынка: рынок X–Y ₽)\nТЕГИ: #тег1 #тег2 #тег3 #тег4\nСОВЕТ: (одна строка — как быстрее продать)";
   api(pts(ph,pr),1000,function(t){for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){S.items[i].av=t;break;}}svi();R();ntf("Объявление готово!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
 }
 
@@ -409,7 +620,7 @@ function doStorAdv(id){
   var btn=g("stb_"+id);if(btn){btn.disabled=true;btn.textContent="Анализирую...";}
   var st=null;for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){st=S.stor[i];break;}}
   if(!st)return;
-  var pr="Ты эксперт по организации хранения.\nМесто: "+st.name+"\nГде: "+(st.loc||"не указано")+"\nСодержимое: "+(st.cont||"не описано")+(st.photos&&st.photos.length?"\nНа фото видно место.":"")+"\n\nДай советы:\n1. Как разложить\n2. Что убрать\n3. Какие органайзеры помогут\n4. Как быстро найти нужное\nКратко, на русском.";
+  var pr="Ты сертифицированный организатор пространства (professional organizer).\n\nМесто хранения: "+st.name+"\nЛокация: "+(st.loc||"не указано")+"\nСодержимое: "+(st.cont||"не описано")+(st.photos&&st.photos.length?"\n\nВнимательно изучи фото места хранения: оцени текущее состояние, занятость пространства, доступность вещей.":"")+"\n\nДай структурированные советы по организации этого места. Используй заголовки ##:\n## 🔍 Текущая проблема\n## ✅ Как организовать (конкретные шаги)\n## 📦 Что докупить (органайзеры, коробки, крючки)\n## ⚡ Быстрый старт (что сделать прямо сейчас за 10 минут)\n\nПиши конкретно и практично. На русском.";
   api(pts(st.photos||[],pr),800,function(t){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].adv=t;break;}}svst();R();ntf("Совет готов!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
 }
 
@@ -418,7 +629,7 @@ function doOrg(){
   if(!S.ophotos.length){ntf("Загрузи фото");return;}
   S.oload=true;R();
   var ctx=gv("octx");
-  var pr="Ты эксперт по организации пространства."+(ctx?"\nЗадача: "+ctx:"")+"\nПосмотри на фото и дай советы:\n1. Как организовать\n2. Что убрать или добавить\n3. Простые решения (ящики, органайзеры)\n4. С чего начать\nКратко, на русском.";
+  var pr="Ты сертифицированный организатор пространства и дизайнер интерьера."+(ctx?"\n\nЗапрос: "+ctx:"")+"\n\nВнимательно изучи фото пространства. Оцени:\n- тип комнаты/зоны\n- текущий уровень организации\n- главные проблемы\n\nДай развёрнутый план организации. Используй заголовки ##:\n## 🔍 Что вижу (честная оценка)\n## 🚀 С чего начать (3 первых шага)\n## 📦 Зонирование и хранение\n## 🛒 Что докупить (конкретные предметы)\n## 💡 Лайфхаки для этого пространства\n## ✨ Как будет выглядеть результат\n\nПиши по-русски, конкретно, с практическими деталями.";
   api(pts(S.ophotos,pr),1000,function(t){S.oadv=t;S.oload=false;R();ntf("Совет готов!");},function(e){S.oload=false;R();ntf("Ошибка: "+e);});
 }
 
@@ -427,13 +638,14 @@ function doStorList(id){
   var btn=document.getElementById("ilb_"+id);if(btn){btn.disabled=true;btn.textContent="Анализирую...";}
   var st=null;for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){st=S.stor[i];break;}}
   if(!st||!st.photos||!st.photos.length){ntf("Сначала добавь фото к месту хранения");return;}
-  var pr="Посмотри внимательно на фото этого места хранения.\n\nСоставь подробный список ВСЕХ предметов которые ты видишь.\nФормат: каждый предмет с новой строки, начиная с •\nПиши по-русски. Только список, без пояснений и вступления.\nЕсли видишь стопку или группу похожих вещей — перечисли их.";
+  var pr="Внимательно изучи фото места хранения. Твоя задача — составить максимально полный инвентарный список.\n\nПравила:\n• Перечисли КАЖДЫЙ видимый предмет отдельной строкой\n• Начинай каждую строку с •\n• Если видишь несколько одинаковых — укажи количество: • Книги (≈8 шт)\n• Описывай точнее: не 'вещи', а 'синяя толстовка', 'зарядный кабель'\n• Если видишь стопки/груды — попробуй угадать содержимое\n• Только список, без вступления и пояснений\n\nПиши по-русски.";
   api(pts(st.photos,pr),800,function(t){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].ilist=t;break;}}svst();R();ntf("Список готов!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
 }
 function cpAv(id){var pre=g("pre_"+id),btn=g("cp_"+id);if(!pre||!btn)return;navigator.clipboard.writeText(pre.textContent).then(function(){btn.textContent="✓ Скопировано!";btn.classList.add("ok");setTimeout(function(){btn.textContent="Копировать";btn.classList.remove("ok");},2500);ntf("Текст скопирован!");});}
 function svPh(id){var it=null;for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){it=S.items[i];break;}}if(!it||!it.photos||!it.photos.length)return;it.photos.forEach(function(d,i){var a=document.createElement("a");a.href=d;a.download="avito_"+(it.name||"photo").replace(/\W/g,"_")+"_"+(i+1)+".jpg";document.body.appendChild(a);a.click();document.body.removeChild(a);});ntf("Сохраняю фото...");}
 function saveKey(){var v=gv("aki").trim();if(!v||v[0]==="●"){ntf("Введи новый ключ");return;}localStorage.setItem("dcl_apikey",v);ntf("Ключ сохранён!");R();}
 
+checkImportHash();
 R();
 </script>
 </body>

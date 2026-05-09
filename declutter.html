@@ -208,7 +208,24 @@ function rItemCard(it){
   o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(it.name)+'</div>'+(it.desc?'<div class="cdesc">'+esc(it.desc)+'</div>':'')+(it.cond?'<div class="cdesc">Сост: '+esc(it.cond)+'</div>':'')+(stlnk?'<div class="cdesc" style="color:#0ea5e9">📦 '+esc(stlnk.name)+(stlnk.loc?' · '+esc(stlnk.loc):'')+'</div>':'')+'</div><div style="display:flex;align-items:center;margin-left:8px">'+(a?'<span class="cbadge" style="background:'+a.b+';color:'+a.c+';border-color:'+a.c+'44">'+a.l+'</span>':'')+'<button class="bsm" style="margin-left:4px" onclick="S.eid=\''+it.id+'\';R()">✏️</button><button class="bdel" onclick="delItem(\''+it.id+'\')">✕</button></div></div>';
   o+='<div class="drow">'+ACT.map(function(a){return '<button class="db" onclick="setS(\''+it.id+'\',\''+a.id+'\')" style="background:'+(it.s===a.id?a.b:"#fff")+';color:'+(it.s===a.id?a.c:"#94a3b8")+';border-color:'+(it.s===a.id?a.c:"#e2e8f0")+';font-weight:'+(it.s===a.id?700:400)+'">'+a.l+'</button>';}).join("")+'</div>';
   if(it.s==="sell") o+='<button class="bavito" id="ab_'+it.id+'" onclick="doAvito(\''+it.id+'\')">'+(it.av?"🔄 Перегенерировать":"📝 Текст для Авито")+'</button>';
-  if(it.s==="sell"&&it.av) o+='<div class="abox"><div class="abox-h"><span class="abox-l">✅ Объявление готово</span><div style="display:flex;gap:6px"><button class="bcopy" id="cp_'+it.id+'" onclick="cpAv(\''+it.id+'\')">Копировать</button>'+(ph.length?'<button class="bsave" onclick="svPh(\''+it.id+'\')">Сохранить фото</button>':'')+'</div></div><pre class="apre" id="pre_'+it.id+'">'+esc(it.av)+'</pre></div>';
+  if(it.s==="sell"&&it.av){
+    var av=parseAvito(it.av);
+    if(av){
+      o+='<div class="abox">';
+      o+='<div class="abox-h"><span class="abox-l">✅ Объявление готово</span><div style="display:flex;gap:6px">';
+      o+='<button class="bcopy" onclick="avCopyText(\''+it.id+'\')">📋 Копировать</button>';
+      o+=(ph.length?'<button class="bsave" onclick="svPh(\''+it.id+'\')">Фото</button>':'');
+      o+='</div></div>';
+      if(av.title) o+='<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Заголовок <button onclick="avCopyTitle(\''+it.id+'\')" style="background:none;border:none;color:#d97706;font-size:10px;cursor:pointer;padding:0;font-family:inherit">скопировать</button></div><div style="font-size:14px;font-weight:600;color:#1e293b">'+esc(av.title)+'</div></div>';
+      if(av.desc) o+='<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Описание</div><div style="font-size:13px;color:#451a03;line-height:1.6">'+esc(av.desc)+'</div></div>';
+      if(av.price) o+='<div style="margin-bottom:8px;display:flex;gap:12px;flex-wrap:wrap"><div><div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Рекомендуемая цена</div><div style="font-size:15px;font-weight:700;color:#16a34a">'+esc(av.price)+'</div></div></div>';
+      if(av.tags) o+='<div style="margin-bottom:6px"><div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Теги</div><div style="font-size:12px;color:#6366f1;line-height:1.8">'+esc(av.tags)+'</div></div>';
+      if(av.tip) o+='<div style="background:#f0fdf4;border-radius:8px;padding:8px 10px;font-size:12px;color:#15803d">💡 '+esc(av.tip)+'</div>';
+      o+='</div>';
+    } else {
+      o+='<div class="abox"><div class="abox-h"><span class="abox-l">✅ Объявление готово</span><div style="display:flex;gap:6px"><button class="bcopy" id="cp_'+it.id+'" onclick="cpAv(\''+it.id+'\')">Копировать</button>'+(ph.length?'<button class="bsave" onclick="svPh(\''+it.id+'\')">Фото</button>':'')+'</div></div><pre class="apre" id="pre_'+it.id+'">'+esc(it.av)+'</pre></div>';
+    }
+  }
   return o+'</div>';
 }
 
@@ -326,7 +343,7 @@ function rOrg(){
   var hp=S.ophotos.length>0;
   var th=S.ophotos.map(function(p,i){return '<div class="pthumb"><img src="'+p+'"><button class="pdel" onclick="S.ophotos.splice('+i+',1);R()">×</button></div>';}).join("");
   var o='<div class="hdr"><div class="hdr-row"><div><h1>🤖 Совет по организации</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div>';
-  o+='<div class="wrap"><div class="fwrap"><div class="ftitle">Загрузи фото пространства</div><input type="file" id="og" accept="image/*" multiple style="display:none"><input type="file" id="oc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bog">🖼 Галерея</button><button class="pbtn" id="boc">📷 Камера</button></div>'+(hp?'<div class="pgrid">'+th+'</div>':'')+'<input id="octx" placeholder="Уточни задачу: какая комната, цель, проблема..." autocomplete="off"><button class="bprim" '+(!hp||S.oload?"disabled":"")+' onclick="doOrg()" style="width:100%;padding:11px">'+(S.oload?"Анализирую...":"🤖 Получить совет")+'</button></div>';
+  o+='<div class="wrap"><div class="fwrap"><div class="ftitle">Загрузи фото пространства</div><input type="file" id="og" accept="image/*" multiple style="display:none"><input type="file" id="oc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bog">🖼 Галерея</button><button class="pbtn" id="boc">📷 Камера</button></div>'+(hp?'<div class="pgrid">'+th+'</div>':'')+'<input id="octx" placeholder="Уточни задачу: какая комната, цель, проблема..." autocomplete="off"><button class="bprim" '+(!hp||S.oload?"disabled":"")+' onclick="doOrg()" style="flex:1;padding:11px">'+(S.oload?"Анализирую...":"🤖 Получить совет")+'</button>'+(!hp?'':'<button onclick="openPrompt(\'org\',\'\')" title="Промт для Claude.ai" style="padding:10px 14px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:16px;cursor:pointer">📋</button>')+'</div></div>';
   if(S.oadv){
     o+='<div class="adv"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0">💡 Совет</h3><button onclick="saveOrgAdvice()" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💾 Сохранить</button></div><div class="adv-txt">'+md2html(S.oadv)+'</div></div>';
   }
@@ -641,6 +658,133 @@ function doStorList(id){
   var pr="Внимательно изучи фото места хранения. Твоя задача — составить максимально полный инвентарный список.\n\nПравила:\n• Перечисли КАЖДЫЙ видимый предмет отдельной строкой\n• Начинай каждую строку с •\n• Если видишь несколько одинаковых — укажи количество: • Книги (≈8 шт)\n• Описывай точнее: не 'вещи', а 'синяя толстовка', 'зарядный кабель'\n• Если видишь стопки/груды — попробуй угадать содержимое\n• Только список, без вступления и пояснений\n\nПиши по-русски.";
   api(pts(st.photos,pr),800,function(t){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].ilist=t;break;}}svst();R();ntf("Список готов!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
 }
+function buildPrompt(type,id){
+  var pr="",ph=[],title="";
+  if(type==="avito"){
+    var it=null;for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){it=S.items[i];break;}}
+    if(!it)return null;
+    ph=it.photos||[];
+    title="Объявление для Авито: "+(it.name||"вещь");
+    pr="Ты опытный продавец на Авито. Напиши продающее объявление.\n\nТовар: "+(it.name||"см. фото")+"\nОписание: "+(it.desc||"—")+"\nСостояние: "+(it.cond||"б/у, хорошее")+(ph.length?"\n\nВнимательно изучи фото: опиши внешний вид, материал, цвет, бренд если виден. Укажи видимые дефекты честно.":"")+"\n\nПри определении цены ориентируйся на:\n- Реальные цены Авито на аналогичный товар\n- Состояние (б/у снижает цену на 30–60% от нового)\n- Популярность и спрос на товар\n\nФормат СТРОГО:\nЗАГОЛОВОК: (до 50 символов, с ключевыми словами для поиска)\nОПИСАНИЕ: (4–5 предложений: что это, состояние, почему продаю, особенности)\nЦЕНА: X XXX ₽ (и укажи диапазон рынка: рынок X–Y ₽)\nТЕГИ: #тег1 #тег2 #тег3 #тег4\nСОВЕТ: (одна строка — как быстрее продать)";
+  } else if(type==="storadv"){
+    var st=null;for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){st=S.stor[i];break;}}
+    if(!st)return null;
+    ph=st.photos||[];
+    title="Совет по организации: "+st.name;
+    pr="Ты сертифицированный организатор пространства (professional organizer).\n\nМесто хранения: "+st.name+"\nЛокация: "+(st.loc||"не указано")+"\nСодержимое: "+(st.cont||"не описано")+(ph.length?"\n\nВнимательно изучи фото места хранения: оцени текущее состояние, занятость пространства, доступность вещей.":"")+"\n\nДай структурированные советы по организации этого места. Используй заголовки ##:\n## 🔍 Текущая проблема\n## ✅ Как организовать (конкретные шаги)\n## 📦 Что докупить (органайзеры, коробки, крючки)\n## ⚡ Быстрый старт (что сделать прямо сейчас за 10 минут)\n\nПиши конкретно и практично. На русском.";
+  } else if(type==="org"){
+    ph=S.ophotos||[];
+    title="Совет по организации пространства";
+    var ctx=gv("octx")||"";
+    pr="Ты сертифицированный организатор пространства и дизайнер интерьера."+(ctx?"\n\nЗапрос: "+ctx:"")+"\n\nВнимательно изучи фото пространства. Оцени:\n- тип комнаты/зоны\n- текущий уровень организации\n- главные проблемы\n\nДай развёрнутый план организации. Используй заголовки ##:\n## 🔍 Что вижу (честная оценка)\n## 🚀 С чего начать (3 первых шага)\n## 📦 Зонирование и хранение\n## 🛒 Что докупить (конкретные предметы)\n## 💡 Лайфхаки для этого пространства\n## ✨ Как будет выглядеть результат\n\nПиши по-русски, конкретно, с практическими деталями.";
+  } else if(type==="storlist"){
+    var st=null;for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){st=S.stor[i];break;}}
+    if(!st)return null;
+    ph=st.photos||[];
+    title="Список вещей: "+st.name;
+    pr="Внимательно изучи фото места хранения. Твоя задача — составить максимально полный инвентарный список.\n\nПравила:\n• Перечисли КАЖДЫЙ видимый предмет отдельной строкой\n• Начинай каждую строку с •\n• Если видишь несколько одинаковых — укажи количество: • Книги (≈8 шт)\n• Описывай точнее: не 'вещи', а 'синяя толстовка', 'зарядный кабель'\n• Если видишь стопки/груды — попробуй угадать содержимое\n• Только список, без вступления и пояснений\n\nПиши по-русски.";
+  }
+  return {pr:pr,ph:ph,title:title,type:type,id:id};
+}
+
+function openPrompt(type,id){
+  var info=buildPrompt(type,id);
+  if(!info||!info.pr){ntf("Нет данных для промта");return;}
+  var modal=document.createElement("div");
+  modal.id="pm_modal";
+  modal.style="position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:999;display:flex;align-items:flex-end;justify-content:center;padding:0";
+  var hasPhotos=info.ph.length>0;
+  var photosNote=hasPhotos?'<div style="background:#fef9c3;border-radius:8px;padding:10px 12px;font-size:12px;color:#92400e;margin-bottom:10px">📷 У этого запроса <strong>'+info.ph.length+' фото</strong>. Прикрепи их вручную в claude.ai вместе с промтом.</div>':'';
+  modal.innerHTML='<div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:92vh;display:flex;flex-direction:column">'+
+    '<div style="padding:16px 16px 0;display:flex;justify-content:space-between;align-items:center">'+
+    '<h3 style="margin:0;font-size:15px;color:#1e293b">📋 Промт для Claude.ai</h3>'+
+    '<button onclick="document.getElementById(\'pm_modal\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#94a3b8;padding:0;line-height:1">×</button>'+
+    '</div>'+
+    '<div style="padding:6px 16px 4px;font-size:12px;color:#64748b">'+esc(info.title)+'</div>'+
+    '<div style="display:flex;gap:0;padding:10px 16px 0;border-bottom:1px solid #f1f5f9">'+
+    '<button id="pm_t1" onclick="pm_tab(1)" style="flex:1;padding:8px;border:none;background:none;font-size:13px;font-weight:600;color:#6366f1;border-bottom:2px solid #6366f1;cursor:pointer;font-family:inherit">1 · Промт</button>'+
+    '<button id="pm_t2" onclick="pm_tab(2)" style="flex:1;padding:8px;border:none;background:none;font-size:13px;font-weight:400;color:#94a3b8;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit">2 · Вставить ответ</button>'+
+    '</div>'+
+    '<div id="pm_p1" style="flex:1;overflow-y:auto;padding:14px 16px">'+
+    photosNote+
+    '<div style="font-size:12px;color:#64748b;margin-bottom:8px">Скопируй промт → открой <a href="https://claude.ai" target="_blank" style="color:#6366f1">claude.ai</a> → вставь в чат'+(hasPhotos?' + прикрепи фото':'')+' → получи ответ</div>'+
+    '<textarea id="pm_prtext" readonly style="width:100%;min-height:200px;border:1px solid #e2e8f0;border-radius:10px;padding:10px;font-size:12px;font-family:monospace;resize:vertical;box-sizing:border-box;background:#f8fafc;color:#334155">'+info.pr.replace(/</g,'&lt;')+'</textarea>'+
+    '<button onclick="pm_copy()" style="width:100%;margin-top:10px;padding:11px;border-radius:10px;border:none;background:#6366f1;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">📋 Скопировать промт</button>'+
+    '</div>'+
+    '<div id="pm_p2" style="flex:1;overflow-y:auto;padding:14px 16px;display:none">'+
+    '<div style="font-size:12px;color:#64748b;margin-bottom:8px">Вставь ответ Claude — он сохранится как если бы сработал AI</div>'+
+    '<textarea id="pm_resp" style="width:100%;min-height:220px;border:1px solid #e2e8f0;border-radius:10px;padding:10px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box" placeholder="Вставь сюда ответ от Claude..."></textarea>'+
+    '<button onclick="pm_save(\''+type+'\',\''+id+'\')" style="width:100%;margin-top:10px;padding:11px;border-radius:10px;border:none;background:#16a34a;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">✅ Сохранить ответ</button>'+
+    '</div>'+
+    '</div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click',function(e){if(e.target===modal)modal.remove();});
+}
+
+function pm_tab(n){
+  document.getElementById('pm_p1').style.display=n===1?'flex':'none';
+  document.getElementById('pm_p2').style.display=n===2?'flex':'none';
+  if(n===1){document.getElementById('pm_p1').style.flexDirection='column';}
+  document.getElementById('pm_t1').style.cssText='flex:1;padding:8px;border:none;background:none;font-size:13px;font-weight:'+(n===1?'600':'400')+';color:'+(n===1?'#6366f1':'#94a3b8')+';border-bottom:2px solid '+(n===1?'#6366f1':'transparent')+';cursor:pointer;font-family:inherit';
+  document.getElementById('pm_t2').style.cssText='flex:1;padding:8px;border:none;background:none;font-size:13px;font-weight:'+(n===2?'600':'400')+';color:'+(n===2?'#6366f1':'#94a3b8')+';border-bottom:2px solid '+(n===2?'#6366f1':'transparent')+';cursor:pointer;font-family:inherit';
+}
+
+function pm_copy(){
+  var ta=document.getElementById('pm_prtext');
+  if(!ta)return;
+  navigator.clipboard.writeText(ta.value).then(function(){
+    ntf('Промт скопирован! Открой claude.ai и вставь.');
+  });
+}
+
+function pm_save(type,id){
+  var resp=(document.getElementById('pm_resp')||{value:''}).value.trim();
+  if(!resp){ntf('Вставь ответ Claude');return;}
+  if(type==='avito'){for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){S.items[i].av=resp;break;}}svi();}
+  else if(type==='storadv'){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].adv=resp;break;}}svst();}
+  else if(type==='org'){S.oadv=resp;}
+  else if(type==='storlist'){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].ilist=resp;break;}}svst();}
+  var m=document.getElementById('pm_modal');if(m)m.remove();
+  R();ntf('Ответ сохранён ✓');
+}
+
+function parseAvito(text){
+  if(!text)return null;
+  var res={title:"",desc:"",price:"",tags:"",tip:"",raw:text};
+  var lines=text.split('\n');
+  var cur="";
+  lines.forEach(function(l){
+    var m;
+    if((m=l.match(/^ЗАГОЛОВОК:\s*(.*)/i))){res.title=m[1].trim();cur="title";}
+    else if((m=l.match(/^ОПИСАНИЕ:\s*(.*)/i))){res.desc=m[1].trim();cur="desc";}
+    else if((m=l.match(/^ЦЕНА:\s*(.*)/i))){res.price=m[1].trim();cur="price";}
+    else if((m=l.match(/^ТЕГИ:\s*(.*)/i))){res.tags=m[1].trim();cur="tags";}
+    else if((m=l.match(/^СОВЕТ:\s*(.*)/i))){res.tip=m[1].trim();cur="tip";}
+    else if(l.trim()){
+      if(cur==="desc")res.desc+=(res.desc?" ":"")+l.trim();
+      else if(cur==="tip")res.tip+=(res.tip?" ":"")+l.trim();
+    }
+  });
+  // if parsing failed, return null to show raw
+  if(!res.title&&!res.price) return null;
+  return res;
+}
+
+function avCopyText(id){
+  var it=null;for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){it=S.items[i];break;}}
+  if(!it||!it.av)return;
+  var p=parseAvito(it.av);
+  var text=p?(p.title+'\n\n'+p.desc+(p.price?'\n\nЦена: '+p.price:'')+(p.tags?'\n\n'+p.tags:'')):it.av;
+  navigator.clipboard.writeText(text).then(function(){ntf("Скопировано для Авито!");});
+}
+
+function avCopyTitle(id){
+  var it=null;for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){it=S.items[i];break;}}
+  if(!it||!it.av)return;
+  var p=parseAvito(it.av);
+  navigator.clipboard.writeText(p?p.title:it.av).then(function(){ntf("Заголовок скопирован!");});
+}
+
 function cpAv(id){var pre=g("pre_"+id),btn=g("cp_"+id);if(!pre||!btn)return;navigator.clipboard.writeText(pre.textContent).then(function(){btn.textContent="✓ Скопировано!";btn.classList.add("ok");setTimeout(function(){btn.textContent="Копировать";btn.classList.remove("ok");},2500);ntf("Текст скопирован!");});}
 function svPh(id){var it=null;for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){it=S.items[i];break;}}if(!it||!it.photos||!it.photos.length)return;it.photos.forEach(function(d,i){var a=document.createElement("a");a.href=d;a.download="avito_"+(it.name||"photo").replace(/\W/g,"_")+"_"+(i+1)+".jpg";document.body.appendChild(a);a.click();document.body.removeChild(a);});ntf("Сохраняю фото...");}
 function saveKey(){var v=gv("aki").trim();if(!v||v[0]==="●"){ntf("Введи новый ключ");return;}localStorage.setItem("dcl_apikey",v);ntf("Ключ сохранён!");R();}

@@ -363,7 +363,7 @@ function rStorCard(st){
     o+='<button onclick="S.shopStor=\''+st.id+'\';R()" style="width:100%;padding:9px;border-radius:10px;border:1px dashed #86efac;background:#f0fdf4;color:#15803d;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">🛒 Купить для этого места'+(shopCnt>0?' ('+shopCnt+')':'')+'</button>';
   }
   o+='</div>';
-  if(st.adv) o+='<div class="adv"><h3>💡 Совет</h3><div class="adv-txt">'+md2html(st.adv)+'</div></div>';
+  if(st.adv) o+='<div class="adv"><h3>💡 Совет</h3><div class="adv-txt">'+addCartBtns(md2html(st.adv),st.id)+'</div></div>';
   if(st.ilist){
     if(S.editIlist===st.id) o+='<div class="adv" style="background:#e0f2fe"><h3>📋 Список вещей <button onclick="S.editIlist=null;R()" style="float:right;background:none;border:none;cursor:pointer;font-size:12px;color:#64748b">✕ Закрыть</button></h3><textarea id="ilt_'+st.id+'" style="width:100%;min-height:120px;border:1px solid #bae6fd;border-radius:8px;padding:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box">'+esc(st.ilist)+'</textarea><div style="display:flex;gap:8px;margin-top:8px"><button onclick="saveIlist(\''+st.id+'\')" style="flex:1;padding:8px;border-radius:8px;border:none;background:#0ea5e9;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Сохранить</button><button onclick="S.editIlist=null;R()" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:13px;cursor:pointer;font-family:inherit">Отмена</button></div></div>';
     else o+='<div class="adv" style="background:#e0f2fe"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">📋 Список вещей</h3><button onclick="S.editIlist=\''+st.id+'\';R()" style="background:none;border:1px solid #7dd3fc;border-radius:6px;padding:3px 8px;font-size:12px;cursor:pointer;color:#0ea5e9">✏️ Изменить</button></div><div class="adv-txt" style="white-space:pre-wrap">'+esc(st.ilist)+'</div></div>';
@@ -453,7 +453,7 @@ function rOrg(){
   var o='<div class="hdr"><div class="hdr-row"><div><h1>🤖 Совет по организации</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div>';
   o+='<div class="wrap"><div class="fwrap"><div class="ftitle">Загрузи фото пространства</div><input type="file" id="og" accept="image/*" multiple style="display:none"><input type="file" id="oc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bog">🖼 Галерея</button><button class="pbtn" id="boc">📷 Камера</button></div>'+(hp?'<div class="pgrid">'+th+'</div>':'')+'<input id="octx" placeholder="Уточни задачу: какая комната, цель, проблема..." autocomplete="off"><button class="bprim" '+(!hp||S.oload?"disabled":"")+' onclick="doOrg()" style="flex:1;padding:11px">'+(S.oload?"Анализирую...":"🤖 Получить совет")+'</button>'+(!hp?'':'<button onclick="openPrompt(\'org\',\'\')" title="Промт для Claude.ai" style="padding:10px 14px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:16px;cursor:pointer">📋</button>')+'</div></div>';
   if(S.oadv){
-    o+='<div class="adv"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0">💡 Совет</h3><button onclick="saveOrgAdvice()" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💾 Сохранить</button></div><div class="adv-txt">'+md2html(S.oadv)+'</div>'
+    o+='<div class="adv"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0">💡 Совет</h3><button onclick="saveOrgAdvice()" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💾 Сохранить</button></div><div class="adv-txt">'+addCartBtns(md2html(S.oadv),'')+'</div>'
       +'<div style="margin-top:12px;border-top:1px solid #fde68a;padding-top:12px">'
       +'<div style="font-size:12px;font-weight:600;color:#92400e;margin-bottom:8px">🛒 Добавить в список покупок</div>'
       +'<div style="display:flex;gap:6px">'
@@ -962,6 +962,35 @@ function doAvito(id){
   api(pts(ph,pr),1000,function(t){for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){S.items[i].av=t;break;}}svi();R();ntf("Объявление готово!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
 }
 
+function addShopFromAdvText(name,storId){
+  if(!name||!name.trim())return;
+  S.shopping.push({id:uid(),name:name.trim(),storId:storId||"",note:"",bought:false,created:Date.now()});
+  svShop();
+  ntf("🛒 Добавлено: "+name.trim());
+}
+function addCartBtns(html,storId){
+  var sid=storId||"";
+  var bs="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap";
+  html=html.replace(/(<thead>)(<tr[^>]*>)([\s\S]*?)(<\/tr>)(<\/thead>)/g,function(m,a,b,c,d,e){
+    return a+b+c+"<th></th>"+d+e;
+  });
+  html=html.replace(/<tbody>([\s\S]*?)<\/tbody>/g,function(m,tbody){
+    var rows=tbody.replace(/<tr>([\s\S]*?)<\/tr>/g,function(m2,cells){
+      var nm=cells.match(/<td>([\s\S]*?)<\/td>/);
+      if(!nm)return m2;
+      var name=nm[1].replace(/<[^>]*>/g,"").trim().split("—")[0].split(" - ")[0].split(" – ")[0].trim();
+      var ename=encodeURIComponent(name);
+      return "<tr>"+cells+'<td style="text-align:center;padding:4px 6px"><button onclick="addShopFromAdvText(decodeURIComponent(\''+ename+'\'),\''+sid+'\')" style="'+bs+'">🛒</button></td></tr>';
+    });
+    return "<tbody>"+rows+"</tbody>";
+  });
+  html=html.replace(/•\s*([^•<\n][^\n<]*)/g,function(m,item){
+    var name=item.split("—")[0].split(" - ")[0].split(" – ")[0].trim();
+    var ename=encodeURIComponent(name);
+    return "• "+item+' <button onclick="addShopFromAdvText(decodeURIComponent(\''+ename+'\'),\''+sid+'\')" style="'+bs+'">🛒</button>';
+  });
+  return html;
+}
 function doStorAdv(id){
   if(!key()){S.scr="set";R();ntf("Сначала введи API-ключ");return;}
   var btn=g("stb_"+id);if(btn){btn.disabled=true;btn.textContent="Анализирую...";}

@@ -163,21 +163,20 @@ function zItems(){return S.items[S.zone]||[];}
 function tots(){return DECS.reduce((a,d)=>{a[d.id]=all().filter(i=>i.dec===d.id).length;return a},{});}
 
 async function genAvito(item){
-  const r=await fetch("https://api.rutronix.ai/v1/messages",{
+  const r=await fetch("https://api.rutronix.ai/functions/v1/chat-completions",{
     method:"POST",
     headers:{
       "Content-Type":"application/json",
-      "Authorization":"Bearer "+getApiKey(),
-      "anthropic-version":"2023-06-01"
+      "Authorization":"Bearer "+getApiKey()
     },
     body:JSON.stringify({
       model:"claude-haiku-4-5",
-      max_tokens:1000,
+      max_completion_tokens:1000,
       messages:[{role:"user",content:`Напиши объявление для Авито.\nТовар: ${item.name}\nОписание: ${item.desc||"нет"}\nСостояние: ${item.cond||"б/у, хорошее"}\n\nФормат строго:\nЗАГОЛОВОК: (до 50 символов)\nОПИСАНИЕ: (3–4 предложения честно, без воды)\nЦЕНА: (в рублях)\nТЕГИ: #тег1 #тег2 #тег3`}]
     })
   });
   const d=await r.json();
-  return d.content?.[0]?.text||"Ошибка генерации. Попробуй ещё раз.";
+  return d.choices?.[0]?.message?.content||"Ошибка генерации. Попробуй ещё раз.";
 }
 
 function compressPhoto(file,cb){
@@ -368,7 +367,7 @@ function renderSettings(){
     <div class="settings-wrap">
       <div class="settings-card">
         <h3>🔑 API-ключ RuTronix</h3>
-        <p>Нужен для генерации текста объявлений на Авито. Получи ключ на сайте <b>rutronix.ai</b> → личный кабинет → API.</p>
+        <p>Нужен для генерации текста объявлений на Авито. Получи ключ на сайте <b>console.anthropic.com</b> → Settings → API Keys.</p>
         <div class="key-status ${key?"ok":"no"}">${key?"✅ Ключ сохранён":"❌ Ключ не введён — генерация не работает"}</div>
         <input id="apiKeyInput" type="password" placeholder="Вставь ключ сюда" value="${key?"●".repeat(20):""}">
         <div style="display:flex;gap:8px">
@@ -378,7 +377,7 @@ function renderSettings(){
       </div>
       <div class="settings-card">
         <h3>ℹ️ Как получить ключ</h3>
-        <p>1. Открой <b>rutronix.ai</b><br>2. Зарегистрируйся или войди<br>3. Перейди в раздел API<br>4. Скопируй ключ и вставь выше</p>
+        <p>1. Открой <b>console.anthropic.com</b><br>2. Войди в аккаунт<br>3. Settings → API Keys → Create Key<br>4. Скопируй ключ и вставь выше</p>
       </div>
     </div>`;
 }
@@ -483,5 +482,3 @@ render();
 </script>
 </body>
 </html>
-
-

@@ -172,12 +172,12 @@ function uid(){return Date.now()+"_"+Math.random().toString(36).slice(2);}
 function ntf(m){var e=document.getElementById("notif");e.textContent=m;e.classList.add("show");setTimeout(function(){e.classList.remove("show");},2200);}
 function badge(){var e=document.getElementById("svbadge");e.classList.add("show");setTimeout(function(){e.classList.remove("show");},1500);}
 function compress(file,cb){var r=new FileReader();r.onload=function(ev){var img=new Image();img.onload=function(){var c=document.createElement("canvas"),MAX=900,w=img.width,h=img.height;if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);cb(c.toDataURL("image/jpeg",0.78));};img.src=ev.target.result;};r.readAsDataURL(file);}
-var S={tab:"items",ifl:"all",sfl:"all",items:ld("dcl2_items",[]),shoes:ld("dcl2_shoes",[]),stor:ld("dcl2_stor",[]),savedOrg:ld("dcl_savedorg",[]),form:false,ftype:null,fphotos:[],eid:null,scr:"main",ophotos:[],oadv:null,oload:false,ssearch:"",gquery:"",editIlist:null,tipsTab:"start"};
+var S={tab:"items",ifl:"all",sfl:"all",items:ld("dcl2_items",[]),shoes:ld("dcl2_shoes",[]),stor:ld("dcl2_stor",[]),shopping:ld("dcl_shopping",[]),savedOrg:ld("dcl_savedorg",[]),form:false,ftype:null,fphotos:[],eid:null,scr:"main",ophotos:[],oadv:null,oload:false,ssearch:"",gquery:"",editIlist:null,tipsTab:"start"};
 function svi(){sv("dcl2_items",S.items);badge();}
 function svs(){sv("dcl2_shoes",S.shoes);badge();}
 function svst(){sv("dcl2_stor",S.stor);badge();}
 
-function nav(){return '<div class="bnav">'+[{id:"items",i:"📋",l:"Вещи"},{id:"shoes",i:"👟",l:"Обувь"},{id:"storage",i:"📦",l:"Хранение"},{id:"tips",i:"💡",l:"Советы"}].map(function(t){return '<button class="nb'+(S.tab===t.id?" act":"")+'" onclick="S.tab=\''+t.id+'\';S.form=false;S.fphotos=[];S.eid=null;R()"><span style="font-size:22px">'+t.i+'</span>'+t.l+'</button>';}).join("")+'</div>';}
+function nav(){return '<div class="bnav">'+[{id:"items",i:"📋",l:"Вещи"},{id:"shoes",i:"👟",l:"Обувь"},{id:"storage",i:"📦",l:"Хранение"},{id:"tips",i:"💡",l:"Советы"},{id:"shop",i:"🛒",l:"Покупки"}].map(function(t){return '<button class="nb'+(S.tab===t.id?" act":"")+'" onclick="S.tab=\''+t.id+'\';S.form=false;S.fphotos=[];S.eid=null;R()"><span style="font-size:22px">'+t.i+'</span>'+t.l+'</button>';}).join("")+'</div>';}
 function hdr(t,s){return '<div class="hdr"><div class="hdr-row"><div><h1>'+t+'</h1>'+(s?'<div class="hdr-sub">'+s+'</div>':'')+'</div><div style="display:flex;gap:4px"><button class="bsm" onclick="S.scr=\'search\';S.gquery=\'\';R()">🔍</button><button class="bsm" onclick="S.scr=\'set\';R()">⚙️</button></div></div></div>';}
 function fps(){var th=S.fphotos.map(function(p,i){return '<div class="pthumb"><img src="'+p+'"><button class="pdel" onclick="S.fphotos.splice('+i+',1);R()">×</button></div>';}).join("");return '<input type="file" id="fg" accept="image/*" multiple style="display:none"><input type="file" id="fc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bg">🖼 Галерея</button><button class="pbtn" id="bc">📷 Камера</button></div>'+(th?'<div class="pgrid">'+th+'</div>':'');}
 
@@ -298,6 +298,19 @@ function rStorCard(st){
   o+='<button id="stb_'+st.id+'" onclick="doStorAdv(\''+st.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#6366f1;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">'+(st.adv?"🔄 Совет":"🤖 Совет")+'</button>';
   if(ph.length) o+='<button id="ilb_'+st.id+'" onclick="doStorList(\''+st.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#0ea5e9;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📋 Список</button>';
   o+='</div>';
+  var shopCnt=S.shopping.filter(function(x){return x.storId===st.id;}).length;
+  o+='<div style="margin-bottom:'+(st.adv||st.ilist?'8':'0')+'px">';
+  if(S.shopStor===st.id){
+    o+='<div style="background:#f0fdf4;border-radius:12px;padding:12px;border:1px solid #86efac">';
+    o+='<div style="font-size:13px;font-weight:600;color:#15803d;margin-bottom:8px">🛒 Что купить для этого места?</div>';
+    o+='<input id="shi_'+st.id+'" placeholder="Название товара *" style="width:100%;border:1px solid #bbf7d0;border-radius:8px;padding:9px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:6px">';
+    o+='<input id="shn_'+st.id+'" placeholder="Для чего (необязательно)" style="width:100%;border:1px solid #bbf7d0;border-radius:8px;padding:9px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:8px">';
+    o+='<div style="display:flex;gap:6px"><button onclick="addShopItem(\''+st.id+'\')" style="flex:1;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Добавить</button><button onclick="S.shopStor=null;R()" style="background:#f1f5f9;color:#374151;border:none;border-radius:8px;padding:9px 12px;font-size:13px;cursor:pointer;font-family:inherit">Отмена</button></div>';
+    o+='</div>';
+  } else {
+    o+='<button onclick="S.shopStor=\''+st.id+'\';R()" style="width:100%;padding:9px;border-radius:10px;border:1px dashed #86efac;background:#f0fdf4;color:#15803d;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">🛒 Купить для этого места'+(shopCnt>0?' ('+shopCnt+')':'')+'</button>';
+  }
+  o+='</div>';
   if(st.adv) o+='<div class="adv"><h3>💡 Совет</h3><div class="adv-txt">'+md2html(st.adv)+'</div></div>';
   if(st.ilist){
     if(S.editIlist===st.id) o+='<div class="adv" style="background:#e0f2fe"><h3>📋 Список вещей <button onclick="S.editIlist=null;R()" style="float:right;background:none;border:none;cursor:pointer;font-size:12px;color:#64748b">✕ Закрыть</button></h3><textarea id="ilt_'+st.id+'" style="width:100%;min-height:120px;border:1px solid #bae6fd;border-radius:8px;padding:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box">'+esc(st.ilist)+'</textarea><div style="display:flex;gap:8px;margin-top:8px"><button onclick="saveIlist(\''+st.id+'\')" style="flex:1;padding:8px;border-radius:8px;border:none;background:#0ea5e9;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Сохранить</button><button onclick="S.editIlist=null;R()" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:13px;cursor:pointer;font-family:inherit">Отмена</button></div></div>';
@@ -365,6 +378,76 @@ function rOrg(){
   return o+'</div>';
 }
 
+function goTo(tab,id){S.tab=tab;S.scr='main';S.highlight=id;R();setTimeout(function(){var el=document.getElementById('c'+id);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='3px solid #6366f1';setTimeout(function(){el.style.outline='';S.highlight=null;},1800);}},100);}
+
+function rOnboard(){
+  return '<div class="hdr"><div class="hdr-row"><div><h1>👋 Добро пожаловать!</h1></div></div></div>'+
+  '<div class="wrap">'+
+  '<div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:18px;padding:24px;color:#fff;margin-bottom:20px;text-align:center">'+
+  '<div style="font-size:56px;margin-bottom:12px">🏠</div>'+
+  '<div style="font-size:22px;font-weight:700;margin-bottom:8px">Домашний порядок</div>'+
+  '<div style="font-size:15px;opacity:0.9">Учёт вещей, хранилищ и продаж — всё в одном месте</div>'+
+  '</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">'+
+  '<div style="background:#f0fdf4;border-radius:14px;padding:16px;text-align:center"><div style="font-size:28px">📦</div><div style="font-size:13px;color:#166534;font-weight:600;margin-top:6px">Вещи</div><div style="font-size:12px;color:#4ade80">фото, статус, продажа</div></div>'+
+  '<div style="background:#fef3c7;border-radius:14px;padding:16px;text-align:center"><div style="font-size:28px">👟</div><div style="font-size:13px;color:#92400e;font-weight:600;margin-top:6px">Обувь</div><div style="font-size:12px;color:#f59e0b">по сезонам</div></div>'+
+  '<div style="background:#ede9fe;border-radius:14px;padding:16px;text-align:center"><div style="font-size:28px">🗄️</div><div style="font-size:13px;color:#5b21b6;font-weight:600;margin-top:6px">Хранение</div><div style="font-size:12px;color:#8b5cf6">шкафы, полки, ящики</div></div>'+
+  '<div style="background:#fff1f2;border-radius:14px;padding:16px;text-align:center"><div style="font-size:28px">💡</div><div style="font-size:13px;color:#9f1239;font-weight:600;margin-top:6px">Советы</div><div style="font-size:12px;color:#f43f5e">и AI-организатор</div></div>'+
+  '</div>'+
+  '<button onclick="localStorage.setItem(\'dcl_onboarded\',\'1\');S.scr=\'main\';R();" style="width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit">✨ Начать</button>'+
+  '<button onclick="S.scr=\'main\';localStorage.setItem(\'dcl_onboarded\',\'1\');R();" style="width:100%;background:transparent;color:#6b7280;border:none;padding:10px;font-size:14px;cursor:pointer;margin-top:4px;font-family:inherit">Пропустить</button>'+
+  '</div>';
+}
+
+function rHelp(){
+  return '<div class="hdr"><div class="hdr-row"><div><h1>📖 Инструкция</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">✕</button></div></div>'+
+  '<div class="wrap">'+
+  '<div style="background:#ede9fe;border-radius:14px;padding:16px;margin-bottom:12px">'+
+  '<div style="font-size:16px;font-weight:700;color:#5b21b6;margin-bottom:8px">📦 Вкладка «Вещи»</div>'+
+  '<div style="font-size:14px;color:#4c1d95;line-height:1.6">'+
+  'Добавляйте вещи с фото и описанием. Назначьте статус: <b>Оставить / Продать / Отдать / Позже / Выбросить</b>.<br>'+
+  'Когда вещь продана — нажмите «✅ Продано», она уйдёт в архив.<br>'+
+  'Кнопка <b>Авито</b> генерирует объявление с ценой по ИИ.<br>'+
+  'Стрелка 🗄️ перенаправляет к хранилищу вещи.'+
+  '</div></div>'+
+  '<div style="background:#fef3c7;border-radius:14px;padding:16px;margin-bottom:12px">'+
+  '<div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:8px">👟 Вкладка «Обувь»</div>'+
+  '<div style="font-size:14px;color:#78350f;line-height:1.6">'+
+  'Храните обувь с сезоном и размером. Значок 🟢/⚪ показывает, в сезоне ли пара.<br>'+
+  'Подходит для капсульного гардероба.'+
+  '</div></div>'+
+  '<div style="background:#f0fdf4;border-radius:14px;padding:16px;margin-bottom:12px">'+
+  '<div style="font-size:16px;font-weight:700;color:#166534;margin-bottom:8px">🗄️ Вкладка «Хранение»</div>'+
+  '<div style="font-size:14px;color:#14532d;line-height:1.6">'+
+  'Описывайте шкафы, ящики, полки. Добавляйте фото и инвентарный список.<br>'+
+  'Статус ✅/⚠️ отражает порядок в хранилище.<br>'+
+  'Кнопка <b>Список вещей</b> — текстовый инвентарь с редактированием.<br>'+
+  'Кнопка <b>AI-совет</b> — рекомендация по организации.'+
+  '</div></div>'+
+  '<div style="background:#fff1f2;border-radius:14px;padding:16px;margin-bottom:12px">'+
+  '<div style="font-size:16px;font-weight:700;color:#9f1239;margin-bottom:8px">💡 Советы и AI-организатор</div>'+
+  '<div style="font-size:14px;color:#881337;line-height:1.6">'+
+  'Раздел советов разбит на темы: Старт, Поддержание, Системы, Комнаты, Мотивация.<br>'+
+  'Вкладка <b>Сохранённые</b> — ваши AI-советы по пространству.<br>'+
+  'Кнопка <b>AI-организатор</b> анализирует всё хозяйство и выдаёт персональный план.'+
+  '</div></div>'+
+  '<div style="background:#f1f5f9;border-radius:14px;padding:16px;margin-bottom:12px">'+
+  '<div style="font-size:16px;font-weight:700;color:#374151;margin-bottom:8px">🔄 Синхронизация</div>'+
+  '<div style="font-size:14px;color:#374151;line-height:1.6">'+
+  'В настройках (⚙️) → Экспорт JSON: скачайте всю базу.<br>'+
+  'Импорт: вставьте JSON или отсканируйте QR-код с другого устройства.<br>'+
+  'QR-код передаёт до ~2500 символов (небольшие базы без фото).'+
+  '</div></div>'+
+  '<div style="background:#f0f9ff;border-radius:14px;padding:16px;margin-bottom:20px">'+
+  '<div style="font-size:16px;font-weight:700;color:#0c4a6e;margin-bottom:8px">🤖 Без API-ключа</div>'+
+  '<div style="font-size:14px;color:#0c4a6e;line-height:1.6">'+
+  'Нет ключа Anthropic? Используйте кнопку <b>📋 Промт</b> рядом с AI-кнопками — скопируйте готовый запрос и вставьте в claude.ai вручную.'+
+  '</div></div>'+
+  '<button onclick="S.scr=\'main\';R();" style="width:100%;background:#6366f1;color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit">Понятно!</button>'+
+  '</div>';
+}
+
+
 function rAllItems(){
   var q=(S.gquery||"").toLowerCase().trim();
   var all=q?S.items.filter(function(it){return(it.name||"").toLowerCase().includes(q)||(it.desc||"").toLowerCase().includes(q);})
@@ -390,6 +473,120 @@ function rAllItems(){
   });
   o+='</div>';
   return o+nav();
+}
+
+function svShop(){localStorage.setItem('dcl_shopping',JSON.stringify(S.shopping));}
+function addShopItem(storId){
+  var el=document.getElementById('shi_'+storId);
+  var nel=document.getElementById('shn_'+storId);
+  var name=el?el.value.trim():'';
+  var note=nel?nel.value.trim():'';
+  if(!name) return;
+  S.shopping.push({id:'sh'+Date.now(),name:name,storId:storId||'',note:note,bought:false,created:Date.now()});
+  svShop(); S.shopStor=null; R();
+}
+function addShopItemGlobal(){
+  var el=document.getElementById('shig');
+  var nel=document.getElementById('shng');
+  var sel=document.getElementById('shsg');
+  var name=el?el.value.trim():'';
+  var note=nel?nel.value.trim():'';
+  var storId=sel?sel.value:'';
+  if(!name) return;
+  S.shopping.push({id:'sh'+Date.now(),name:name,storId:storId,note:note,bought:false,created:Date.now()});
+  svShop(); S.shopForm=null; R();
+}
+function toggleBought(id){
+  var it=S.shopping.find(function(x){return x.id===id;});
+  if(it) it.bought=!it.bought;
+  svShop(); R();
+}
+function delShopItem(id){
+  if(!confirm('Удалить?')) return;
+  S.shopping=S.shopping.filter(function(x){return x.id!==id;});
+  svShop(); R();
+}
+function clearBought(){
+  if(!confirm('Убрать все купленные?')) return;
+  S.shopping=S.shopping.filter(function(x){return !x.bought;});
+  svShop(); R();
+}
+function startEditShop(id){S.shopEdit=id;R();}
+function saveEditShop(id){
+  var it=S.shopping.find(function(x){return x.id===id;});
+  if(!it) return;
+  var n=(document.getElementById('shed_n')||{value:''}).value.trim();
+  var note=(document.getElementById('shed_nt')||{value:''}).value.trim();
+  var sid=(document.getElementById('shed_s')||{value:''}).value;
+  if(!n) return;
+  it.name=n; it.note=note; it.storId=sid;
+  svShop(); S.shopEdit=null; R();
+}
+
+function rShop(){
+  var items=S.shopping;
+  var total=items.length;
+  var bought=items.filter(function(x){return x.bought;}).length;
+  var sub=total>0?(total-bought)+' осталось':'';
+  var o=hdr('🛒 Покупки',sub);
+  o+='<div class="wrap">';
+  var showForm=S.shopForm==='new';
+  if(!showForm){
+    o+='<button onclick="S.shopForm=\'new\';R()" style="width:100%;background:#6366f1;color:#fff;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:16px">+ Добавить покупку</button>';
+  } else {
+    var sOpts='<option value="">— Без зоны —</option>'+S.stor.map(function(s){return '<option value="'+s.id+'">'+esc(s.name)+'</option>';}).join('');
+    o+='<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:16px;border:2px solid #6366f1">';
+    o+='<div style="font-size:14px;font-weight:600;color:#374151;margin-bottom:10px">Новая покупка</div>';
+    o+='<input id="shig" placeholder="Что купить *" style="width:100%;border:1px solid #e2e8f0;border-radius:10px;padding:10px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:8px">';
+    o+='<input id="shng" placeholder="Для чего (необязательно)" style="width:100%;border:1px solid #e2e8f0;border-radius:10px;padding:10px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:8px">';
+    o+='<select id="shsg" style="width:100%;border:1px solid #e2e8f0;border-radius:10px;padding:10px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:12px;background:#fff">'+sOpts+'</select>';
+    o+='<div style="display:flex;gap:8px">';
+    o+='<button onclick="addShopItemGlobal()" style="flex:1;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Добавить</button>';
+    o+='<button onclick="S.shopForm=null;R()" style="flex:1;background:#f1f5f9;color:#374151;border:none;border-radius:10px;padding:10px;font-size:14px;cursor:pointer;font-family:inherit">Отмена</button>';
+    o+='</div></div>';
+  }
+  if(total===0){
+    o+='<div style="text-align:center;padding:40px 20px;color:#94a3b8"><div style="font-size:48px;margin-bottom:12px">🛒</div><div style="font-size:16px;font-weight:600;margin-bottom:6px">Список пуст</div><div style="font-size:14px">Добавляй нужные покупки сюда или прямо из карточек хранилищ</div></div>';
+    return o+'</div>'+nav();
+  }
+  var groups={};
+  items.forEach(function(it){var key=it.storId||'__none__';if(!groups[key])groups[key]=[];groups[key].push(it);});
+  Object.keys(groups).forEach(function(k){groups[k].sort(function(a,b){return (a.bought?1:0)-(b.bought?1:0);});});
+  var keys=Object.keys(groups).sort(function(a,b){if(a==='__none__')return 1;if(b==='__none__')return -1;return 0;});
+  keys.forEach(function(key){
+    var grp=groups[key];
+    var stor=S.stor.find(function(s){return s.id===key;});
+    var label=stor?('🗄️ '+esc(stor.name)):'📝 Без зоны';
+    var grpBought=grp.filter(function(x){return x.bought;}).length;
+    o+='<div style="margin-bottom:18px">';
+    o+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    o+='<div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px">'+label+'</div>';
+    if(grpBought>0) o+='<span style="font-size:11px;color:#94a3b8">'+grpBought+' куплено</span>';
+    o+='</div>';
+    grp.forEach(function(it){
+      if(S.shopEdit===it.id){
+        var edOpts='<option value="">— Без зоны —</option>'+S.stor.map(function(s){return '<option value="'+s.id+'"'+(s.id===it.storId?' selected':'')+'>'+esc(s.name)+'</option>';}).join('');
+        o+='<div style="background:#fff;border-radius:12px;padding:12px;border:2px solid #6366f1;margin-bottom:8px">';
+        o+='<input id="shed_n" value="'+esc(it.name)+'" placeholder="Что купить" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:6px">';
+        o+='<input id="shed_nt" value="'+esc(it.note||'')+'" placeholder="Для чего" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:6px">';
+        o+='<select id="shed_s" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:10px;background:#fff">'+edOpts+'</select>';
+        o+='<div style="display:flex;gap:6px"><button onclick="saveEditShop(\''+it.id+'\')" style="flex:1;background:#6366f1;color:#fff;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Сохранить</button><button onclick="S.shopEdit=null;R()" style="background:#f1f5f9;color:#374151;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;font-family:inherit">Отмена</button></div></div>';
+      } else {
+        o+='<div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border-radius:12px;padding:12px;margin-bottom:6px;'+(it.bought?'opacity:.5;':'')+'border:1px solid #f1f5f9">';
+        o+='<button onclick="toggleBought(\''+it.id+'\')" style="flex-shrink:0;margin-top:1px;width:22px;height:22px;border-radius:6px;border:2px solid '+(it.bought?'#6366f1':'#d1d5db')+';background:'+(it.bought?'#6366f1':'#fff')+';cursor:pointer;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0">'+(it.bought?'✓':'')+'</button>';
+        o+='<div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:500;'+(it.bought?'text-decoration:line-through;color:#94a3b8':'color:#1e293b')+'">'+esc(it.name)+'</div>';
+        if(it.note) o+='<div style="font-size:12px;color:#64748b;margin-top:2px">для: '+esc(it.note)+'</div>';
+        o+='</div>';
+        o+='<div style="display:flex;gap:4px;flex-shrink:0">';
+        o+='<button onclick="startEditShop(\''+it.id+'\')" style="background:#f1f5f9;border:none;border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;color:#64748b">✏️</button>';
+        o+='<button onclick="delShopItem(\''+it.id+'\')" style="background:#fef2f2;border:none;border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;color:#ef4444">✕</button>';
+        o+='</div></div>';
+      }
+    });
+    o+='</div>';
+  });
+  if(bought>0) o+='<button onclick="clearBought()" style="width:100%;background:#f8fafc;color:#94a3b8;border:1px dashed #cbd5e1;border-radius:12px;padding:12px;font-size:13px;cursor:pointer;font-family:inherit;margin-top:4px">🗑 Убрать купленные ('+bought+')</button>';
+  return o+'</div>'+nav();
 }
 
 function rSearch(){
@@ -596,6 +793,7 @@ function checkImportHash(){
 function R(){
   var h="";
   if(S.scr==="onboard") h=rOnboard();
+  else if(S.scr==="help") h=rHelp();
   else if(S.scr==="set") h=rSet();
   else if(S.scr==="org") h=rOrg();
   else if(S.scr==="search") h=rSearch();
@@ -605,6 +803,7 @@ function R(){
   else if(S.tab==="shoes") h=rShoes();
   else if(S.tab==="storage") h=rStor();
   else if(S.tab==="tips") h=rTips();
+  else if(S.tab==="shop") h=rShop();
   document.getElementById("root").innerHTML=h;
   ev();
   if(S.scr==="search"){var _gs=document.getElementById("gsq");if(_gs){var _gl=S.gquery?S.gquery.length:0;_gs.focus();try{_gs.setSelectionRange(_gl,_gl);}catch(e){}}}

@@ -310,25 +310,25 @@ function rHome(){
   var nd=S.items.filter(function(i){return !i.s||i.s==="later";});
   var pct=ni>0?Math.round(done/ni*100):0;
   var isEmpty=!ni&&!ns&&!nst;
-  var o=hdr("\U0001F3E0 Дом","");
+  var o=hdr("🏠 Дом","");
   o+='<div class="wrap" style="padding-top:8px">';
 
   // --- Блок первого старта ---
   if(isEmpty){
     o+='<div style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);border-radius:16px;padding:18px 16px;margin-bottom:16px">';
-    o+='<div style="font-size:16px;font-weight:700;color:#5b21b6;margin-bottom:4px">\U0001F44B Добро пожаловать!</div>';
+    o+='<div style="font-size:16px;font-weight:700;color:#5b21b6;margin-bottom:4px">👋 Добро пожаловать!</div>';
     o+='<div style="font-size:13px;color:#6d28d9;margin-bottom:14px;line-height:1.5">Приложение для домашнего порядка. Начни с трёх шагов:</div>';
     o+='<div onclick="S.tab=\'myitems\';S.myFilter=\'storage\';R()" style="background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">';
     o+='<div style="width:28px;height:28px;background:#6366f1;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">1</div>';
-    o+='<div><div style="font-size:14px;font-weight:600;color:#1e293b">\U0001F5C4 Добавь хранилища</div><div style="font-size:12px;color:#64748b">шкаф, ящик, полка — где лежат вещи</div></div>';
+    o+='<div><div style="font-size:14px;font-weight:600;color:#1e293b">🗄 Добавь хранилища</div><div style="font-size:12px;color:#64748b">шкаф, ящик, полка — где лежат вещи</div></div>';
     o+='<div style="margin-left:auto;color:#94a3b8;font-size:18px">›</div></div>';
     o+='<div onclick="S.tab=\'myitems\';S.myFilter=\'items\';S.form=true;S.ftype=\'item\';S.fphotos=[];S.eid=null;R()" style="background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">';
     o+='<div style="width:28px;height:28px;background:#8b5cf6;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">2</div>';
-    o+='<div><div style="font-size:14px;font-weight:600;color:#1e293b">\U0001F4CB Добавь вещи</div><div style="font-size:12px;color:#64748b">с фото и статусом: оставить / продать / отдать</div></div>';
+    o+='<div><div style="font-size:14px;font-weight:600;color:#1e293b">📋 Добавь вещи</div><div style="font-size:12px;color:#64748b">с фото и статусом: оставить / продать / отдать</div></div>';
     o+='<div style="margin-left:auto;color:#94a3b8;font-size:18px">›</div></div>';
     o+='<div onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()" style="background:#fff;border-radius:12px;padding:12px;cursor:pointer;display:flex;align-items:center;gap:10px">';
     o+='<div style="width:28px;height:28px;background:#a78bfa;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">3</div>';
-    o+='<div><div style="font-size:14px;font-weight:600;color:#1e293b">\U0001F916 Получи AI-совет</div><div style="font-size:12px;color:#64748b">загрузи фото — ИИ подскажет как организовать</div></div>';
+    o+='<div><div style="font-size:14px;font-weight:600;color:#1e293b">🤖 Получи AI-совет</div><div style="font-size:12px;color:#64748b">загрузи фото — ИИ подскажет как организовать</div></div>';
     o+='<div style="margin-left:auto;color:#94a3b8;font-size:18px">›</div></div>';
     o+='</div>';
   }
@@ -361,9 +361,9 @@ function rHome(){
       o+='<div style="font-size:12px;color:#94a3b8;line-height:1.4">Назначь статус каждой вещи — <b>Оставить / Продать / Отдать / Выбросить</b> — и прогресс начнёт расти</div>';
     } else {
       o+='<div style="display:flex;gap:12px;font-size:12px;color:#64748b;flex-wrap:wrap">';
-      if(sell>0) o+='<span>\U0001F4B0 продать: <b>'+sell+'</b></span>';
-      if(don>0) o+='<span>\U0001F91D отдать: <b>'+don+'</b></span>';
-      if(tr>0) o+='<span>\U0001F5D1 выбросить: <b>'+tr+'</b></span>';
+      if(sell>0) o+='<span>💰 продать: <b>'+sell+'</b></span>';
+      if(don>0) o+='<span>🤝 отдать: <b>'+don+'</b></span>';
+      if(tr>0) o+='<span>🗑 выбросить: <b>'+tr+'</b></span>';
       if(done>0) o+='<span>✅ готово: <b>'+done+'</b></span>';
       o+='</div>';
     }
@@ -376,7 +376,7 @@ function rHome(){
     o+='<div style="font-size:13px;font-weight:600;color:#ef4444;margin-bottom:8px">⚠️ Беспорядок: '+messy.length+' хранилища</div>';
     o+=messy.slice(0,3).map(function(s){
       return '<div onclick="S.tab=\'myitems\';S.myFilter=\'storage\';S.scr=\'main\';R()" style="padding:8px 0;border-bottom:1px solid #fee2e2;cursor:pointer;font-size:14px;color:#374151;display:flex;justify-content:space-between;align-items:center">'
-        +'<span>\U0001F4E6 '+esc(s.name)+(s.loc?' <span style="color:#94a3b8;font-size:12px">· '+esc(s.loc)+'</span>':'')+'</span>'
+        +'<span>📦 '+esc(s.name)+(s.loc?' <span style="color:#94a3b8;font-size:12px">· '+esc(s.loc)+'</span>':'')+'</span>'
         +'<span style="font-size:12px;color:#f87171">› разобрать</span></div>';
     }).join("");
     if(messy.length>3) o+='<div style="font-size:12px;color:#94a3b8;margin-top:6px">и ещё '+(messy.length-3)+' хранилища</div>';
@@ -392,7 +392,7 @@ function rHome(){
     o+='<div style="font-size:12px;color:#a16207;margin-bottom:8px">Оставить, продать, отдать или выбросить?</div>';
     o+=nd.slice(0,3).map(function(it){
       return '<div onclick="S.tab=\'myitems\';S.myFilter=\'items\';R()" style="padding:7px 0;border-bottom:1px solid #fef3c7;cursor:pointer;font-size:14px;color:#374151;display:flex;justify-content:space-between;align-items:center">'
-        +'<span>\U0001F4CB '+esc(it.name)+'</span>'
+        +'<span>📋 '+esc(it.name)+'</span>'
         +'<span style="font-size:12px;color:#f59e0b">› решить</span></div>';
     }).join('');
     if(nd.length>3) o+='<div style="font-size:12px;color:#94a3b8;margin-top:6px">и ещё '+(nd.length-3)+' вещей</div>';
@@ -402,12 +402,12 @@ function rHome(){
   // --- Быстрые действия ---
   o+='<div style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Быстрые действия</div>';
   o+='<button onclick="S.tab=\'myitems\';S.myFilter=\'items\';S.ifl=\'all\';R()" style="width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:14px;padding:13px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">';
-  o+='<span>\U0001F9F9 Мои вещи</span><span style="font-size:12px;opacity:.8">вещи · обувь · хранилища ›</span></button>';
+  o+='<span>🧹 Мои вещи</span><span style="font-size:12px;opacity:.8">вещи · обувь · хранилища ›</span></button>';
   o+='<div style="display:flex;gap:8px;margin-bottom:4px">';
   o+='<div onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()" style="flex:1;background:#fff;color:#6366f1;border:2px solid #6366f1;border-radius:14px;padding:11px 8px;font-size:13px;font-weight:600;cursor:pointer;text-align:center">';
-  o+='\U0001F916 ИИ-совет<div style="font-size:10px;font-weight:400;color:#94a3b8;margin-top:2px">фото → план</div></div>';
+  o+='🤖 ИИ-совет<div style="font-size:10px;font-weight:400;color:#94a3b8;margin-top:2px">фото → план</div></div>';
   o+='<div onclick="S.scr=\'tips\';R()" style="flex:1;background:#fff;color:#8b5cf6;border:2px solid #8b5cf6;border-radius:14px;padding:11px 8px;font-size:13px;font-weight:600;cursor:pointer;text-align:center">';
-  o+='\U0001F4A1 Советы<div style="font-size:10px;font-weight:400;color:#94a3b8;margin-top:2px">мотивация · системы</div></div>';
+  o+='💡 Советы<div style="font-size:10px;font-weight:400;color:#94a3b8;margin-top:2px">мотивация · системы</div></div>';
   o+='</div>';
   o+='</div>';
   return o+nav();

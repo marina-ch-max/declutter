@@ -971,25 +971,47 @@ function addShopFromAdvText(name,storId){
 function addCartBtns(html,storId){
   var sid=storId||"";
   var bs="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap";
-  html=html.replace(/(<thead>)(<tr[^>]*>)([\s\S]*?)(<\/tr>)(<\/thead>)/g,function(m,a,b,c,d,e){
+  // Найти секцию «Что докупить» и обрабатывать только её
+  var dokIdx=html.search(/докупить/i);
+  if(dokIdx<0)return html;
+  // Конец заголовка содержащего «докупить»
+  var closeTag=html.indexOf('</h',dokIdx);
+  var sectionStart=closeTag>0?html.indexOf('>',closeTag)+1:dokIdx;
+  var before=html.slice(0,sectionStart);
+  var rest=html.slice(sectionStart);
+  // Следующий крупный заголовок h2/h3 — граница секции
+  var nextHdr=rest.search(/<h[23][^>]*>/);
+  var after='';
+  if(nextHdr>0){after=rest.slice(nextHdr);rest=rest.slice(0,nextHdr);}
+  // 1. Таблицы: доб. пустой th в шапку и кнопку в каждую строку тела
+  rest=rest.replace(/(<thead>)(<tr[^>]*>)([\s\S]*?)(<\/tr>)(<\/thead>)/g,function(m,a,b,c,d,e){
     return a+b+c+"<th></th>"+d+e;
   });
-  html=html.replace(/<tbody>([\s\S]*?)<\/tbody>/g,function(m,tbody){
+  rest=rest.replace(/<tbody>([\s\S]*?)<\/tbody>/g,function(m,tbody){
     var rows=tbody.replace(/<tr>([\s\S]*?)<\/tr>/g,function(m2,cells){
       var nm=cells.match(/<td>([\s\S]*?)<\/td>/);
       if(!nm)return m2;
-      var name=nm[1].replace(/<[^>]*>/g,"").trim().split("—")[0].split(" - ")[0].split(" – ")[0].trim();
+      var name=nm[1].replace(/<[^>]*>/g,"").replace(/\[\s*\]/g,"").trim().split("—")[0].split(" - ")[0].split(" – ")[0].trim();
+      if(!name)return m2;
       var ename=encodeURIComponent(name);
       return "<tr>"+cells+'<td style="text-align:center;padding:4px 6px"><button onclick="addShopFromAdvText(decodeURIComponent(\''+ename+'\'),\''+sid+'\')" style="'+bs+'">🛒</button></td></tr>';
     });
     return "<tbody>"+rows+"</tbody>";
   });
-  html=html.replace(/•\s*([^•<\n][^\n<]*)/g,function(m,item){
+  // 2. Элементы <li> (формат [ ] текст или обычный)
+  rest=rest.replace(/<li>([\s\S]*?)<\/li>/g,function(m,item){
+    var name=item.replace(/<[^>]*>/g,"").replace(/^\[\s*\]\s*/,"").trim().split("—")[0].split(" - ")[0].split("(")[0].trim();
+    if(!name)return m;
+    var ename=encodeURIComponent(name);
+    return '<li>'+item+' <button onclick="addShopFromAdvText(decodeURIComponent(\''+ename+'\'),\''+sid+'\')" style="'+bs+'">🛒</button></li>';
+  });
+  // 3. Пункты с символом • (формат doStorAdv)
+  rest=rest.replace(/•\s*([^•<\n][^\n<]*)/g,function(m,item){
     var name=item.split("—")[0].split(" - ")[0].split(" – ")[0].trim();
     var ename=encodeURIComponent(name);
     return "• "+item+' <button onclick="addShopFromAdvText(decodeURIComponent(\''+ename+'\'),\''+sid+'\')" style="'+bs+'">🛒</button>';
   });
-  return html;
+  return before+rest+after;
 }
 function doStorAdv(id){
   if(!key()){S.scr="set";R();ntf("Сначала введи API-ключ");return;}

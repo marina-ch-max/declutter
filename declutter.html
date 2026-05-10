@@ -420,6 +420,31 @@ function rHome(){
     o+='</div>';
   }
 
+  // --- Как пользоваться ---
+  o+='<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;border:1px solid #e2e8f0">';
+  o+='<div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:10px">📖 Как пользоваться</div>';
+  var steps=[
+    {icon:'📦',tab:'storage',title:'Хранение',desc:'Добавь шкафы, ящики, полки',color:'#10b981'},
+    {icon:'📋',tab:'items',title:'Разбор',desc:'Фото вещей → назначь статус или хранилище',color:'#6366f1'},
+    {icon:'👟',tab:'shoes',title:'Обувь',desc:'Учёт по сезонам и размерам',color:'#0ea5e9'},
+    {icon:'💰',tab:'sell',title:'Продать',desc:'ИИ пишет объявление для Авито',color:'#f59e0b'},
+    {icon:'🛒',tab:'buy',title:'Купить',desc:'Список покупок по хранилищам',color:'#8b5cf6'},
+  ];
+  steps.forEach(function(s){
+    var onclick;
+    if(s.tab==='storage') onclick="S.tab='myitems';S.myFilter='storage';R()";
+    else if(s.tab==='items') onclick="S.tab='myitems';S.myFilter='items';R()";
+    else if(s.tab==='shoes') onclick="S.tab='myitems';S.myFilter='shoes';R()";
+    else if(s.tab==='sell') onclick="S.tab='actions';S.actTab='sell';R()";
+    else onclick="S.tab='actions';S.actTab='buy';R()";
+    o+='<div onclick="'+onclick+'" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;cursor:pointer">'
+      +'<div style="width:32px;height:32px;background:'+s.color+'18;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">'+s.icon+'</div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:#1e293b">'+s.title+'</div>'
+      +'<div style="font-size:11px;color:#94a3b8;margin-top:1px">'+s.desc+'</div></div>'
+      +'<div style="color:#cbd5e1;font-size:16px">›</div></div>';
+  });
+  o+='</div>';
+
   // --- Быстрые действия ---
   o+='<div style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Быстрые действия</div>';
   o+='<button onclick="S.tab=\'myitems\';S.myFilter=\'items\';S.ifl=\'all\';R()" style="width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:14px;padding:13px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">';
@@ -625,22 +650,29 @@ function rStorForm(){var dr=S.fdraft||{};return '<div class="fwrap"><div class="
 function goTo(tab,id){if(tab==='items'){S.tab='myitems';S.myFilter='items';}else if(tab==='shoes'){S.tab='myitems';S.myFilter='shoes';}else if(tab==='storage'){S.tab='myitems';S.myFilter='storage';}else if(tab==='shop'){S.tab='actions';S.actTab='buy';}else{S.tab=tab;}S.scr='main';S.highlight=id;R();setTimeout(function(){var el=document.getElementById('c'+id);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='3px solid #6366f1';setTimeout(function(){el.style.outline='';S.highlight=null;},1800);}},100);}
 
 function rOnboard(){
-  return '<div class="hdr"><div class="hdr-row"><div><h1>👋 Добро пожаловать!</h1></div></div></div>'+
-  '<div class="wrap">'+
-  '<div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:18px;padding:24px;color:#fff;margin-bottom:20px;text-align:center">'+
-  '<div style="font-size:56px;margin-bottom:12px">🏠</div>'+
-  '<div style="font-size:22px;font-weight:700;margin-bottom:8px">Домашний порядок</div>'+
-  '<div style="font-size:15px;opacity:0.9">Учёт вещей, хранилищ и продаж — всё в одном месте</div>'+
-  '</div>'+
-  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">'+
-  '<div style="background:#f0fdf4;border-radius:14px;padding:16px;text-align:center"><div style="font-size:28px">📦</div><div style="font-size:13px;color:#166534;font-weight:600;margin-top:6px">Вещи</div><div style="font-size:12px;color:#4ade80">фото, статус, продажа</div></div>'+
-  '<div style="background:#fef3c7;border-radius:14px;padding:16px;text-align:center"><div style="font-size:28px">👟</div><div style="font-size:13px;color:#92400e;font-weight:600;margin-top:6px">Обувь</div><div style="font-size:12px;color:#f59e0b">по сезонам</div></div>'+
-  '<div style="background:#ede9fe;border-radius:14px;padding:16px;text-align:center"><div style="font-size:28px">🗄️</div><div style="font-size:13px;color:#5b21b6;font-weight:600;margin-top:6px">Хранение</div><div style="font-size:12px;color:#8b5cf6">шкафы, полки, ящики</div></div>'+
-  '<div style="background:#fff1f2;border-radius:14px;padding:16px;text-align:center"><div style="font-size:28px">💡</div><div style="font-size:13px;color:#9f1239;font-weight:600;margin-top:6px">Советы</div><div style="font-size:12px;color:#f43f5e">и AI-организатор</div></div>'+
-  '</div>'+
-  '<button onclick="localStorage.setItem(\'dcl_onboarded\',\'1\');S.scr=\'main\';S.tab=\'tips\';R();" style="width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit">✨ Начать</button>'+
-  '<button onclick="S.scr=\'main\';S.tab=\'tips\';localStorage.setItem(\'dcl_onboarded\',\'1\');R();" style="width:100%;background:transparent;color:#6b7280;border:none;padding:10px;font-size:14px;cursor:pointer;margin-top:4px;font-family:inherit">Пропустить</button>'+
-  '</div>';
+  var startFn="localStorage.setItem('dcl_onboarded','1');S.scr='main';S.tab='home';R();";
+  return '<div style="min-height:100vh;background:linear-gradient(160deg,#f5f3ff 0%,#ede9fe 50%,#ddd6fe 100%);display:flex;flex-direction:column">'
+    +'<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px 16px;text-align:center">'
+    +'<div style="font-size:64px;margin-bottom:16px">🏠</div>'
+    +'<div style="font-size:24px;font-weight:800;color:#3730a3;margin-bottom:8px">Домашний порядок</div>'
+    +'<div style="font-size:15px;color:#5b21b6;line-height:1.6;max-width:280px">Разбери вещи, найди им место,<br>продай лишнее — всё в одном месте</div>'
+    +'</div>'
+    +'<div style="background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 32px;box-shadow:0 -4px 24px rgba(99,102,241,.12)">'
+    +'<div style="font-size:13px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;text-align:center">Как это работает</div>'
+    +'<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">'
+    +'<div style="display:flex;align-items:center;gap:14px;background:#f8fafc;border-radius:14px;padding:14px">'
+    +'<div style="width:40px;height:40px;background:#6366f1;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📦</div>'
+    +'<div><div style="font-size:14px;font-weight:700;color:#1e293b">Добавь хранилища</div><div style="font-size:12px;color:#64748b;margin-top:2px">Шкаф, ящик, полка — где лежат вещи</div></div></div>'
+    +'<div style="display:flex;align-items:center;gap:14px;background:#f8fafc;border-radius:14px;padding:14px">'
+    +'<div style="width:40px;height:40px;background:#8b5cf6;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📋</div>'
+    +'<div><div style="font-size:14px;font-weight:700;color:#1e293b">Сфотографируй вещи</div><div style="font-size:12px;color:#64748b;margin-top:2px">Назначь: оставить, продать, отдать, выбросить</div></div></div>'
+    +'<div style="display:flex;align-items:center;gap:14px;background:#f8fafc;border-radius:14px;padding:14px">'
+    +'<div style="width:40px;height:40px;background:#10b981;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">✅</div>'
+    +'<div><div style="font-size:14px;font-weight:700;color:#1e293b">Смотри прогресс</div><div style="font-size:12px;color:#64748b;margin-top:2px">ИИ поможет написать объявление и организовать пространство</div></div></div>'
+    +'</div>'
+    +'<button onclick="'+startFn+'" style="width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(99,102,241,.35)">Начать →</button>'
+    +'</div>'
+    +'</div>';
 }
 
 function rHelp(){

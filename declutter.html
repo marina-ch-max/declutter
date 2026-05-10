@@ -487,12 +487,12 @@ function rTips(){
   var t=S.items.length,sell=0,don=0,tr=0,done=0;
   S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;});
   done=sell+don+tr;
-  var tabs=[{id:"start",l:"🚀 Старт"},{id:"maintain",l:"🔄 Поддержание"},{id:"systems",l:"📦 Системы"},{id:"rooms",l:"🏠 Комнаты"},{id:"motiv",l:"💪 Мотивация"}];
+  var tabs=[{id:"start",l:"🚀 Старт"},{id:"maintain",l:"🔄 Поддержание"},{id:"systems",l:"📦 Системы"},{id:"rooms",l:"🏠 Комнаты"},{id:"motiv",l:"💪 Мотивация"},{id:"howto",l:"📖 Как пользоваться"}];
   var secMap={start:0,maintain:1,systems:2,rooms:3,motiv:4};
   var o='<div class="hdr"><div class="hdr-row"><div><h1>💡 Советы</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◄ Назад</button></div></div>';
   // progress block
   o+='<div class="wrap">';
-  o+='<div style="display:flex;gap:8px;margin-bottom:12px"><button onclick="S.scr=\'set\';R()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:13px;color:#475569;cursor:pointer;font-family:inherit">📤 Синхронизация</button><button onclick="S.scr=\'help\';R()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:13px;color:#475569;cursor:pointer;font-family:inherit">📖 Инструкция</button></div>';
+  o+='<div style="margin-bottom:12px"><button onclick="S.scr=\'set\';R()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:13px;color:#475569;cursor:pointer;font-family:inherit">📤 Синхронизация</button></div>';
   o+='<div class="motiv">';
   if(done>0){
     var pct=t?Math.round(done/t*100):0;
@@ -526,6 +526,8 @@ function rTips(){
           '</div>';
       }).join("");
     }
+  } else if(S.tipsTab==="howto") {
+    o+='<div style="background:#ede9fe;border-radius:14px;padding:16px;margin-bottom:12px"><div style="font-size:16px;font-weight:700;color:#5b21b6;margin-bottom:8px">📦 Вкладка «Вещи»</div><div style="font-size:14px;color:#4c1d95;line-height:1.6">Добавляйте вещи с фото и описанием. Назначьте статус: <b>Оставить / Продать / Отдать / Позже / Выбросить</b>.<br>Когда вещь продана — нажмите «✅ Продано», она уйдёт в архив.<br>Кнопка <b>Авито</b> генерирует объявление с ценой по ИИ.<br>Стрелка 🗄️ перенаправляет к хранилищу вещи.</div></div><div style="background:#fef3c7;border-radius:14px;padding:16px;margin-bottom:12px"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:8px">👟 Вкладка «Обувь»</div><div style="font-size:14px;color:#78350f;line-height:1.6">Храните обувь с сезоном и размером. Значок 🟢/⚪ показывает, в сезоне ли пара.<br>Подходит для капсульного гардероба.</div></div><div style="background:#f0fdf4;border-radius:14px;padding:16px;margin-bottom:12px"><div style="font-size:16px;font-weight:700;color:#166534;margin-bottom:8px">🗄️ Вкладка «Хранение»</div><div style="font-size:14px;color:#14532d;line-height:1.6">Описывайте шкафы, ящики, полки. Добавляйте фото и инвентарный список.<br>Статус ✅/⚠️ отражает порядок в хранилище.<br>Кнопка <b>Список вещей</b> — текстовый инвентарь с редактированием.<br>Кнопка <b>AI-совет</b> — рекомендация по организации.</div></div><div style="background:#fff1f2;border-radius:14px;padding:16px;margin-bottom:12px"><div style="font-size:16px;font-weight:700;color:#9f1239;margin-bottom:8px">💡 Советы и AI-организатор</div><div style="font-size:14px;color:#881337;line-height:1.6">Раздел советов разбит на темы: Старт, Поддержание, Системы, Комнаты, Мотивация.<br>Кнопка <b>AI-организатор</b> анализирует всё хозяйство и выдаёт персональный план.</div></div><div style="background:#f1f5f9;border-radius:14px;padding:16px;margin-bottom:12px"><div style="font-size:16px;font-weight:700;color:#374151;margin-bottom:8px">🔄 Синхронизация</div><div style="font-size:14px;color:#374151;line-height:1.6">В настройках (⚙️) → Экспорт JSON: скачайте всю базу.<br>Импорт: вставьте JSON или отсканируйте QR-код с другого устройства.<br>QR-код передаёт до ~2500 символов (небольшие базы без фото).</div></div><div style="background:#f0f9ff;border-radius:14px;padding:16px;margin-bottom:12px"><div style="font-size:16px;font-weight:700;color:#0c4a6e;margin-bottom:8px">🤖 Без API-ключа</div><div style="font-size:14px;color:#0c4a6e;line-height:1.6">Нет ключа Anthropic? Используйте кнопку <b>📋 Промт</b> рядом с AI-кнопками — скопируйте готовый запрос и вставьте в claude.ai вручную.</div></div>';
   } else {
     var secIdx=secMap[S.tipsTab]||0;
     var sec=TIPS_SECTIONS[secIdx];

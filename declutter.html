@@ -178,8 +178,6 @@ function svs(){sv("dcl2_shoes",S.shoes);badge();}
 function svst(){sv("dcl2_stor",S.stor);badge();}
 
 function nav(){return '<div class="bnav">'+[{id:"home",i:"🏠",l:"Главная"},{id:"myitems",i:"🧹",l:"Мои вещи"},{id:"actions",i:"🛒",l:"Купить/продать"}].map(function(t){return '<button class="nb'+(S.tab===t.id?" act":"")+'" onclick="S.tab=\''+t.id+'\';S.form=false;S.fphotos=[];S.eid=null;R()"><span style="font-size:22px">'+t.i+'</span>'+t.l+'</button>';}).join("")+'</div>';}
-function invSubTabs(){if(S.tab!=="inventory")return "";var tabs=[{id:"items",i:"📋",l:"Вещи"},{id:"shoes",i:"👟",l:"Обувь"},{id:"storage",i:"📦",l:"Хранение"}];return '<div style="display:flex;border-bottom:2px solid #e2e8f0;background:#fff;padding:0 12px;position:sticky;top:0;z-index:10">'+tabs.map(function(t){var act=S.invTab===t.id;return '<button onclick="S.invTab=\''+ t.id+'\';S.form=false;S.fphotos=[];R()" '+'style="flex:1;padding:10px 4px;border:none;background:transparent;font-size:13px;font-weight:600;'+'color:'+(act?"#6366f1":"#94a3b8")+';cursor:pointer;font-family:inherit;'+'border-bottom:2px solid '+(act?"#6366f1":"transparent")+';margin-bottom:-2px">'+t.i+' '+t.l+'</button>';}).join("")+'</div>';}
-function advSubTabs(){if(S.tab!=="advice")return "";var tabs=[{id:"tips",i:"💡",l:"Советы"},{id:"shop",i:"🛒",l:"Покупки"}];return '<div style="display:flex;border-bottom:2px solid #e2e8f0;background:#fff;padding:0 12px;position:sticky;top:0;z-index:10">'+tabs.map(function(t){var act=S.advTab===t.id;return '<button onclick="S.advTab=\''+ t.id+'\';S.form=false;S.fphotos=[];R()" '+'style="flex:1;padding:10px 4px;border:none;background:transparent;font-size:14px;font-weight:600;'+'color:'+(act?"#6366f1":"#94a3b8")+';cursor:pointer;font-family:inherit;'+'border-bottom:2px solid '+(act?"#6366f1":"transparent")+';margin-bottom:-2px">'+t.i+' '+t.l+'</button>';}).join("")+'</div>';}
 function hdr(t,s){return '<div class="hdr"><div class="hdr-row"><div><h1>'+t+'</h1>'+(s?'<div class="hdr-sub">'+s+'</div>':'')+'</div><div style="display:flex;gap:4px"><button class="bsm" onclick="S.scr=\'search\';S.gquery=\'\';R()">🔍</button><button class="bsm" onclick="S.scr=\'tips\';R()" title="Советы">💡</button><button class="bsm" onclick="S.scr=\'set\';R()">⚙️</button></div></div></div>';}
 function saveDraft(){var ids=["fn","fd","fk","fst","fsn","fsp","fss","fsl","fsea","fstn","fstl","fstc","en","ed","ek","est","esn","esp","ess","esl","esea","estn","estl","estc"];var d={};ids.forEach(function(id){var e=document.getElementById(id);if(e)d[id]=e.value;});S.fdraft=d;}
 function fps(){var th=S.fphotos.map(function(p,i){return '<div class="pthumb"><img src="'+p+'"><button class="pdel" onclick="saveDraft();S.fphotos.splice('+i+',1);R()">×</button></div>';}).join("");return '<input type="file" id="fg" accept="image/*" multiple style="display:none"><input type="file" id="fc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bg">🖼 Галерея</button><button class="pbtn" id="bc">📷 Камера</button></div>'+(th?'<div class="pgrid">'+th+'</div>':'');}
@@ -293,10 +291,8 @@ function rActions(){
           +(it.desc?'<div style="font-size:12px;color:#64748b;margin-bottom:3px">'+esc(it.desc)+'</div>':'')
           +(sl?'<div style="font-size:12px;color:#64748b;margin-bottom:8px">📦 '+esc(sl.name)+'</div>':'<div style="margin-bottom:8px"></div>')
           +'<div style="display:flex;gap:6px">'
-          +'<button onclick="goTo(\'items\',\''+it.id+'\')" style="flex:1;background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:8px 6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">📋 Карточка</button>'
-          +'<button onclick="doAvito(\''+it.id+'\')" style="flex:2;background:#f59e0b;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">📝 Авито</button>'
+          +'<button onclick="goTo(\'items\',\''+it.id+'\')" style="width:100%;background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:8px 6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">📋 Карточка</button>'
           +'</div>'
-          +(it.av?'<div style="margin-top:8px;background:#fffbeb;border-radius:8px;padding:8px;font-size:11px;color:#92400e">'+esc(it.av.substr(0,80))+'...</div>':'')
           +'</div></div>';
       }).join("");
     }
@@ -311,57 +307,112 @@ function rHome(){
   S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;});
   var done=S.items.filter(function(i){return doneIds.indexOf(i.s)>=0;}).length;
   var messy=S.stor.filter(function(s){return s.status==="messy";});
+  var nd=S.items.filter(function(i){return !i.s||i.s==="later";});
   var pct=ni>0?Math.round(done/ni*100):0;
-  var o=hdr("🏠 Дом","");
+  var isEmpty=!ni&&!ns&&!nst;
+  var o=hdr("\U0001F3E0 Дом","");
   o+='<div class="wrap" style="padding-top:8px">';
-  o+='<div style="display:flex;gap:10px;margin-bottom:16px">';
-  o+='<div onclick="S.tab=\'inventory\';S.invTab=\'items\';R()" style="flex:1;background:#fff;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;border:1px solid #e2e8f0">';
-  o+='<div style="font-size:26px;font-weight:700;color:#6366f1">'+ni+'</div><div style="font-size:12px;color:#64748b;margin-top:2px">вещей</div></div>';
-  o+='<div onclick="S.tab=\'inventory\';S.invTab=\'shoes\';R()" style="flex:1;background:#fff;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;border:1px solid #e2e8f0">';
-  o+='<div style="font-size:26px;font-weight:700;color:#0ea5e9">'+ns+'</div><div style="font-size:12px;color:#64748b;margin-top:2px">пар обуви</div></div>';
-  o+='<div onclick="S.tab=\'inventory\';S.invTab=\'storage\';R()" style="flex:1;background:#fff;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;border:1px solid #e2e8f0">';
-  o+='<div style="font-size:26px;font-weight:700;color:#10b981">'+nst+'</div><div style="font-size:12px;color:#64748b;margin-top:2px">мест хранения</div></div>';
+
+  // --- Блок первого старта ---
+  if(isEmpty){
+    o+='<div style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);border-radius:16px;padding:18px 16px;margin-bottom:16px">';
+    o+='<div style="font-size:16px;font-weight:700;color:#5b21b6;margin-bottom:4px">\U0001F44B Добро пожаловать!</div>';
+    o+='<div style="font-size:13px;color:#6d28d9;margin-bottom:14px;line-height:1.5">Приложение для домашнего порядка. Начни с трёх шагов:</div>';
+    o+='<div onclick="S.tab=\'myitems\';S.myFilter=\'storage\';R()" style="background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">';
+    o+='<div style="width:28px;height:28px;background:#6366f1;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">1</div>';
+    o+='<div><div style="font-size:14px;font-weight:600;color:#1e293b">\U0001F5C4 Добавь хранилища</div><div style="font-size:12px;color:#64748b">шкаф, ящик, полка — где лежат вещи</div></div>';
+    o+='<div style="margin-left:auto;color:#94a3b8;font-size:18px">›</div></div>';
+    o+='<div onclick="S.tab=\'myitems\';S.myFilter=\'items\';S.form=true;S.ftype=\'item\';S.fphotos=[];S.eid=null;R()" style="background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">';
+    o+='<div style="width:28px;height:28px;background:#8b5cf6;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">2</div>';
+    o+='<div><div style="font-size:14px;font-weight:600;color:#1e293b">\U0001F4CB Добавь вещи</div><div style="font-size:12px;color:#64748b">с фото и статусом: оставить / продать / отдать</div></div>';
+    o+='<div style="margin-left:auto;color:#94a3b8;font-size:18px">›</div></div>';
+    o+='<div onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()" style="background:#fff;border-radius:12px;padding:12px;cursor:pointer;display:flex;align-items:center;gap:10px">';
+    o+='<div style="width:28px;height:28px;background:#a78bfa;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">3</div>';
+    o+='<div><div style="font-size:14px;font-weight:600;color:#1e293b">\U0001F916 Получи AI-совет</div><div style="font-size:12px;color:#64748b">загрузи фото — ИИ подскажет как организовать</div></div>';
+    o+='<div style="margin-left:auto;color:#94a3b8;font-size:18px">›</div></div>';
+    o+='</div>';
+  }
+
+  // --- Статистика ---
+  o+='<div style="display:flex;gap:8px;margin-bottom:14px">';
+  o+='<div onclick="S.tab=\'myitems\';S.myFilter=\'items\';R()" style="flex:1;background:#fff;border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;border:1px solid #e2e8f0;position:relative">';
+  o+='<div style="font-size:24px;font-weight:700;color:#6366f1">'+ni+'</div>';
+  o+='<div style="font-size:11px;color:#64748b;margin-top:2px">вещей</div>';
+  o+='<div style="font-size:10px;color:#a5b4fc;margin-top:3px">нажми →</div></div>';
+  o+='<div onclick="S.tab=\'myitems\';S.myFilter=\'shoes\';R()" style="flex:1;background:#fff;border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;border:1px solid #e2e8f0">';
+  o+='<div style="font-size:24px;font-weight:700;color:#0ea5e9">'+ns+'</div>';
+  o+='<div style="font-size:11px;color:#64748b;margin-top:2px">пар обуви</div>';
+  o+='<div style="font-size:10px;color:#7dd3fc;margin-top:3px">нажми →</div></div>';
+  o+='<div onclick="S.tab=\'myitems\';S.myFilter=\'storage\';R()" style="flex:1;background:#fff;border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;border:1px solid #e2e8f0">';
+  o+='<div style="font-size:24px;font-weight:700;color:#10b981">'+nst+'</div>';
+  o+='<div style="font-size:11px;color:#64748b;margin-top:2px">хранилищ</div>';
+  o+='<div style="font-size:10px;color:#6ee7b7;margin-top:3px">нажми →</div></div>';
   o+='</div>';
+
+  // --- Прогресс расхламления ---
   if(ni>0){
-    o+='<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;border:1px solid #e2e8f0">';
-    o+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    o+='<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px;border:1px solid #e2e8f0">';
+    o+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
     o+='<div style="font-size:13px;font-weight:600;color:#374151">Прогресс расхламления</div>';
     o+='<div style="font-size:14px;font-weight:700;color:#6366f1">'+pct+'%</div></div>';
-    o+='<div style="background:#f1f5f9;border-radius:8px;height:8px;overflow:hidden">';
-    o+='<div style="background:linear-gradient(90deg,#6366f1,#8b5cf6);height:100%;width:'+pct+'%;border-radius:8px"></div></div>';
-    o+='<div style="display:flex;gap:14px;margin-top:10px;font-size:12px;color:#64748b;flex-wrap:wrap">';
-    if(sell>0) o+='<span>💰 продать: <b>'+sell+'</b></span>';
-    if(don>0) o+='<span>🤝 отдать: <b>'+don+'</b></span>';
-    if(tr>0) o+='<span>🗑 выбросить: <b>'+tr+'</b></span>';
-    if(done>0) o+='<span>✅ готово: <b>'+done+'</b></span>';
-    o+='</div></div>';
+    o+='<div style="background:#f1f5f9;border-radius:8px;height:8px;overflow:hidden;margin-bottom:8px">';
+    o+='<div style="background:linear-gradient(90deg,#6366f1,#8b5cf6);height:100%;width:'+pct+'%;border-radius:8px;transition:width .3s"></div></div>';
+    if(pct===0&&nd.length>0){
+      o+='<div style="font-size:12px;color:#94a3b8;line-height:1.4">Назначь статус каждой вещи — <b>Оставить / Продать / Отдать / Выбросить</b> — и прогресс начнёт расти</div>';
+    } else {
+      o+='<div style="display:flex;gap:12px;font-size:12px;color:#64748b;flex-wrap:wrap">';
+      if(sell>0) o+='<span>\U0001F4B0 продать: <b>'+sell+'</b></span>';
+      if(don>0) o+='<span>\U0001F91D отдать: <b>'+don+'</b></span>';
+      if(tr>0) o+='<span>\U0001F5D1 выбросить: <b>'+tr+'</b></span>';
+      if(done>0) o+='<span>✅ готово: <b>'+done+'</b></span>';
+      o+='</div>';
+    }
+    o+='</div>';
   }
+
+  // --- Требуют внимания ---
   if(messy.length){
-    o+='<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;border:1px solid #fecaca">';
-    o+='<div style="font-size:13px;font-weight:600;color:#ef4444;margin-bottom:8px">⚠️ Требует внимания: '+messy.length+' места</div>';
-    o+=messy.slice(0,3).map(function(s){return '<div onclick="S.tab=\'inventory\';S.invTab=\'storage\';S.scr=\'main\';R()" style="padding:8px 0;border-bottom:1px solid #fee2e2;cursor:pointer;font-size:14px;color:#374151">📦 '+esc(s.name)+(s.loc?' <span style="color:#94a3b8;font-size:12px">· '+esc(s.loc)+'</span>':'')+ '</div>';}).join("");
-    if(messy.length>3) o+='<div style="font-size:12px;color:#94a3b8;margin-top:6px">и ещё '+(messy.length-3)+' места</div>';
+    o+='<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px;border:1px solid #fecaca">';
+    o+='<div style="font-size:13px;font-weight:600;color:#ef4444;margin-bottom:8px">⚠️ Беспорядок: '+messy.length+' хранилища</div>';
+    o+=messy.slice(0,3).map(function(s){
+      return '<div onclick="S.tab=\'myitems\';S.myFilter=\'storage\';S.scr=\'main\';R()" style="padding:8px 0;border-bottom:1px solid #fee2e2;cursor:pointer;font-size:14px;color:#374151;display:flex;justify-content:space-between;align-items:center">'
+        +'<span>\U0001F4E6 '+esc(s.name)+(s.loc?' <span style="color:#94a3b8;font-size:12px">· '+esc(s.loc)+'</span>':'')+'</span>'
+        +'<span style="font-size:12px;color:#f87171">› разобрать</span></div>';
+    }).join("");
+    if(messy.length>3) o+='<div style="font-size:12px;color:#94a3b8;margin-top:6px">и ещё '+(messy.length-3)+' хранилища</div>';
     o+='</div>';
   }
-  var nd=S.items.filter(function(i){return !i.s||i.s==="later";});
+
+  // --- Ждут решения ---
   if(nd.length){
-    o+='<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;border:1px solid #fde68a">';
-    o+='<div style="font-size:13px;font-weight:600;color:#92400e;margin-bottom:8px">⏳ Ждут решения: '+nd.length+'</div>';
-    o+=nd.slice(0,3).map(function(it){return '<div onclick="S.tab=\'myitems\';S.myFilter=\'items\';R()" style="padding:7px 0;border-bottom:1px solid #fef3c7;cursor:pointer;font-size:14px;color:#374151">📋 '+esc(it.name)+'</div>';}).join('');
-    if(nd.length>3) o+='<div style="font-size:12px;color:#94a3b8;margin-top:6px">и ещё '+(nd.length-3)+'</div>';
+    o+='<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px;border:1px solid #fde68a">';
+    o+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    o+='<div style="font-size:13px;font-weight:600;color:#92400e">⏳ Ждут решения: '+nd.length+'</div>';
+    o+='<div style="font-size:11px;color:#d97706">нажми на вещь → назначь статус</div></div>';
+    o+='<div style="font-size:12px;color:#a16207;margin-bottom:8px">Оставить, продать, отдать или выбросить?</div>';
+    o+=nd.slice(0,3).map(function(it){
+      return '<div onclick="S.tab=\'myitems\';S.myFilter=\'items\';R()" style="padding:7px 0;border-bottom:1px solid #fef3c7;cursor:pointer;font-size:14px;color:#374151;display:flex;justify-content:space-between;align-items:center">'
+        +'<span>\U0001F4CB '+esc(it.name)+'</span>'
+        +'<span style="font-size:12px;color:#f59e0b">› решить</span></div>';
+    }).join('');
+    if(nd.length>3) o+='<div style="font-size:12px;color:#94a3b8;margin-top:6px">и ещё '+(nd.length-3)+' вещей</div>';
     o+='</div>';
   }
-  o+='<button onclick="S.tab=\'myitems\';S.myFilter=\'items\';S.ifl=\'all\';R()" style="width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px">🧹 Мои вещи</button>';
-  o+='<div style="display:flex;gap:8px;margin-bottom:10px">';
-  o+='<button onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()" style="flex:1;background:#fff;color:#6366f1;border:2px solid #6366f1;border-radius:14px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">🤖 ИИ-совет</button>';
-  o+='<button onclick="S.scr=\'tips\';R()" style="flex:1;background:#fff;color:#8b5cf6;border:2px solid #8b5cf6;border-radius:14px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">💡 Советы</button>';
+
+  // --- Быстрые действия ---
+  o+='<div style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Быстрые действия</div>';
+  o+='<button onclick="S.tab=\'myitems\';S.myFilter=\'items\';S.ifl=\'all\';R()" style="width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:14px;padding:13px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">';
+  o+='<span>\U0001F9F9 Мои вещи</span><span style="font-size:12px;opacity:.8">вещи · обувь · хранилища ›</span></button>';
+  o+='<div style="display:flex;gap:8px;margin-bottom:4px">';
+  o+='<div onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()" style="flex:1;background:#fff;color:#6366f1;border:2px solid #6366f1;border-radius:14px;padding:11px 8px;font-size:13px;font-weight:600;cursor:pointer;text-align:center">';
+  o+='\U0001F916 ИИ-совет<div style="font-size:10px;font-weight:400;color:#94a3b8;margin-top:2px">фото → план</div></div>';
+  o+='<div onclick="S.scr=\'tips\';R()" style="flex:1;background:#fff;color:#8b5cf6;border:2px solid #8b5cf6;border-radius:14px;padding:11px 8px;font-size:13px;font-weight:600;cursor:pointer;text-align:center">';
+  o+='\U0001F4A1 Советы<div style="font-size:10px;font-weight:400;color:#94a3b8;margin-top:2px">мотивация · системы</div></div>';
   o+='</div>';
-  if(!S.items.length&&!S.shoes.length&&!S.stor.length){
-    o+='<div style="text-align:center;padding:20px;margin-top:14px;background:#f8fafc;border-radius:14px;color:#64748b;font-size:14px">👆 Начни с добавления хранилища или вещи<br>во вкладке <b>Инвентарь</b></div>';
-  }
   o+='</div>';
   return o+nav();
 }
+
 function rItems(){
   var all=S.items,sell=0,don=0,tr=0,lat=0,done=0;
   var doneIds=["sold","given","trashed"];

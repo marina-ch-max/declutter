@@ -172,7 +172,7 @@ function uid(){return Date.now()+"_"+Math.random().toString(36).slice(2);}
 function ntf(m){var e=document.getElementById("notif");e.textContent=m;e.classList.add("show");setTimeout(function(){e.classList.remove("show");},2200);}
 function badge(){var e=document.getElementById("svbadge");e.classList.add("show");setTimeout(function(){e.classList.remove("show");},1500);}
 function compress(file,cb){var r=new FileReader();r.onload=function(ev){var img=new Image();img.onload=function(){var c=document.createElement("canvas"),MAX=900,w=img.width,h=img.height;if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);cb(c.toDataURL("image/jpeg",0.78));};img.src=ev.target.result;};r.readAsDataURL(file);}
-var S={tab:"home",myFilter:"items",actTab:"buy",ifl:"all",sfl:"all",items:ld("dcl2_items",[]),shoes:ld("dcl2_shoes",[]),stor:ld("dcl2_stor",[]),shopping:ld("dcl_shopping",[]),savedOrg:ld("dcl_savedorg",[]),form:false,ftype:null,fphotos:[],eid:null,scr:"main",ophotos:[],oadv:null,oload:false,ssearch:"",gquery:"",editIlist:null,tipsTab:"start"};
+var S={tab:"home",myFilter:"items",actTab:"buy",ifl:"all",sfl:"all",items:ld("dcl2_items",[]),shoes:ld("dcl2_shoes",[]),stor:ld("dcl2_stor",[]),shopping:ld("dcl_shopping",[]),savedOrg:ld("dcl_savedorg",[]),form:false,ftype:null,fphotos:[],eid:null,scr:"main",ophotos:[],oadv:null,oload:false,ssearch:"",gquery:"",editIlist:null,tipsTab:"howto"};
 function svi(){sv("dcl2_items",S.items);badge();}
 function svs(){sv("dcl2_shoes",S.shoes);badge();}
 function svst(){sv("dcl2_stor",S.stor);badge();}
@@ -281,7 +281,20 @@ function rActions(){
     } else {
       o+=sellItems.map(function(it){
         var sl=S.stor.find(function(s){return s.id===it.stor_id;});
-        return '<div class="card" id="c'+it.id+'"><div class="cname">'+esc(it.name)+'</div>'+(it.desc?'<div class="cdesc">'+esc(it.desc)+'</div>':'')+(sl?'<div class="cdesc" style="color:#64748b">📦 '+esc(sl.name)+'</div>':'')+'<div style="margin-top:10px"><button onclick="doAvito(\''+it.id+'\')" style="width:100%;background:#f59e0b;color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📝 Объявление для Авито</button></div>'+(it.av?'<div style="margin-top:8px;background:#fffbeb;border-radius:10px;padding:10px;font-size:12px;color:#92400e">'+esc(it.av.substr(0,80))+'...</div>':'')+'</div>';
+        var ph=it.photos&&it.photos.length?it.photos[0]:null;
+        return '<div class="card" id="c'+it.id+'" style="display:flex;gap:12px;align-items:flex-start">'
+          +(ph?'<div style="flex-shrink:0;width:64px;height:64px;border-radius:10px;overflow:hidden"><img src="'+ph+'" style="width:100%;height:100%;object-fit:cover"></div>'
+              :'<div style="flex-shrink:0;width:64px;height:64px;border-radius:10px;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:28px">\U0001F4B0</div>')
+          +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:3px">'+esc(it.name)+'</div>'
+          +(it.desc?'<div style="font-size:12px;color:#64748b;margin-bottom:3px">'+esc(it.desc)+'</div>':'')
+          +(sl?'<div style="font-size:12px;color:#64748b;margin-bottom:8px">\U0001F4E6 '+esc(sl.name)+'</div>':'<div style="margin-bottom:8px"></div>')
+          +'<div style="display:flex;gap:6px">'
+          +'<button onclick="goTo(\'items\',\''+it.id+'\')" style="flex:1;background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:8px 6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">\U0001F4CB Карточка</button>'
+          +'<button onclick="doAvito(\''+it.id+'\')" style="flex:2;background:#f59e0b;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">\U0001F4DD Авито</button>'
+          +'</div>'
+          +(it.av?'<div style="margin-top:8px;background:#fffbeb;border-radius:8px;padding:8px;font-size:11px;color:#92400e">'+esc(it.av.substr(0,80))+'...</div>':'')
+          +'</div></div>';
       }).join("");
     }
     o+='</div>';
@@ -487,8 +500,8 @@ function rTips(){
   var t=S.items.length,sell=0,don=0,tr=0,done=0;
   S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;});
   done=sell+don+tr;
-  var tabs=[{id:"start",l:"🚀 Старт"},{id:"maintain",l:"🔄 Поддержание"},{id:"systems",l:"📦 Системы"},{id:"rooms",l:"🏠 Комнаты"},{id:"motiv",l:"💪 Мотивация"},{id:"howto",l:"📖 Как пользоваться"}];
-  var secMap={start:0,maintain:1,systems:2,rooms:3,motiv:4};
+  var tabs=[{id:"howto",l:"📖 Как пользоваться"},{id:"motiv",l:"💪 Мотивация"},{id:"start",l:"🚀 Старт"},{id:"maintain",l:"🔄 Поддержание"},{id:"systems",l:"📦 Системы"},{id:"rooms",l:"🏠 Комнаты"}];
+  var secMap={start:2,maintain:3,systems:4,rooms:5,motiv:1};
   var o='<div class="hdr"><div class="hdr-row"><div><h1>💡 Советы</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◄ Назад</button></div></div>';
   // progress block
   o+='<div class="wrap">';

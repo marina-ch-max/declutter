@@ -92,7 +92,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="notif" id="notif"></div>
 <div class="svbadge" id="svbadge">Сохранено</div>
 <script>
-var ACT=[{id:"keep",l:"Оставить",c:"#16a34a",b:"#f0fdf4"},{id:"sell",l:"Продать",c:"#d97706",b:"#fffbeb"},{id:"donate",l:"Отдать",c:"#7c3aed",b:"#f5f3ff"},{id:"later",l:"Разобрать",c:"#6b7280",b:"#f9fafb"},{id:"trash",l:"Выброс",c:"#dc2626",b:"#fef2f2"}];
+var ACT=[{id:"sell",l:"Продать",c:"#d97706",b:"#fffbeb"},{id:"donate",l:"Отдать",c:"#7c3aed",b:"#f5f3ff"},{id:"later",l:"Разобрать",c:"#6b7280",b:"#f9fafb"},{id:"trash",l:"Выброс",c:"#dc2626",b:"#fef2f2"}];
 var ACT_DONE=[{id:"sold",l:"✅ Продано",c:"#15803d",b:"#dcfce7"},{id:"given",l:"✅ Отдано",c:"#6d28d9",b:"#ede9fe"},{id:"trashed",l:"🗑 Выброшено",c:"#9ca3af",b:"#f3f4f6"}];
 var SEA=[{id:"all",l:"Все"},{id:"summer",l:"Лето"},{id:"winter",l:"Зима"},{id:"demi",l:"Демисезон"},{id:"sport",l:"Спорт"}];
 var TIPS_SECTIONS=[
@@ -177,7 +177,7 @@ function svi(){sv("dcl2_items",S.items);badge();}
 function svs(){sv("dcl2_shoes",S.shoes);badge();}
 function svst(){sv("dcl2_stor",S.stor);badge();}
 
-function nav(){return '<div class="bnav">'+[{id:"home",i:"🏠",l:"Главная"},{id:"myitems",i:"🧹",l:"Мои вещи"},{id:"actions",i:"🛒",l:"Купить/продать"}].map(function(t){return '<button class="nb'+(S.tab===t.id?" act":"")+'" onclick="S.tab=\''+t.id+'\';S.form=false;S.fphotos=[];S.eid=null;R()"><span style="font-size:22px">'+t.i+'</span>'+t.l+'</button>';}).join("")+'</div>';}
+function nav(){return '<div class="bnav">'+[{id:"home",i:"🏠",l:"Главная"},{id:"myitems",i:"📋",l:"Разбор"},{id:"actions",i:"🛒",l:"Купить/продать"}].map(function(t){return '<button class="nb'+(S.tab===t.id?" act":"")+'" onclick="S.tab=\''+t.id+'\';S.form=false;S.fphotos=[];S.eid=null;R()"><span style="font-size:22px">'+t.i+'</span>'+t.l+'</button>';}).join("")+'</div>';}
 function hdr(t,s){return '<div class="hdr"><div class="hdr-row"><div><h1>'+t+'</h1>'+(s?'<div class="hdr-sub">'+s+'</div>':'')+'</div><div style="display:flex;gap:4px"><button class="bsm" onclick="S.scr=\'search\';S.gquery=\'\';R()">🔍</button><button class="bsm" onclick="S.scr=\'tips\';R()" title="Советы">💡</button><button class="bsm" onclick="S.scr=\'set\';R()">⚙️</button></div></div></div>';}
 function saveDraft(){var ids=["fn","fd","fk","fst","fsn","fsp","fss","fsl","fsea","fstn","fstl","fstc","en","ed","ek","est","esn","esp","ess","esl","esea","estn","estl","estc"];var d={};ids.forEach(function(id){var e=document.getElementById(id);if(e)d[id]=e.value;});S.fdraft=d;}
 function fps(){var th=S.fphotos.map(function(p,i){return '<div class="pthumb"><img src="'+p+'"><button class="pdel" onclick="saveDraft();S.fphotos.splice('+i+',1);R()">×</button></div>';}).join("");return '<input type="file" id="fg" accept="image/*" multiple style="display:none"><input type="file" id="fc" accept="image/*" capture="environment" style="display:none"><div class="pbtns"><button class="pbtn" id="bg">🖼 Галерея</button><button class="pbtn" id="bc">📷 Камера</button></div>'+(th?'<div class="pgrid">'+th+'</div>':'');}
@@ -190,16 +190,17 @@ function rMyItems(){
   S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;else if(i.s==="later")lat++;else if(doneIds.indexOf(i.s)>=0)done++;});
   var o=hdr("🧹 Мои вещи","");
   o+='<div style="display:flex;gap:8px;padding:10px 12px 8px;overflow-x:auto;scrollbar-width:none;background:#fff;border-bottom:1px solid #f1f5f9">';
-  [{id:"items",l:"📋 Вещи",n:activeItems.length},{id:"shoes",l:"👟 Обувь",n:S.shoes.length},{id:"storage",l:"📦 Хранение",n:S.stor.length}].forEach(function(c){
+  [{id:"items",l:"📋 Разбор",n:activeItems.length},{id:"shoes",l:"👟 Обувь",n:S.shoes.length},{id:"storage",l:"📦 Хранение",n:S.stor.length}].forEach(function(c){
     var act=f===c.id;
     o+='<button onclick="S.myFilter=\''+c.id+'\';S.form=false;S.fphotos=[];R()" style="flex-shrink:0;padding:7px 18px;border-radius:20px;border:none;background:'+(act?"#6366f1":"#f1f5f9")+';color:'+(act?"#fff":"#475569")+';font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">'+c.l+' ('+c.n+')</button>';
   });
   o+='</div>';
-  var hints={items:'📦 Добавляй вещи с фото. Назначь статус — Оставить, Продать, Отдать или Выбросить. Проданные уйдут в архив.',shoes:'👟 Добавляй обувь по сезонам. 🟢 — в сезоне, ⚪ — не в сезоне. Удобно для капсульного гардероба.',storage:'🗄 Опиши шкафы, ящики, полки. Добавь фото — ИИ составит инвентарь и подскажет как организовать хранение.'};
+  var hints={items:'📦 Фотографируй вещи и кидай в Разбор. Назначь хранилище — или выбери: Продать, Отдать, Выбросить.',shoes:'👟 Добавляй обувь по сезонам. 🟢 — в сезоне, ⚪ — не в сезоне. Удобно для капсульного гардероба.',storage:'🗄 Опиши шкафы, ящики, полки. Добавь фото — ИИ составит инвентарь и подскажет как организовать хранение.'};
   o+='<div style="padding:8px 12px 0"><div style="font-size:12px;color:#64748b;line-height:1.5;background:#f8fafc;border-radius:10px;padding:8px 12px">'+hints[f]+'</div></div>';
   if(f==="items"){
-    var fl=[{id:"all",l:"Все ("+activeItems.length+")"},{id:"sell",l:"Продать ("+sell+")"},{id:"donate",l:"Отдать ("+don+")"},{id:"later",l:"Разобрать ("+lat+")"},{id:"done",l:"✅ Готово ("+done+")"}];
-    var shown=S.ifl==="all"?activeItems:S.ifl==="done"?S.items.filter(function(i){return doneIds.indexOf(i.s)>=0;}):S.items.filter(function(i){return i.s===S.ifl;});
+    var razborItems=activeItems.filter(function(i){return !i.stor_id||["sell","donate","trash"].indexOf(i.s)>=0;});
+    var fl=[{id:"all",l:"Все ("+razborItems.length+")"},{id:"sell",l:"Продать ("+sell+")"},{id:"donate",l:"Отдать ("+don+")"},{id:"later",l:"Разобрать ("+lat+")"},{id:"done",l:"✅ Готово ("+done+")"}];
+    var shown=S.ifl==="all"?razborItems:S.ifl==="done"?S.items.filter(function(i){return doneIds.indexOf(i.s)>=0;}):S.items.filter(function(i){return i.s===S.ifl;});
     o+='<div class="fsbar" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:8px 12px 4px">'+fl.map(function(f2){return '<button class="ft'+(S.ifl===f2.id?" act":"")+'" onclick="S.ifl=\''+f2.id+'\';R()">'+f2.l+'</button>';}).join("")+'</div>';
     o+='<button class="aibtn" onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()"><span style="font-size:24px">🤖</span><div><div style="font-size:13px;font-weight:700">Совет по организации</div><div style="font-size:11px;opacity:.8">Загрузи фото — ИИ подскажет как хранить</div></div></button>';
     o+='<div class="wrap" style="padding-top:12px">';
@@ -234,12 +235,13 @@ function rMyItems(){
 function rActions(){
   var at=S.actTab||"buy";
   var sellItems=S.items.filter(function(i){return i.s==="sell";});
+  var sellShoes=S.shoes.filter(function(s){return s.s==="sell";});
   var shopItems=S.shopping;
   var bought=shopItems.filter(function(x){return x.bought;}).length;
   var o=hdr("🛒 Купить и продать","");
   o+='<div style="display:flex;gap:8px;padding:10px 12px 8px;background:#fff;border-bottom:1px solid #f1f5f9">';
   o+='<button onclick="S.actTab=\'buy\';R()" style="flex:1;padding:9px;border-radius:12px;border:none;background:'+(at==="buy"?"#6366f1":"#f1f5f9")+';color:'+(at==="buy"?"#fff":"#475569")+';font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">🛒 Покупки ('+(shopItems.length-bought)+')</button>';
-  o+='<button onclick="S.actTab=\'sell\';R()" style="flex:1;padding:9px;border-radius:12px;border:none;background:'+(at==="sell"?"#f59e0b":"#f1f5f9")+';color:'+(at==="sell"?"#fff":"#475569")+';font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💰 Продать ('+sellItems.length+')</button>';
+  o+='<button onclick="S.actTab=\'sell\';R()" style="flex:1;padding:9px;border-radius:12px;border:none;background:'+(at==="sell"?"#f59e0b":"#f1f5f9")+';color:'+(at==="sell"?"#fff":"#475569")+';font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💰 Продать ('+(sellItems.length+sellShoes.length)+')</button>';
   o+='</div>';
   if(at==="buy"){
     o+='<div class="wrap">';
@@ -295,6 +297,24 @@ function rActions(){
           +'</div>'
           +'</div></div>';
       }).join("");
+      if(sellShoes.length){
+        o+='<div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;padding:12px 0 4px">👟 Обувь на продажу</div>';
+        o+=sellShoes.map(function(sh){
+          var ph=sh.photos&&sh.photos.length?sh.photos[0]:null;
+          return '<div class="card" style="display:flex;gap:12px;align-items:flex-start">'
+            +(ph?'<div style="flex-shrink:0;width:64px;height:64px;border-radius:10px;overflow:hidden"><img src="'+ph+'" style="width:100%;height:100%;object-fit:cover"></div>'
+                :'<div style="flex-shrink:0;width:64px;height:64px;border-radius:10px;background:#f5f3ff;display:flex;align-items:center;justify-content:center;font-size:28px">👟</div>')
+            +'<div style="flex:1;min-width:0">'
+            +'<div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:3px">'+esc(sh.name)+'</div>'
+            +(sh.person?'<div style="font-size:12px;color:#64748b;margin-bottom:2px">👤 '+esc(sh.person)+'</div>':'')
+            +(sh.size?'<div style="font-size:12px;color:#64748b;margin-bottom:8px">📏 '+esc(sh.size)+'</div>':'<div style="margin-bottom:8px"></div>')
+            +'<div style="display:flex;gap:6px">'
+            +'<button onclick="goTo(\'shoes\',\''+sh.id+'\')" style="flex:1;background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:8px 6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">📋 Карточка</button>'
+            +'<button onclick="setShoeS(\''+sh.id+'\',\'sold\')" style="flex:1;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:8px;padding:8px 6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Продано!</button>'
+            +'</div>'
+            +'</div></div>';
+        }).join("");
+      }
     }
     o+='</div>';
   }
@@ -303,9 +323,10 @@ function rActions(){
 function rHome(){
   var ni=S.items.length,ns=S.shoes.length,nst=S.stor.length;
   var doneIds=["sold","given","trashed"];
+  var actIds=["sell","donate","trash"];
   var sell=0,don=0,tr=0;
   S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;});
-  var done=S.items.filter(function(i){return doneIds.indexOf(i.s)>=0;}).length;
+  var done=S.items.filter(function(i){return i.stor_id||(actIds.indexOf(i.s)>=0)||(doneIds.indexOf(i.s)>=0);}).length;
   var messy=S.stor.filter(function(s){return s.status==="messy";});
   var nd=S.items.filter(function(i){return !i.s||i.s==="later";});
   var pct=ni>0?Math.round(done/ni*100):0;
@@ -433,6 +454,18 @@ function rItems(){
 }
 function rItemForm(){var stopts='<option value="">— Место хранения (необязательно) —</option>'+S.stor.map(function(s){return '<option value="'+s.id+'"'+(S.fdraft&&S.fdraft.fst===s.id?' selected':'')+'>'+esc(s.name)+(s.loc?' ('+esc(s.loc)+')':'')+'</option>';}).join('');var dr=S.fdraft||{};return '<div class="fwrap"><div class="ftitle">+ Добавить вещь</div>'+fps()+'<input id="fn" placeholder="Название *" value="'+(dr.fn?esc(dr.fn):'')+'" autocomplete="off"><input id="fd" placeholder="Описание" value="'+(dr.fd?esc(dr.fd):'')+'" autocomplete="off"><input id="fk" placeholder="Состояние (б/у 1 раз...)" value="'+(dr.fk?esc(dr.fk):'')+'" autocomplete="off"><select id="fst">'+stopts+'</select><div class="rbtns"><button class="bprim" onclick="addItem()">Добавить</button><button class="bghost" onclick="S.form=false;S.fphotos=[];S.fdraft={};R()">Отмена</button></div></div>';}
 function rItemEdit(it){var stopts='<option value="">— Место хранения —</option>'+S.stor.map(function(s){return '<option value="'+s.id+'"'+(it.stor_id===s.id?' selected':'')+'>'+esc(s.name)+(s.loc?' ('+esc(s.loc)+')':'')+'</option>';}).join('');var dr=S.fdraft||{};return '<div class="fwrap edit"><div class="ftitle">✏️ Редактировать</div>'+fps()+'<input id="en" value="'+(dr.en!==undefined?esc(dr.en):esc(it.name))+'" autocomplete="off"><input id="ed" value="'+(dr.ed!==undefined?esc(dr.ed):esc(it.desc||""))+'" placeholder="Описание" autocomplete="off"><input id="ek" value="'+(dr.ek!==undefined?esc(dr.ek):esc(it.cond||""))+'" placeholder="Состояние" autocomplete="off"><select id="est">'+stopts+'</select><div class="rbtns"><button class="bprim" onclick="saveItem(\''+it.id+'\')">Сохранить</button><button class="bghost" onclick="S.eid=null;S.fphotos=[];S.fdraft={};R()">Отмена</button></div></div>';}
+function rToShoeForm(it){
+  return '<div style="margin-top:8px;background:#f5f3ff;border-radius:10px;padding:12px;border:1px solid #ddd6fe">'
+    +'<div style="font-size:13px;font-weight:700;color:#6d28d9;margin-bottom:8px">👟 Перенести в обувь</div>'
+    +'<input id="tsn" placeholder="Название *" value="'+esc(it.name)+'" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid #ddd6fe;border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:6px;outline:none">'
+    +'<input id="tsp" placeholder="Чья (Маша, Петя...)" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid #ddd6fe;border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:6px;outline:none">'
+    +'<input id="tss" placeholder="Размер (36, 39...)" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid #ddd6fe;border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:6px;outline:none">'
+    +'<select id="tsea" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid #ddd6fe;border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:6px;outline:none;background:#fff"><option value="">— Сезон —</option><option value="summer">Лето</option><option value="winter">Зима</option><option value="demi">Демисезон</option><option value="sport">Спорт</option></select>'
+    +'<input id="tsl" placeholder="Где хранится (коридор, шкаф...)" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid #ddd6fe;border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:8px;outline:none">'
+    +'<div style="display:flex;gap:6px"><button onclick="confirmMoveToShoe(\''+it.id+'\')" style="flex:1;padding:8px;border-radius:8px;border:none;background:#6d28d9;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">✅ Перенести</button>'
+    +'<button onclick="cancelMoveToShoe()" style="padding:8px 14px;border-radius:8px;border:1px solid #ddd6fe;background:#fff;color:#6d28d9;font-size:13px;cursor:pointer;font-family:inherit">Отмена</button></div>'
+    +'</div>';
+}
 function rItemCard(it){
   if(S.eid===it.id) return rItemEdit(it);
   var a=null;for(var i=0;i<ACT.length;i++){if(ACT[i].id===it.s){a=ACT[i];break;}}
@@ -442,16 +475,23 @@ function rItemCard(it){
   var stlnk=null;if(it.stor_id){for(var j=0;j<S.stor.length;j++){if(S.stor[j].id===it.stor_id){stlnk=S.stor[j];break;}}}
   o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(it.name)+'</div>'+(it.desc?'<div class="cdesc">'+esc(it.desc)+'</div>':'')+(it.cond?'<div class="cdesc">Сост: '+esc(it.cond)+'</div>':'')+(stlnk?'<div class="cdesc" style="color:#0ea5e9">📦 '+esc(stlnk.name)+(stlnk.loc?' · '+esc(stlnk.loc):'')+'</div>':'')+'</div><div style="display:flex;align-items:center;margin-left:8px">'+(a?'<span class="cbadge" style="background:'+a.b+';color:'+a.c+';border-color:'+a.c+'44">'+a.l+'</span>':'')+'<button class="bsm" style="margin-left:4px" onclick="openItemEdit(\''+it.id+'\')">✏️</button><button class="bdel" onclick="delItem(\''+it.id+'\')">✕</button></div></div>';
   var isDone=["sold","given","trashed"].indexOf(it.s)>=0;
-  if(!isDone){
+  // Вещь распределена в хранилище — показать бейдж
+  if(it.stor_id&&!isDone&&it.s!=="sell"&&it.s!=="donate"&&it.s!=="trash"){
+    o+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;flex-wrap:wrap"><span style="font-size:12px;font-weight:600;color:#0ea5e9">📦 Распределена</span>';
+    o+='<button onclick="moveToShoe(\''+it.id+'\')" style="padding:4px 10px;border-radius:6px;border:1px solid #ddd6fe;background:#f5f3ff;color:#6d28d9;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">👟 В обувь</button></div>';
+    if(S.toShoeId===it.id) o+=rToShoeForm(it);
+  } else if(!isDone){
     o+='<div class="drow">'+ACT.map(function(a){return '<button class="db" onclick="setS(\''+it.id+'\',\''+a.id+'\')" style="background:'+(it.s===a.id?a.b:"#fff")+';color:'+(it.s===a.id?a.c:"#94a3b8")+';border-color:'+(it.s===a.id?a.c:"#e2e8f0")+';font-weight:'+(it.s===a.id?700:400)+'">'+a.l+'</button>';}).join("")+'</div>';
     if(it.s==="sell") o+='<div style="display:flex;gap:6px;margin-top:6px"><button onclick="setS(\''+it.id+'\',\'sold\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Продано!</button></div>';
     if(it.s==="donate") o+='<div style="display:flex;gap:6px;margin-top:6px"><button onclick="setS(\''+it.id+'\',\'given\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #ddd6fe;background:#f5f3ff;color:#6d28d9;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Отдано!</button></div>';
     if(it.s==="trash") o+='<div style="display:flex;gap:6px;margin-top:6px"><button onclick="setS(\''+it.id+'\',\'trashed\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #e5e7eb;background:#f9fafb;color:#6b7280;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Выброшено</button></div>';
+    o+='<div style="margin-top:6px"><button onclick="moveToShoe(\''+it.id+'\')" style="width:100%;padding:6px;border-radius:8px;border:1px solid #ddd6fe;background:#f5f3ff;color:#6d28d9;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">👟 Это обувь → перенести</button></div>';
+    if(S.toShoeId===it.id) o+=rToShoeForm(it);
   } else {
     var da=null;for(var k=0;k<ACT_DONE.length;k++){if(ACT_DONE[k].id===it.s){da=ACT_DONE[k];break;}}
-    o+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span style="font-size:12px;font-weight:600;color:'+(da?da.c:"#6b7280")+'">'+( da?da.l:"Завершено")+'</span><button onclick="setS(\''+it.id+'\',null)" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;cursor:pointer;font-family:inherit">↩ Вернуть</button></div>';
+    o+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span style="font-size:12px;font-weight:600;color:'+(da?da.c:"#6b7280")+'">'+(da?da.l:"Завершено")+'</span><button onclick="setS(\''+it.id+'\',null)" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;cursor:pointer;font-family:inherit">↩ Вернуть</button></div>';
   }
-  if(it.s==="sell") o+='<button class="bavito" id="ab_'+it.id+'" onclick="doAvito(\''+it.id+'\')">'+(it.av?"🔄 Перегенерировать":"📝 Текст для Авито")+'</button>';
+    if(it.s==="sell") o+='<button class="bavito" id="ab_'+it.id+'" onclick="doAvito(\''+it.id+'\')">'+(it.av?"🔄 Перегенерировать":"📝 Текст для Авито")+'</button>';
   if(it.s==="sell"&&it.av){
     var av=parseAvito(it.av);
     if(av){
@@ -495,10 +535,76 @@ function rShoeCard(sh){
   if(ph.length) o+='<div class="cphotos">'+ph.map(function(p){return '<img src="'+p+'">';}).join("")+'</div>';
   var mo=new Date().getMonth()+1,cur=mo>=6&&mo<=8?"summer":mo>=12||mo<=2?"winter":"demi";
   var seaBadge=sh.sea?(sh.sea===cur||(cur==="demi"&&sh.sea==="demi")?'<span class="stag" style="background:#dcfce7;color:#16a34a">🟢 В сезоне</span>':'<span class="stag" style="background:#f1f5f9;color:#94a3b8">⚪ Не в сезоне</span>'):'';
-  o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(sh.name)+'</div><div class="stags">'+(sh.person?'<span class="stag">👤 '+esc(sh.person)+'</span>':'')+(sh.size?'<span class="stag">📏 '+esc(sh.size)+'</span>':'')+(sh.loc?'<span class="stag">📍 '+esc(sh.loc)+'</span>':'')+(sl?'<span class="stag">'+sl+'</span>':'')+seaBadge+'</div></div><div style="display:flex;gap:4px"><button class="bsm" onclick="openShoeEdit(\''+sh.id+'\')">✏️</button><button class="bdel" onclick="delShoe(\''+sh.id+'\')">✕</button></div></div></div>';
+  o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(sh.name)+'</div><div class="stags">'+(sh.person?'<span class="stag">👤 '+esc(sh.person)+'</span>':'')+(sh.size?'<span class="stag">📏 '+esc(sh.size)+'</span>':'')+(sh.loc?'<span class="stag">📍 '+esc(sh.loc)+'</span>':'')+(sl?'<span class="stag">'+sl+'</span>':'')+seaBadge+'</div></div><div style="display:flex;gap:4px"><button class="bsm" onclick="openShoeEdit(\''+sh.id+'\')">✏️</button><button class="bdel" onclick="delShoe(\''+sh.id+'\')">✕</button></div></div>';
+  // Кнопки статуса обуви
+  var shDoneIds=['sold','given'];
+  var shIsDone=shDoneIds.indexOf(sh.s)>=0;
+  if(!shIsDone){
+    o+='<div style="display:flex;gap:6px;margin-top:8px">';
+    o+='<button onclick="setShoeS(\''+sh.id+'\',\'sell\')" style="flex:1;padding:6px;border-radius:8px;border:1px solid '+(sh.s==="sell"?'#fcd34d':'#e2e8f0')+';background:'+(sh.s==="sell"?'#fffbeb':'#fff')+';color:'+(sh.s==="sell"?'#d97706':'#94a3b8')+';font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💰 Продать</button>';
+    o+='<button onclick="setShoeS(\''+sh.id+'\',\'donate\')" style="flex:1;padding:6px;border-radius:8px;border:1px solid '+(sh.s==="donate"?'#ddd6fe':'#e2e8f0')+';background:'+(sh.s==="donate"?'#f5f3ff':'#fff')+';color:'+(sh.s==="donate"?'#6d28d9':'#94a3b8')+';font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">🤝 Отдать</button>';
+    o+='</div>';
+    if(sh.s==="sell") o+='<div style="margin-top:6px"><button onclick="setShoeS(\''+sh.id+'\',\'sold\')" style="width:100%;padding:7px;border-radius:8px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Продано!</button></div>';
+    if(sh.s==="donate") o+='<div style="margin-top:6px"><button onclick="setShoeS(\''+sh.id+'\',\'given\')" style="width:100%;padding:7px;border-radius:8px;border:1px solid #ddd6fe;background:#f5f3ff;color:#6d28d9;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Отдано!</button></div>';
+  } else {
+    o+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span style="font-size:12px;font-weight:600;color:'+(sh.s==="sold"?'#15803d':'#6d28d9')+'">'+(sh.s==="sold"?'✅ Продано':'✅ Отдано')+'</span><button onclick="setShoeS(\''+sh.id+'\',null)" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;cursor:pointer;font-family:inherit">↩ Вернуть</button></div>';
+  }
+  o+='</div>';
   return o;
 }
 
+function rStorCard(st){
+  if(S.eid===st.id){
+    var dr=S.fdraft||{};
+    return '<div class="fwrap edit"><div class="ftitle">✏️ Редактировать хранилище</div>'+fps()
+      +'<input id="estn" value="'+(dr.estn!==undefined?esc(dr.estn):esc(st.name))+'" placeholder="Название *" autocomplete="off">'
+      +'<input id="estl" value="'+(dr.estl!==undefined?esc(dr.estl):esc(st.loc||''))+'" placeholder="Где (спальня, коридор...)" autocomplete="off">'
+      +'<textarea id="estc" placeholder="Что лежит">'+(dr.estc!==undefined?esc(dr.estc):esc(st.cont||''))+'</textarea>'
+      +'<div class="rbtns"><button class="bprim" onclick="saveStor(\''+st.id+'\')">Сохранить</button>'
+      +'<button class="bghost" onclick="S.eid=null;S.fphotos=[];S.fdraft={};R()">Отмена</button></div></div>';
+  }
+  var ph=st.photos||[];
+  var o='<div class="card">';
+  if(ph.length) o+='<div class="cphotos">'+ph.map(function(p){return '<img src="'+p+'">';}).join('')+'</div>';
+  var stBadge=st.status==='messy'?'<span class="stag" style="background:#fef3c7;color:#d97706">⚠️ Беспорядок</span>':st.status==='ok'?'<span class="stag" style="background:#dcfce7;color:#16a34a">✅ Порядок</span>':'';
+  o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(st.name)+'</div>'
+    +'<div class="stags">'+(st.loc?'<span class="stag">📍 '+esc(st.loc)+'</span>':'')+stBadge+'</div></div>'
+    +'<div style="display:flex;gap:4px"><button class="bsm" onclick="openStorEdit(\''+st.id+'\')">✏️</button>'
+    +'<button class="bdel" onclick="delStor(\''+st.id+'\')">✕</button></div></div>';
+  if(st.cont) o+='<div style="font-size:12px;color:#64748b;padding:4px 0 2px;line-height:1.5">'+esc(st.cont)+'</div>';
+  // Статус порядок/беспорядок
+  o+='<div style="display:flex;gap:6px;margin-top:8px">'
+    +'<button onclick="setStSt(\''+st.id+'\',\'ok\')" style="flex:1;padding:6px;border-radius:8px;border:1px solid '+(st.status==='ok'?'#86efac':'#e2e8f0')+';background:'+(st.status==='ok'?'#dcfce7':'#fff')+';color:'+(st.status==='ok'?'#16a34a':'#94a3b8')+';font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">✅ Порядок</button>'
+    +'<button onclick="setStSt(\''+st.id+'\',\'messy\')" style="flex:1;padding:6px;border-radius:8px;border:1px solid '+(st.status==='messy'?'#fcd34d':'#e2e8f0')+';background:'+(st.status==='messy'?'#fef3c7':'#fff')+';color:'+(st.status==='messy'?'#d97706':'#94a3b8')+';font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">⚠️ Беспорядок</button>'
+    +'</div>';
+  // AI кнопки
+  o+='<div style="display:flex;gap:6px;margin-top:6px">'
+    +'<button id="stb_'+st.id+'" onclick="doStorAdv(\''+st.id+'\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #e0e7ff;background:#eef2ff;color:#4f46e5;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">🤖 ИИ-совет</button>'
+    +'<button id="ilb_'+st.id+'" onclick="doStorList(\''+st.id+'\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #e0e7ff;background:#eef2ff;color:#4f46e5;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">📋 Инвентарь</button>'
+    +'</div>';
+  // Результат AI-совета
+  if(st.adv) o+='<div style="margin-top:8px;background:#f8fafc;border-radius:10px;padding:10px 12px;font-size:13px;color:#334155;line-height:1.6">'+addCartBtns(md2html(st.adv),st.id)+'</div>';
+  // Инвентарь
+  if(st.ilist) o+='<div style="margin-top:6px;background:#f0fdf4;border-radius:10px;padding:10px 12px;font-size:13px;color:#14532d;line-height:1.6">'+md2html(st.ilist)+'</div>';
+  // Вещи в этом хранилище
+  var its=S.items.filter(function(i){return i.stor_id===st.id;});
+  if(its.length){
+    o+='<div style="margin-top:8px;border-top:1px solid #f1f5f9;padding-top:8px">'
+      +'<div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Вещи здесь ('+its.length+')</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    its.forEach(function(i){
+      var thumb=i.photos&&i.photos.length
+        ?'<img src="'+i.photos[0]+'" style="width:48px;height:48px;object-fit:cover;border-radius:8px;display:block">'
+        :'<div style="width:48px;height:48px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px">📦</div>';
+      o+='<div onclick="goTo(\'items\',\''+i.id+'\')" style="cursor:pointer;text-align:center;width:56px">'
+        +thumb
+        +'<div style="font-size:10px;color:#64748b;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:56px">'+esc(i.name)+'</div></div>';
+    });
+    o+='</div></div>';
+  }
+  o+='</div>';
+  return o;
+}
 function rStor(){
   var q=(S.ssearch||"").toLowerCase().trim();
   var all=q?S.stor.filter(function(st){
@@ -1060,6 +1166,29 @@ function saveStor(id){var n=gv("estn").trim();if(!n){ntf("Введи назва�
 function setS(id,s){for(var i=0;i<S.items.length;i++){if(S.items[i].id===id){S.items[i].s=s;break;}}svi();R();}
 function delItem(id){S.items=S.items.filter(function(i){return i.id!==id;});svi();R();}
 function delShoe(id){S.shoes=S.shoes.filter(function(s){return s.id!==id;});svs();R();}
+function setStSt(id,s){
+  for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].status=(S.stor[i].status===s?null:s);break;}}
+  svst();R();
+}
+function setShoeS(id,s){
+  for(var i=0;i<S.shoes.length;i++){if(S.shoes[i].id===id){S.shoes[i].s=s;break;}}
+  svs();R();
+}
+function moveToShoe(id){S.toShoeId=id;R();}
+function cancelMoveToShoe(){S.toShoeId=null;R();}
+function confirmMoveToShoe(id){
+  var it=S.items.find(function(x){return x.id===id;});
+  if(!it)return;
+  var nm=gv('tsn')||it.name;
+  var pr=gv('tsp')||'';
+  var sz=gv('tss')||'';
+  var se=document.getElementById('tsea')?document.getElementById('tsea').value:'';
+  var lc=gv('tsl')||'';
+  S.shoes.push({id:'s'+Date.now(),name:nm,person:pr,size:sz,sea:se,loc:lc,photos:(it.photos||[]).slice()});
+  S.items=S.items.filter(function(x){return x.id!==id;});
+  S.toShoeId=null;
+  svi();svs();R();ntf('Перенесено в обувь 👟');
+}
 function delStor(id){S.stor=S.stor.filter(function(s){return s.id!==id;});svst();R();}
 
 function api(parts,tok,ok,err){fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":key(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:tok||1000,messages:[{role:"user",content:parts}]})}).then(function(r){return r.json();}).then(function(d){if(d.error)throw new Error(d.error.message);ok((d.content&&d.content[0]&&d.content[0].text)||"");}).catch(function(e){err(e.message);});}

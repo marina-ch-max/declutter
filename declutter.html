@@ -528,12 +528,74 @@ function rHelp(){
   '<div style="background:#f0f9ff;border-radius:14px;padding:16px;margin-bottom:20px">'+
   '<div style="font-size:16px;font-weight:700;color:#0c4a6e;margin-bottom:8px">🤖 Без API-ключа</div>'+
   '<div style="font-size:14px;color:#0c4a6e;line-height:1.6">'+
-  'Нет ключа Anthropic? Используйте кнопку <b>📋 Промт</b> рядом с AI-кнопками — скопируйте готовый запрос и вставьте в claude.ai вручную.'+
+  'Нет ключа Anthropic? Используйте кнопку <b>📋 Промт</b> рядом с AI-кнопками — скопируйте готовый запрос и вставьте в любой AI-чат (Claude, ChatGPT, Gemini...) вручную.'+
   '</div></div>'+
   '<button onclick="S.scr=\'main\';R();" style="width:100%;background:#6366f1;color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit">Понятно!</button>'+
   '</div>';
 }
 
+
+function rTips(){
+  var tabs=[{id:"howto",l:"\U0001F4D6 Как"},{id:"motiv",l:"\U0001F4AA Мотив"},{id:"start",l:"\U0001F680 Старт"},{id:"maintain",l:"\U0001F504 Регуляр"},{id:"systems",l:"\U0001F4E6 Системы"},{id:"rooms",l:"\U0001F3E0 Комнаты"}];
+  var chips=tabs.map(function(t){return '<button class="chip'+(S.tipsTab===t.id?" act":"")+'" onclick="S.tipsTab=\''+t.id+'\';R()">'+t.l+'</button>';}).join("");
+  var orgBtn='<div style="background:#ede9fe;border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:15px;font-weight:700;color:#5b21b6">\U0001F916 AI-организатор</div><div style="font-size:12px;color:#7c3aed;margin-top:2px">Анализ всего дома по фото</div></div><button class="bprim" onclick="S.scr=\'org\';R()" style="padding:8px 14px;font-size:13px">Открыть</button></div>';
+  var content="";
+  if(S.tipsTab==="howto"){
+    content='<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#5b21b6;margin-bottom:8px">\U0001F4E6 Вкладка «Вещи»</div><div style="font-size:14px;color:#374151;line-height:1.6">Добавляйте вещи с фото и описанием. Назначьте статус: <b>Оставить / Продать / Отдать / Позже / Выбросить</b>.<br>Когда вещь продана — нажмите «✅ Продано», она уйдёт в архив.<br>Кнопка <b>Авито</b> генерирует объявление с ценой по ИИ.</div></div>'
+      +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:8px">\U0001F45F Вкладка «Обувь»</div><div style="font-size:14px;color:#374151;line-height:1.6">Храните обувь с сезоном и размером. Значок \U0001F7E2/⚪ показывает, в сезоне ли пара.</div></div>'
+      +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#166534;margin-bottom:8px">\U0001F5C4️ Вкладка «Хранение»</div><div style="font-size:14px;color:#374151;line-height:1.6">Описывайте шкафы, ящики, полки. Добавляйте фото и инвентарный список.<br>Кнопка <b>Список вещей</b> — текстовый инвентарь.<br>Кнопка <b>AI-совет</b> — рекомендации по организации конкретного хранилища.</div></div>'
+      +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#9f1239;margin-bottom:8px">\U0001F6D2 Купить / Продать</div><div style="font-size:14px;color:#374151;line-height:1.6">Вкладка «Покупки» — список нужного с пометкой «куплено».<br>Вкладка «Продать» — все вещи со статусом «Продать» с быстрым переходом к карточке и генерацией объявления Авито.</div></div>'
+      +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#0c4a6e;margin-bottom:8px">\U0001F916 Без API-ключа</div><div style="font-size:14px;color:#374151;line-height:1.6">Нет ключа Anthropic? Нажмите <b>\U0001F4CB Скопировать промт</b> рядом с AI-кнопками — скопируйте запрос и вставьте в любой AI-чат: <a href="https://claude.ai" target="_blank" style="color:#6366f1">Claude</a>, ChatGPT, Gemini и др.</div></div>'
+      +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#374151;margin-bottom:8px">\U0001F504 Синхронизация</div><div style="font-size:14px;color:#374151;line-height:1.6">В настройках (⚙️) → Экспорт JSON: скачайте всю базу.<br>Импорт: вставьте JSON или отсканируйте QR-код с другого устройства.</div></div>';
+  } else if(S.tipsTab==="motiv"){
+    content='<div class="motiv"><h2>\U0001F31F Зачем это вообще нужно?</h2><p>Среднестатистический человек тратит 2,5 дня в год на поиск потерянных вещей. Порядок — это не идеальный дом, это освобождённая голова.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F9E0 Принцип «одна вещь — одно место»</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Когда у каждой вещи есть постоянное место, уборка занимает 10 минут, а не час. Начните с одного ящика.</p></div>'
+      +'<div class="motiv"><h2>\U0001F4C8 Маленький прогресс — большой результат</h2><p>15 минут в день = 90 часов в год. За год можно разобрать всё. Не откладывайте на «когда будет время».</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F4B0 Продавайте — не копите</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Вещи, которые вы не используете, стоят деньги прямо сейчас. Авито, Юла, группы в Telegram — отдайте с пользой.</p></div>'
+      +'<div class="motiv"><h2>❤️ Оставляйте только то, что любите</h2><p>Если вещь не приносит радости и не используется — она занимает место в вашей жизни, а не только в шкафу.</p></div>';
+  } else if(S.tipsTab==="start"){
+    content='<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F3AF Шаг 1: Выберите один угол</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Не пытайтесь разобрать весь дом сразу. Начните с одного ящика, одной полки или одного шкафа. Доведите до конца — это даст энергию.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F4F8 Шаг 2: Сфотографируйте «до»</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Добавьте хранилище в приложение, сделайте фото. Потом сравните с «после» — это мотивирует продолжать.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F4E6 Шаг 3: Три коробки</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Разложите всё из зоны по трём коробкам: <b>Оставить / Отдать-продать / Выбросить</b>. Не думайте долго — первый импульс обычно правильный.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">✅ Шаг 4: Дайте вещам дом</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Каждая оставленная вещь должна иметь место хранения. Добавьте её в приложение — хранилище, описание, фото. Это и есть инвентарь.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F4AA Шаг 5: Вынесите лишнее сегодня</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Не ждите идеального момента. Мешок для отдачи — в машину или у двери. Пакет для мусора — сразу в ведро.</p></div>';
+  } else if(S.tipsTab==="maintain"){
+    content='<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">⏰ Правило 10 минут</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Каждый вечер — 10 минут на возврат вещей на место. Это не уборка, это поддержание. Разница огромная.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F6D2 Список покупок в приложении</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Прежде чем что-то купить — проверьте, не дублирует ли это то, что уже есть. Добавляйте в список покупок только реально нужное.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F504 Сезонный пересмотр</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Раз в сезон (4 раза в год) пройдитесь по хранилищам в приложении. Обновите статусы, уберите ненужное, сфотографируйте изменения.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F4F8 Фото — ваш помощник</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Сфотографировали хранилище после уборки — теперь есть эталон. Если стало хуже, видно сразу. Фото в приложении помнят, как должно быть.</p></div>';
+  } else if(S.tipsTab==="systems"){
+    content='<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F4E6 Группируйте по категориям, не по комнатам</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Все инструменты в одном месте, все кабели вместе, все лекарства в одной аптечке. Ищете инструмент — идёте в одно место, а не по всей квартире.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F3F7️ Подписывайте хранилища</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Добавьте хранилище в приложение с точным названием: «Полка в прихожей — верхняя» лучше, чем «Шкаф 1». Используйте функцию AI-списка для автоматического инвентаря по фото.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F31F Золотое правило: «Один вошёл — один вышел»</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Купили новую кружку — отдайте старую. Это останавливает накопление. Применяйте к одежде, книгам, кухонной утвари.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F5C3️ Цифровой инвентарь</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Ценные вещи, электроника, документы — заносите в приложение с фото. При краже или потере будете знать, что пропало. При переезде — что где лежало.</p></div>';
+  } else if(S.tipsTab==="rooms"){
+    content='<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F6AA Прихожая</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Правило: только то, что используется ежедневно. Ключи, сумка, куртка сезона. Остальное — убрать. Крючки и обувные полки снимают хаос за 5 минут.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F373 Кухня</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Зона у плиты — только для готовки. Освободите столешницу: оставьте максимум 3 предмета. Дубли (2 сковородки, 5 кружек) — первые кандидаты на выход.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F6C0 Ванная</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Проверьте сроки годности косметики. Всё просроченное — выбросить. Оставьте только то, что используете ежемесячно. Запасы — в отдельную коробку.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F6CC Спальня</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Под кроватью — только сезонное хранение в контейнерах. Тумбочка — только то, что читаете/используете сейчас. Гардероб: проверьте, надевали ли каждую вещь в этом сезоне.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">\U0001F4DA Рабочее место / кабинет</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Стол должен быть пустым по умолчанию. Документы — в папки по категориям. Кабели — подписать или убрать в органайзер. Раз в месяц — разобрать стопки.</p></div>';
+  }
+  var savedHtml="";
+  if(S.savedOrg.length>0){
+    savedHtml='<div style="margin-top:16px"><div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:8px">\U0001F4BE Сохранённые советы ('+S.savedOrg.length+')</div>'
+      +S.savedOrg.map(function(a){
+        var phHtml=a.photos&&a.photos.length?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+a.photos.map(function(p){return '<img src="'+p+'" style="width:56px;height:56px;object-fit:cover;border-radius:8px">';}).join("")+'</div>':"";
+        return '<div class="adv" style="margin-bottom:10px">'
+          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+          +'<div><div style="font-size:13px;font-weight:700;color:#0c4a6e">'+esc(a.title)+'</div>'
+          +'<div style="font-size:11px;color:#64748b;margin-top:2px">'+a.date+'</div></div>'
+          +'<button onclick="delSavedOrg(\''+a.id+'\')" style="background:none;border:none;color:#94a3b8;font-size:16px;cursor:pointer;padding:0 0 0 8px">×</button></div>'
+          +phHtml
+          +'<div class="adv-txt">'+md2html(a.text)+'</div></div>';
+      }).join("")
+      +'</div>';
+  }
+  return '<div class="hdr"><div class="hdr-row"><div><h1>\U0001F4A1 Советы</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">✕</button></div></div>'
+    +'<div class="wrap">'+orgBtn
+    +'<div class="chips" style="margin-bottom:14px">'+chips+'</div>'
+    +content+savedHtml+'</div>';
+}
 
 function rAllItems(){
   var q=(S.gquery||"").toLowerCase().trim();
@@ -768,7 +830,7 @@ function rSet(){
     '<button class="bghost" onclick="S.scr=\'qrimp\';R()" style="flex:1;padding:10px;font-size:13px">📷 Сканировать QR</button>'+
     '</div>'+
     '</div></div>';
-  return '<div class="hdr"><div class="hdr-row"><div><h1>⚙️ Настройки</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div><div class="wrap"><div class="scard"><h3>🔑 API-ключ Anthropic</h3><p>Нужен для AI-функций. Получи на console.anthropic.com — API Keys</p><div class="kstat '+(k?"ok":"no")+'">'+(k?"✅ Ключ сохранён":"❌ Не введён — AI не работает")+'</div><input id="aki" type="password" placeholder="Вставь ключ" value="'+(k?"●●●●●●●●●●●●●●●●●●●●":"")+'"><div style="display:flex;gap:8px"><button class="bprim" onclick="saveKey()">Сохранить</button>'+(k?'<button class="bghost" onclick="delApiKey()">Удалить</button>':'')+'</div></div>'+(k?'':'<div class="scard" style="background:#f0f9ff;border:1px solid #bae6fd"><h3 style="color:#0c4a6e">🤖 Без API-ключа? Не страшно</h3><p style="color:#0c4a6e;font-size:13px;line-height:1.6">Все AI-кнопки в приложении имеют рядом кнопку <b>📋 Промт</b>.<br>Нажми её — скопируй готовый запрос — вставь в <b>claude.ai</b> вручную.<br><br>Это работает для:<br>• Объявления на Авито 📝<br>• Совета по хранилищу 🗄<br>• Анализа всего дома 🏠</p><a href="https://claude.ai" target="_blank" style="display:block;text-align:center;margin-top:12px;padding:10px;background:#6366f1;color:#fff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none">🔗 Открыть claude.ai</a></div>')+syncCard+'<div class="scard"><h3>ℹ️ API-ключ — как получить</h3><p>1. Зайди на console.anthropic.com<br>2. Settings → API Keys → Create Key<br>3. Скопируй ключ и вставь выше</p><button onclick="S.scr=\'help\';R()" style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;color:#6366f1;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📖 Полная инструкция по приложению</button></div><div class="scard" style="text-align:center"><button onclick="if(confirm(\'Очистить ВСЕ данные?\')){[\'dcl2_items\',\'dcl2_shoes\',\'dcl2_stor\'].forEach(function(k){localStorage.removeItem(k);});S.items=[];S.shoes=[];S.stor=[];S.scr=\'main\';R();}" style="padding:8px 20px;border-radius:10px;border:1px solid #fee2e2;background:#fff;color:#ef4444;font-size:13px;cursor:pointer;font-family:inherit">🗑 Очистить все данные</button></div></div>';
+  return '<div class="hdr"><div class="hdr-row"><div><h1>⚙️ Настройки</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div><div class="wrap"><div class="scard"><h3>🔑 API-ключ Anthropic</h3><p>Нужен для AI-функций. Получи на console.anthropic.com — API Keys</p><div class="kstat '+(k?"ok":"no")+'">'+(k?"✅ Ключ сохранён":"❌ Не введён — AI не работает")+'</div><input id="aki" type="password" placeholder="Вставь ключ" value="'+(k?"●●●●●●●●●●●●●●●●●●●●":"")+'"><div style="display:flex;gap:8px"><button class="bprim" onclick="saveKey()">Сохранить</button>'+(k?'<button class="bghost" onclick="delApiKey()">Удалить</button>':'')+'</div></div>'+(k?'':'<div class="scard" style="background:#f0f9ff;border:1px solid #bae6fd"><h3 style="color:#0c4a6e">🤖 Без API-ключа? Не страшно</h3><p style="color:#0c4a6e;font-size:13px;line-height:1.6">Все AI-кнопки в приложении имеют рядом кнопку <b>📋 Промт</b>.<br>Нажми её — скопируй готовый запрос — вставь в любой AI-чат вручную.<br><br>Это работает для:<br>• Объявления на Авито 📝<br>• Совета по хранилищу 🗄<br>• Анализа всего дома 🏠</p><div style="display:flex;gap:8px;margin-top:12px"><a href="https://claude.ai" target="_blank" style="flex:1;text-align:center;padding:9px;background:#6366f1;color:#fff;border-radius:10px;font-size:12px;font-weight:600;text-decoration:none">Claude</a><a href="https://chat.openai.com" target="_blank" style="flex:1;text-align:center;padding:9px;background:#10a37f;color:#fff;border-radius:10px;font-size:12px;font-weight:600;text-decoration:none">ChatGPT</a><a href="https://gemini.google.com" target="_blank" style="flex:1;text-align:center;padding:9px;background:#4285f4;color:#fff;border-radius:10px;font-size:12px;font-weight:600;text-decoration:none">Gemini</a></div></div>')+syncCard+'<div class="scard"><h3>ℹ️ API-ключ — как получить</h3><p>1. Зайди на console.anthropic.com<br>2. Settings → API Keys → Create Key<br>3. Скопируй ключ и вставь выше</p><button onclick="S.scr=\'help\';R()" style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;color:#6366f1;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📖 Полная инструкция по приложению</button></div><div class="scard" style="text-align:center"><button onclick="if(confirm(\'Очистить ВСЕ данные?\')){[\'dcl2_items\',\'dcl2_shoes\',\'dcl2_stor\'].forEach(function(k){localStorage.removeItem(k);});S.items=[];S.shoes=[];S.stor=[];S.scr=\'main\';R();}" style="padding:8px 20px;border-radius:10px;border:1px solid #fee2e2;background:#fff;color:#ef4444;font-size:13px;cursor:pointer;font-family:inherit">🗑 Очистить все данные</button></div></div>';
 }
 
 function saveOrgAdvice(){
@@ -1088,7 +1150,7 @@ function openPrompt(type,id){
     '</div>'+
     '<div id="pm_p1" style="flex:1;overflow-y:auto;padding:14px 16px">'+
     photosNote+
-    '<div style="font-size:12px;color:#64748b;margin-bottom:8px">Скопируй промт → открой <a href="https://claude.ai" target="_blank" style="color:#6366f1">claude.ai</a> → вставь в чат'+(hasPhotos?' + прикрепи фото':'')+' → получи ответ</div>'+
+    '<div style="font-size:12px;color:#64748b;margin-bottom:8px">Скопируй промт → открой любой AI-чат (Claude, ChatGPT, Gemini...) → вставь'+(hasPhotos?' + прикрепи фото':'')+' → получи ответ</div>'+
     '<textarea id="pm_prtext" readonly style="width:100%;min-height:200px;border:1px solid #e2e8f0;border-radius:10px;padding:10px;font-size:12px;font-family:monospace;resize:vertical;box-sizing:border-box;background:#f8fafc;color:#334155">'+info.pr.replace(/</g,'&lt;')+'</textarea>'+
     '<button onclick="pm_copy()" style="width:100%;margin-top:10px;padding:11px;border-radius:10px;border:none;background:#6366f1;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">📋 Скопировать промт</button>'+
     '</div>'+
@@ -1114,7 +1176,7 @@ function pm_copy(){
   var ta=document.getElementById('pm_prtext');
   if(!ta)return;
   navigator.clipboard.writeText(ta.value).then(function(){
-    ntf('Промт скопирован! Открой claude.ai и вставь.');
+    ntf('Промт скопирован! Вставь в любой AI-чат.');
   });
 }
 
@@ -1175,12 +1237,7 @@ function svPh(id){var it=null;for(var i=0;i<S.items.length;i++){if(S.items[i].id
 function delApiKey(){if(!confirm("Удалить API-ключ?"))return;localStorage.removeItem("dcl_apikey");ntf("Ключ удалён");R();}
 function saveKey(){var v=gv("aki").trim();if(!v||v[0]==="●"){ntf("Введи новый ключ");return;}localStorage.setItem("dcl_apikey",v);ntf("Ключ сохранён!");R();}
 
-checkOnboard();
-checkImportHash();
-R();
-</script>
-</body>
-</html>function rOrg(){
+function rOrg(){
   var hp=S.ophotos.length>0;
   var th=S.ophotos.map(function(p,i){return '<div class="pthumb"><img src="'+p+'"><button class="pdel" onclick="S.ophotos.splice('+i+',1);R()">×</button></div>';}).join("");
   var o='<div class="hdr"><div class="hdr-row"><div><h1>🤖 Совет по организации</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div>';
@@ -1197,7 +1254,7 @@ R();
       :'<button onclick="openPrompt(\'org\',\'\')" style="padding:10px 14px;border-radius:10px;border:none;background:#eff6ff;color:#1d4ed8;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📋 Скопировать промт</button>'
     ):'')
     +'</div>'
-    +(key()?'':'<div style="margin-top:10px;background:#eff6ff;border-radius:10px;padding:10px 12px;font-size:12px;color:#1e40af;line-height:1.5">🔑 <b>Нет API-ключа?</b> Добавь фото, нажми <b>📋 Скопировать промт</b> — получишь готовый текст для <a href="https://claude.ai" target="_blank" style="color:#6366f1;font-weight:600">claude.ai</a>.</div>')
+    +(key()?'':'<div style="margin-top:10px;background:#eff6ff;border-radius:10px;padding:10px 12px;font-size:12px;color:#1e40af;line-height:1.5">🔑 <b>Нет API-ключа?</b> Добавь фото, нажми <b>📋 Скопировать промт</b> — вставь в любой AI-чат: <a href="https://claude.ai" target="_blank" style="color:#6366f1;font-weight:600">Claude</a>, ChatGPT, Gemini.</div>')
     +'</div></div>';
   if(S.oadv){
     o+='<div class="adv"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0">💡 Совет</h3>'
@@ -1218,24 +1275,4 @@ checkImportHash();
 R();
 </script>
 </body>
-</html>function rOrg(){
-  var hp=S.ophotos.length>0;
-  var th=S.ophotos.map(function(p,i){return '<div class="pthumb"><img src="'+p+'"><button class="pdel" onclick="S.ophotos.splice('+i+',1);R()">×</button></div>';}).join("");
-  var o='<div class="hdr"><div class="hdr-row"><div><h1>🤖 Совет по организации</h1></div><button class="bsm" onclick="S.scr=\'main\';R()">◀ Назад</button></div></div>';
-  o+='<div class="wrap"><div class="fwrap"><div class="ftitle">Загрузи фото пространства</div>'
-    +'<input type="file" id="og" accept="image/*" multiple style="display:none">'
-    +'<input type="file" id="oc" accept="image/*" capture="environment" style="display:none">'
-    +'<div class="pbtns"><button class="pbtn" id="bog">🖼 Галерея</button><button class="pbtn" id="boc">📷 Камера</button></div>'
-    +(hp?'<div class="pgrid">'+th+'</div>':'')
-    +'<input id="octx" placeholder="Уточни задачу: какая комната, цель, проблема..." autocomplete="off">'
-    +'<div style="display:flex;gap:8px">'
-    +'<button class="bprim" '+(!hp||S.oload?"disabled":"")+' onclick="doOrg()" style="flex:1;padding:11px">'+(S.oload?"Анализирую...":"🤖 Получить совет")+'</button>'
-    +(hp?(key()?
-      '<button onclick="openPrompt(\'org\',\'\')" title="Промт для Claude.ai" style="padding:10px 14px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:16px;cursor:pointer">📋</button>'
-      :'<button onclick="openPrompt(\'org\',\'\')" style="padding:10px 14px;border-radius:10px;border:none;background:#eff6ff;color:#1d4ed8;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📋 Скопировать промт</button>'
-    ):'')
-    +'</div>'
-    +(key()?'':'<div style="margin-top:10px;background:#eff6ff;border-radius:10px;padding:10px 12px;font-size:12px;color:#1e40af;line-height:1.5">🔑 <b>Нет API-ключа?</b> Добавь фото, нажми <b>📋 Скопировать промт</b> — получишь готовый текст для <a href="https://claude.ai" target="_blank" style="color:#6366f1;font-weight:600">claude.ai</a>.</div>')
-    +'</div></div>';
-'</div>';
-}
+</html>

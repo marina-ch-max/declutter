@@ -338,12 +338,18 @@ function rHome(){
   var ni=S.items.length,ns=S.shoes.length,nst=S.stor.length;
   var doneIds=["sold","given","trashed"];
   var actIds=["sell","donate","trash"];
-  var sell=0,don=0,tr=0;
-  S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;});
-  var done=S.items.filter(function(i){return i.stor_id||(actIds.indexOf(i.s)>=0)||(doneIds.indexOf(i.s)>=0);}).length;
+  var sell=0,don=0,tr=0,finished=0,stored=0;
+  S.items.forEach(function(i){
+    if(doneIds.indexOf(i.s)>=0)finished++;
+    else if(i.s==="sell")sell++;
+    else if(i.s==="donate")don++;
+    else if(i.s==="trash")tr++;
+    else if(i.stor_id)stored++;
+  });
+  var decided=S.items.filter(function(i){return i.stor_id||i.s;}).length;
   var messy=S.stor.filter(function(s){return s.status==="messy";});
-  var nd=S.items.filter(function(i){return !i.s;});
-  var pct=ni>0?Math.round(done/ni*100):0;
+  var nd=S.items.filter(function(i){return !i.stor_id&&!i.s;});
+  var pct=ni>0?Math.round(decided/ni*100):0;
   var isEmpty=!ni&&!ns&&!nst;
   var o=hdr("🏠 Дом","");
   o+='<div class="wrap" style="padding-top:8px">';
@@ -399,7 +405,8 @@ function rHome(){
       if(sell>0) o+='<span>💰 продать: <b>'+sell+'</b></span>';
       if(don>0) o+='<span>🤝 отдать: <b>'+don+'</b></span>';
       if(tr>0) o+='<span>🗑 выбросить: <b>'+tr+'</b></span>';
-      if(done>0) o+='<span>✅ готово: <b>'+done+'</b></span>';
+      if(stored>0) o+='<span>📦 в хранении: <b>'+stored+'</b></span>';
+      if(finished>0) o+='<span>✅ готово: <b>'+finished+'</b></span>';
       o+='</div>';
     }
     o+='</div>';

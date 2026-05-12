@@ -279,7 +279,7 @@ function rActions(){
     o+='</div>';
   } else {
     o+='<div class="wrap" style="padding-top:12px">';
-    if(!sellItems.length){
+    if(!sellItems.length && !sellShoes.length){
       o+='<div class="empty"><div class="emi">💰</div><p>Ничего не выставлено на продажу.<br>В <b>Мои вещи</b> отметь вещь статусом <b>Продать</b><br>или нажми «💰 Продать» в карточке обуви.</p></div>';
     } else {
       o+=sellItems.map(function(it){

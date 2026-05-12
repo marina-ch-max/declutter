@@ -137,11 +137,14 @@ var TIPS_SECTIONS=[
 ];
 var TIPS=[];TIPS_SECTIONS.forEach(function(s){s.tips.forEach(function(t){TIPS.push(t);});});
 function ld(k,d){try{var s=localStorage.getItem(k);return s?JSON.parse(s):d;}catch(e){return d;}}
-function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+var _quotaWarned=false;
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){if(!_quotaWarned){_quotaWarned=true;setTimeout(function(){_quotaWarned=false;},10000);try{ntf("⚠ Хранилище заполнено — удали часть фото");}catch(_){}}return false;}}
 function key(){return localStorage.getItem("dcl_apikey")||"";}
 function esc(s){if(!s)return"";return(""+s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function md2html(s){
   if(!s)return"";
+  // экранируем HTML на входе — защита от XSS через ответы ИИ или ручную вставку
+  s=esc(s);
   // tables
   s=s.replace(/^(\|.+\|)\r?\n\|[-|: ]+\|\r?\n((?:\|.+\|?[\r\n]?)*)/gm,function(m,hdr,rows){
     var ths=hdr.replace(/^\||\|$/g,"").split("|").map(function(c){return "<th>"+c.trim()+"</th>";}).join("");
@@ -1013,21 +1016,38 @@ function exportJSON(){
   ntf("Файл скачан!");
 }
 
+function sanitizeImport(data){
+  if(!data||typeof data!=='object')return null;
+  function arr(x){return Array.isArray(x)?x.filter(function(o){return o&&typeof o==='object'&&typeof o.id==='string';}):[];}
+  var items=arr(data.items),shoes=arr(data.shoes),stor=arr(data.stor);
+  if(!items.length&&!shoes.length&&!stor.length)return null;
+  // миграции: later/keep → null для статуса вещи; неизвестные статусы вещи тоже → null
+  var okStatus=['sell','donate','trash','sold','given','trashed'];
+  items.forEach(function(i){if(i.s&&okStatus.indexOf(i.s)<0)i.s=null;});
+  var okShoeStatus=['sell','donate','sold','given'];
+  shoes.forEach(function(s){if(s.s&&okShoeStatus.indexOf(s.s)<0)s.s=null;});
+  // сирот по stor_id чистим — указанное хранилище должно существовать
+  var storIds={};stor.forEach(function(s){storIds[s.id]=true;});
+  items.forEach(function(i){if(i.stor_id&&!storIds[i.stor_id])i.stor_id=null;});
+  return {items:items,shoes:shoes,stor:stor};
+}
+function applyImport(data){
+  var clean=sanitizeImport(data);
+  if(!clean){ntf("Файл не содержит данных");return false;}
+  if(!confirm("Загрузить данные? Текущие данные будут заменены.\n"+
+    "Вещей: "+clean.items.length+
+    "\nОбуви: "+clean.shoes.length+
+    "\nМест хранения: "+clean.stor.length))return false;
+  S.items=clean.items;S.shoes=clean.shoes;S.stor=clean.stor;
+  svi();svs();svst();return true;
+}
 function importJSON(input){
   var file=input.files[0];if(!file)return;
   var reader=new FileReader();
   reader.onload=function(e){
     try{
       var data=JSON.parse(e.target.result);
-      if(!data.items&&!data.shoes&&!data.stor){ntf("Неверный формат файла");return;}
-      if(!confirm("Загрузить данные? Текущие данные будут заменены.\n"+
-        "Вещей: "+(data.items||[]).length+
-        "\nОбуви: "+(data.shoes||[]).length+
-        "\nМест хранения: "+(data.stor||[]).length))return;
-      if(data.items)S.items=data.items;
-      if(data.shoes)S.shoes=data.shoes;
-      if(data.stor)S.stor=data.stor;
-      svi();svs();svst();R();ntf("Данные загружены ✓");
+      if(applyImport(data)){R();ntf("Данные загружены ✓");}
     }catch(err){ntf("Ошибка: неверный формат файла");}
   };
   reader.readAsText(file);
@@ -1083,11 +1103,7 @@ function importFromPaste(){
     else{b64=text;}
     var json=decodeURIComponent(escape(atob(b64)));
     var data=JSON.parse(json);
-    if(!confirm("Загрузить данные?\nВещей: "+(data.items||[]).length+"\nОбуви: "+(data.shoes||[]).length+"\nХранение: "+(data.stor||[]).length))return;
-    if(data.items)S.items=data.items;
-    if(data.shoes)S.shoes=data.shoes;
-    if(data.stor)S.stor=data.stor;
-    svi();svs();svst();S.scr="main";R();ntf("Данные загружены ✓");
+    if(applyImport(data)){S.scr="main";R();ntf("Данные загружены ✓");}
   }catch(e){ntf("Ошибка: не удалось прочитать код");}
 }
 
@@ -1100,11 +1116,7 @@ function checkImportHash(){
       var json=decodeURIComponent(escape(atob(b64)));
       var data=JSON.parse(json);
       history.replaceState(null,"",location.pathname);
-      if(!confirm("Найдены данные для импорта:\nВещей: "+(data.items||[]).length+"\nОбуви: "+(data.shoes||[]).length+"\nМест хранения: "+(data.stor||[]).length+"\n\nЗагрузить? Текущие данные будут заменены."))return;
-      if(data.items)S.items=data.items;
-      if(data.shoes)S.shoes=data.shoes;
-      if(data.stor)S.stor=data.stor;
-      svi();svs();svst();ntf("Данные загружены ✓");
+      if(applyImport(data))ntf("Данные загружены ✓");
     }catch(e){history.replaceState(null,"",location.pathname);}
   }
 }
@@ -1183,7 +1195,18 @@ function confirmMoveToShoe(id){
   S.toShoeId=null;
   svi();svs();R();ntf('Перенесено в обувь 👟');
 }
-function delStor(id){S.stor=S.stor.filter(function(s){return s.id!==id;});svst();R();}
+function delStor(id){
+  var st=null;for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){st=S.stor[i];break;}}
+  if(!st)return;
+  var bound=S.items.filter(function(i){return i.stor_id===id;}).length;
+  var msg=bound>0
+    ?'Удалить «'+st.name+'»? К нему привязано вещей: '+bound+'. Они вернутся в «Без места».'
+    :'Удалить «'+st.name+'»?';
+  if(!confirm(msg))return;
+  if(bound>0){S.items.forEach(function(i){if(i.stor_id===id)i.stor_id=null;});svi();}
+  S.stor=S.stor.filter(function(s){return s.id!==id;});
+  svst();R();ntf("Удалено: "+st.name);
+}
 
 function api(parts,tok,ok,err){fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":key(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:tok||1000,messages:[{role:"user",content:parts}]})}).then(function(r){return r.json();}).then(function(d){if(d.error)throw new Error(d.error.message);ok((d.content&&d.content[0]&&d.content[0].text)||"");}).catch(function(e){err(e.message);});}
 function pts(photos,prompt){var p=[];(photos||[]).slice(0,4).forEach(function(d){var b=d.split(",")[1];if(b)p.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:b}});});p.push({type:"text",text:prompt});return p;}
@@ -1193,8 +1216,11 @@ function findEntity(id){
   for(var i=0;i<S.shoes.length;i++){if(S.shoes[i].id===id)return {obj:S.shoes[i],kind:'shoe'};}
   return null;
 }
+function aiGuard(k){S.aiBusy=S.aiBusy||{};if(S.aiBusy[k]){ntf("Уже выполняется — подожди");return false;}if(typeof navigator!=='undefined'&&navigator.onLine===false){ntf("Нет интернета");return false;}S.aiBusy[k]=true;return true;}
+function aiDone(k){if(S.aiBusy)delete S.aiBusy[k];}
 function doAvito(id){
   if(!key()){openPrompt('avito',id);return;}
+  if(!aiGuard('av_'+id))return;
   var btn=g("ab_"+id);if(btn){btn.disabled=true;btn.textContent="Генерирую...";}
   var e=findEntity(id);if(!e)return;
   var it=e.obj;
@@ -1206,7 +1232,7 @@ function doAvito(id){
   } else {
     pr="Ты опытный продавец на Авито. Напиши продающее объявление.\n\nТовар: "+(it.name||"см. фото")+"\nОписание: "+(it.desc||"—")+"\nСостояние: "+(it.cond||"б/у, хорошее")+(ph.length?"\n\nВнимательно изучи фото: опиши внешний вид, материал, цвет, бренд если виден. Укажи видимые дефекты честно.":"")+"\n\nПри определении цены ориентируйся на:\n- Реальные цены Авито на аналогичный товар\n- Состояние (б/у снижает цену на 30–60% от нового)\n- Популярность и спрос на товар\n\nФормат СТРОГО:\nЗАГОЛОВОК: (до 50 символов, с ключевыми словами для поиска)\nОПИСАНИЕ: (4–5 предложений: что это, состояние, почему продаю, особенности)\nЦЕНА: X XXX ₽ (и укажи диапазон рынка: рынок X–Y ₽)\nТЕГИ: #тег1 #тег2 #тег3 #тег4\nСОВЕТ: (одна строка — как быстрее продать)";
   }
-  api(pts(ph,pr),1000,function(t){var e2=findEntity(id);if(e2){e2.obj.av=t;e2.kind==='shoe'?svs():svi();R();ntf("Объявление готово!");}},function(err){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+err);});
+  api(pts(ph,pr),1000,function(t){aiDone('av_'+id);var e2=findEntity(id);if(e2){e2.obj.av=t;e2.kind==='shoe'?svs():svi();R();ntf("Объявление готово!");}},function(err){aiDone('av_'+id);if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+err);});
 }
 
 function addShopFromAdvText(name,storId){
@@ -1240,7 +1266,7 @@ function addCartBtns(html,storId){
       if(!nm)return m2;
       var name=nm[1].replace(/<[^>]*>/g,"").replace(/\[\s*\]/g,"").trim().split("—")[0].split(" - ")[0].split(" – ")[0].trim();
       if(!name)return m2;
-      var ename=encodeURIComponent(name);
+      var ename=encodeURIComponent(name).replace(/'/g,"%27");
       return "<tr>"+cells+'<td style="text-align:center;padding:4px 6px"><button onclick="addShopFromAdvText(decodeURIComponent(\''+ename+'\'),\''+sid+'\')" style="'+bs+'">🛒</button></td></tr>';
     });
     return "<tbody>"+rows+"</tbody>";
@@ -1249,33 +1275,35 @@ function addCartBtns(html,storId){
   rest=rest.replace(/<li>([\s\S]*?)<\/li>/g,function(m,item){
     var name=item.replace(/<[^>]*>/g,"").replace(/^\[\s*\]\s*/,"").trim().split("—")[0].split(" - ")[0].split("(")[0].trim();
     if(!name)return m;
-    var ename=encodeURIComponent(name);
+    var ename=encodeURIComponent(name).replace(/'/g,"%27");
     return '<li>'+item+' <button onclick="addShopFromAdvText(decodeURIComponent(\''+ename+'\'),\''+sid+'\')" style="'+bs+'">🛒</button></li>';
   });
   // 3. Пункты с символом • (формат doStorAdv)
   rest=rest.replace(/•\s*([^•<\n][^\n<]*)/g,function(m,item){
     var name=item.split("—")[0].split(" - ")[0].split(" – ")[0].trim();
-    var ename=encodeURIComponent(name);
+    var ename=encodeURIComponent(name).replace(/'/g,"%27");
     return "• "+item+' <button onclick="addShopFromAdvText(decodeURIComponent(\''+ename+'\'),\''+sid+'\')" style="'+bs+'">🛒</button>';
   });
   return before+rest+after;
 }
 function doStorAdv(id){
   if(!key()){openPrompt('storadv',id);return;}
+  if(!aiGuard('adv_'+id))return;
   var btn=g("stb_"+id);if(btn){btn.disabled=true;btn.textContent="Анализирую...";}
   var st=null;for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){st=S.stor[i];break;}}
   if(!st)return;
   var pr="Ты сертифицированный организатор пространства (professional organizer).\n\nМесто хранения: "+st.name+"\nЛокация: "+(st.loc||"не указано")+"\nСодержимое: "+(st.cont||"не описано")+(st.photos&&st.photos.length?"\n\nВнимательно изучи фото места хранения: оцени текущее состояние, занятость пространства, доступность вещей.":"")+"\n\nДай структурированные советы по организации этого места. Используй заголовки ##:\n## 🔍 Текущая проблема\n## ✅ Как организовать (конкретные шаги)\n## 📦 Что докупить\nСписком, каждый пункт на новой строке, формат: • Название — зачем — примерная цена (3-5 пунктов, без таблицы)\n## ⚡ Быстрый старт (что сделать прямо сейчас за 10 минут)\n\nПиши конкретно и практично. Таблицу завершай полностью. На русском.";
-  api(pts(st.photos||[],pr),1500,function(t){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].adv=t;break;}}svst();R();ntf("Совет готов!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
+  api(pts(st.photos||[],pr),1500,function(t){aiDone('adv_'+id);for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].adv=t;break;}}svst();R();ntf("Совет готов!");},function(e){aiDone('adv_'+id);if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
 }
 
 function doOrg(){
   if(!key()){openPrompt('org','');return;}
   if(!S.ophotos.length){ntf("Загрузи фото");return;}
+  if(!aiGuard('org'))return;
   S.oload=true;R();
   var ctx=gv("octx");
   var pr="Ты опытный организатор пространства."+(ctx?"\n\nЗапрос: "+ctx:"")+"\n\nВнимательно изучи фото. Дай структурированный план. Заголовки ##:\n## 🔍 Что вижу\n## 🚀 С чего начать (3 шага)\n## 📦 Зонирование и хранение\n## 🛒 Что докупить\nТаблица: | Предмет | Зачем | Цена |, 3-5 строк, ОБЯЗАТЕЛЬНО завершить таблицу закрывающей строкой.\n## 💡 Лайфхак\n\nПиши кратко и конкретно. Таблицу завершай полностью. На русском.";
-  api(pts(S.ophotos,pr),2000,function(t){S.oadv=t;S.oload=false;R();ntf("Совет готов!");},function(e){S.oload=false;R();ntf("Ошибка: "+e);});
+  api(pts(S.ophotos,pr),2000,function(t){aiDone('org');S.oadv=t;S.oload=false;R();ntf("Совет готов!");},function(e){aiDone('org');S.oload=false;R();ntf("Ошибка: "+e);});
 }
 
 function storKnownItems(stId){
@@ -1297,9 +1325,10 @@ function doStorList(id){
     ntf("Сначала добавь фото или вещи в это хранилище");return;
   }
   if(!key()){openPrompt('storlist',id);return;}
+  if(!aiGuard('lst_'+id))return;
   var btn=document.getElementById("ilb_"+id);if(btn){btn.disabled=true;btn.textContent="Анализирую...";}
   var pr=known+"Внимательно изучи фото места хранения. Составь инвентарный список предметов хранения.\n\nСтрого включай ТОЛЬКО то, что:\n• Физически видно на фото как объект (не додумывай, не предполагай)\n• Ты УВЕРЕННО можешь опознать и назвать одним словом или коротко\n• Является предметом хранения (вещь, которую можно куда-то положить)\n\nИСКЛЮЧАЙ из списка:\n• Части тела (руки, ноги людей) — это не инвентарь\n• Сам мебель/контейнер хранения (саму коробку, саму полку, сам шкаф)\n• Предметы, которые ты не можешь опознать или которые видно лишь частично — лучше пропусти, чем напиши 'неизвестный серый предмет'\n• Пометки 'содержимое не видно', 'не разобрать', 'возможно X' — таких строк не должно быть\n• Если на фото только экран монитора с картинкой — то, что нарисовано на экране, не считается\n\nФормат:\n• Каждый предмет — отдельная строка, начинай с •\n• Называй ПРЕДМЕТ ЦЕЛИКОМ, не его части: пиши 'лампа', а не 'лампа, абажур, провод'\n• Мелкие однородные вещи объединяй: 'набор инструментов'\n• Если одинаковых несколько — укажи количество: • Книги (≈8 шт)\n• Только список, без вступления и комментариев\n• Если уверенно опознанных предметов мало — короткий список лучше, чем длинный с догадками\n\nПиши по-русски.";
-  api(pts(st.photos,pr),800,function(t){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].ilist=t;break;}}svst();R();ntf("Список готов!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
+  api(pts(st.photos,pr),800,function(t){aiDone('lst_'+id);for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].ilist=t;break;}}svst();R();ntf("Список готов!");},function(e){aiDone('lst_'+id);if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
 }
 function buildPrompt(type,id){
   var pr="",ph=[],title="";

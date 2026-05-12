@@ -190,7 +190,7 @@ function rMyItems(){
   S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;else if(i.s==="later")lat++;else if(doneIds.indexOf(i.s)>=0)done++;});
   var o=hdr("🧹 Мои вещи","");
   o+='<div style="display:flex;gap:8px;padding:10px 12px 8px;overflow-x:auto;scrollbar-width:none;background:#fff;border-bottom:1px solid #f1f5f9">';
-  [{id:"items",l:"📋 Разбор",n:activeItems.length},{id:"shoes",l:"👟 Обувь",n:S.shoes.length},{id:"storage",l:"📦 Хранение",n:S.stor.length}].forEach(function(c){
+  [{id:"items",l:"📋 Вещи",n:activeItems.length},{id:"shoes",l:"👟 Обувь",n:S.shoes.length},{id:"storage",l:"📦 Хранение",n:S.stor.length}].forEach(function(c){
     var act=f===c.id;
     o+='<button onclick="S.myFilter=\''+c.id+'\';S.form=false;S.fphotos=[];R()" style="flex-shrink:0;padding:7px 18px;border-radius:20px;border:none;background:'+(act?"#6366f1":"#f1f5f9")+';color:'+(act?"#fff":"#475569")+';font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">'+c.l+' ('+c.n+')</button>';
   });
@@ -199,8 +199,8 @@ function rMyItems(){
   o+='<div style="padding:8px 12px 0"><div style="font-size:12px;color:#64748b;line-height:1.5;background:#f8fafc;border-radius:10px;padding:8px 12px">'+hints[f]+'</div></div>';
   if(f==="items"){
     var razborItems=activeItems.filter(function(i){return !i.stor_id && !i.s;});
-    var inStorage=activeItems.filter(function(i){return i.stor_id && ["sell","donate","trash"].indexOf(i.s)<0;});
-    var fl=[{id:"all",l:"На разбор ("+razborItems.length+")"},{id:"sell",l:"Продать ("+sell+")"},{id:"donate",l:"Отдать ("+don+")"},{id:"later",l:"Разобрать ("+lat+")"},{id:"stored",l:"📦 В хранении ("+inStorage.length+")"},{id:"done",l:"✅ Готово ("+done+")"}];
+    var inStorage=activeItems.filter(function(i){return i.stor_id && !i.s;});
+    var fl=[{id:"all",l:"На разбор ("+razborItems.length+")"},{id:"sell",l:"Продать ("+sell+")"},{id:"donate",l:"Отдать ("+don+")"},{id:"trash",l:"Выброс ("+tr+")"},{id:"later",l:"Разобрать ("+lat+")"},{id:"stored",l:"📦 В хранении ("+inStorage.length+")"},{id:"done",l:"✅ Готово ("+done+")"}];
     var shown=S.ifl==="all"?razborItems:S.ifl==="done"?S.items.filter(function(i){return doneIds.indexOf(i.s)>=0;}):S.ifl==="stored"?inStorage:S.items.filter(function(i){return i.s===S.ifl;});
     o+='<div class="fsbar" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:8px 12px 4px">'+fl.map(function(f2){return '<button class="ft'+(S.ifl===f2.id?" act":"")+'" onclick="S.ifl=\''+f2.id+'\';R()">'+f2.l+'</button>';}).join("")+'</div>';
     o+='<button class="aibtn" onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()"><span style="font-size:24px">🤖</span><div><div style="font-size:13px;font-weight:700">Совет по организации</div><div style="font-size:11px;opacity:.8">Загрузи фото — ИИ подскажет как хранить</div></div></button>';

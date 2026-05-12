@@ -193,7 +193,7 @@ function rMyItems(){
   o+='<div style="display:flex;gap:8px;padding:10px 12px 8px;overflow-x:auto;scrollbar-width:none;background:#fff;border-bottom:1px solid #f1f5f9">';
   var doneShIds=["sold","given"];
   var activeShoesCount=S.shoes.filter(function(s){return doneShIds.indexOf(s.s)<0;}).length;
-  [{id:"items",l:"📋 Вещи",n:activeItems.length},{id:"shoes",l:"👟 Обувь",n:activeShoesCount},{id:"storage",l:"📦 Хранение",n:S.stor.length}].forEach(function(c){
+  [{id:"items",l:"📋 Вещи",n:activeItems.length},{id:"shoes",l:"👟 Обувь",n:activeShoesCount},{id:"storage",l:"🗄 Хранилища",n:S.stor.length}].forEach(function(c){
     var act=f===c.id;
     o+='<button onclick="S.myFilter=\''+c.id+'\';S.form=false;S.fphotos=[];R()" style="flex-shrink:0;padding:7px 18px;border-radius:20px;border:none;background:'+(act?"#6366f1":"#f1f5f9")+';color:'+(act?"#fff":"#475569")+';font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">'+c.l+' ('+c.n+')</button>';
   });
@@ -493,16 +493,23 @@ function rItemCard(it){
   var stlnk=null;if(it.stor_id){for(var j=0;j<S.stor.length;j++){if(S.stor[j].id===it.stor_id){stlnk=S.stor[j];break;}}}
   o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(it.name)+'</div>'+(it.desc?'<div class="cdesc">'+esc(it.desc)+'</div>':'')+(it.cond?'<div class="cdesc">Сост: '+esc(it.cond)+'</div>':'')+(stlnk?'<div class="cdesc" style="color:#0ea5e9">📦 '+esc(stlnk.name)+(stlnk.loc?' · '+esc(stlnk.loc):'')+'</div>':'')+'</div><div style="display:flex;align-items:center;margin-left:8px"><button class="bsm" style="margin-left:4px" onclick="openItemEdit(\''+it.id+'\')">✏️</button><button class="bdel" onclick="delItem(\''+it.id+'\')">✕</button></div></div>';
   var isDone=["sold","given","trashed"].indexOf(it.s)>=0;
-  // Вещь распределена в хранилище — показать бейдж
-  if(it.stor_id&&!isDone&&it.s!=="sell"&&it.s!=="donate"&&it.s!=="trash"){
-    o+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;flex-wrap:wrap"><span style="font-size:12px;font-weight:600;color:#0ea5e9">📦 Распределена</span>';
-    o+='<button onclick="moveToShoe(\''+it.id+'\')" style="padding:4px 10px;border-radius:6px;border:1px solid #ddd6fe;background:#f5f3ff;color:#6d28d9;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">👟 В обувь</button></div>';
-    if(S.toShoeId===it.id) o+=rToShoeForm(it);
-  } else if(!isDone){
-    o+='<div class="drow">'+ACT.map(function(a){return '<button class="db" onclick="setS(\''+it.id+'\',\''+a.id+'\')" style="background:'+(it.s===a.id?a.b:"#fff")+';color:'+(it.s===a.id?a.c:"#94a3b8")+';border-color:'+(it.s===a.id?a.c:"#e2e8f0")+';font-weight:'+(it.s===a.id?700:400)+'">'+a.l+'</button>';}).join("")+'</div>';
+  if(!isDone){
+    // Кнопки статуса
+    o+='<div class="drow">'+ACT.map(function(a){return '<button class="db" onclick="setS(\''+it.id+'\','+(it.s===a.id?'null':'\''+a.id+'\'')+')" style="background:'+(it.s===a.id?a.b:"#fff")+';color:'+(it.s===a.id?a.c:"#94a3b8")+';border-color:'+(it.s===a.id?a.c:"#e2e8f0")+';font-weight:'+(it.s===a.id?700:400)+'">'+a.l+'</button>';}).join("")+'</div>';
     if(it.s==="sell") o+='<div style="display:flex;gap:6px;margin-top:6px"><button onclick="setS(\''+it.id+'\',\'sold\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Продано!</button></div>';
     if(it.s==="donate") o+='<div style="display:flex;gap:6px;margin-top:6px"><button onclick="setS(\''+it.id+'\',\'given\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #ddd6fe;background:#f5f3ff;color:#6d28d9;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Отдано!</button></div>';
     if(it.s==="trash") o+='<div style="display:flex;gap:6px;margin-top:6px"><button onclick="setS(\''+it.id+'\',\'trashed\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #e5e7eb;background:#f9fafb;color:#6b7280;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Выброшено</button></div>';
+    // Назначение хранилища
+    if(S.assignStorId===it.id){
+      var stOpts='<option value="">— Выбери место —</option>'+S.stor.map(function(s){return '<option value="'+s.id+'"'+(it.stor_id===s.id?' selected':'')+'>'+esc(s.name)+(s.loc?' ('+esc(s.loc)+')':'')+'</option>';}).join('');
+      o+='<div style="margin-top:8px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:10px"><select onchange="quickSetStor(\''+it.id+'\',this.value)" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #bae6fd;font-size:13px;font-family:inherit;background:#fff;margin-bottom:6px;outline:none">'+stOpts+'</select><div style="display:flex;gap:6px"><button onclick="S.assignStorId=null;S.newStorInCard=\''+it.id+'\';R();setTimeout(function(){var e=document.getElementById(\'nsc_n\');if(e)e.focus();},50)" style="flex:1;padding:7px;border-radius:8px;border:1px solid #bae6fd;background:#fff;color:#0c4a6e;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">+ Новое хранилище</button>'+(it.stor_id?'<button onclick="quickSetStor(\''+it.id+'\',\'\')" style="padding:7px 10px;border-radius:8px;border:1px solid #fee2e2;background:#fff;color:#ef4444;font-size:12px;cursor:pointer;font-family:inherit">Убрать</button>':'')+'<button onclick="S.assignStorId=null;R()" style="padding:7px 10px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;font-size:12px;cursor:pointer;font-family:inherit">✕</button></div></div>';
+    } else if(S.newStorInCard===it.id){
+      o+='<div style="margin-top:8px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:10px"><div style="font-size:11px;font-weight:600;color:#0c4a6e;margin-bottom:6px">+ Новое хранилище</div><input id="nsc_n" placeholder="Название (комод, верхняя полка...) *" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid #bae6fd;font-size:13px;margin-bottom:6px;font-family:inherit;box-sizing:border-box;outline:none"><input id="nsc_l" placeholder="Где (спальня, коридор...)" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid #bae6fd;font-size:13px;margin-bottom:6px;font-family:inherit;box-sizing:border-box;outline:none"><div style="display:flex;gap:6px"><button onclick="createStorFromCard(\''+it.id+'\')" style="flex:1;padding:7px;border-radius:8px;border:none;background:#0ea5e9;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Создать</button><button onclick="S.newStorInCard=null;S.assignStorId=\''+it.id+'\';R()" style="padding:7px 10px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;font-size:12px;cursor:pointer;font-family:inherit">Отмена</button></div></div>';
+    } else {
+      var stBtnLabel = stlnk ? '🗄 '+esc(stlnk.name)+(stlnk.loc?' · '+esc(stlnk.loc):'')+' · сменить' : '🗄 Назначить хранилище';
+      o+='<div style="margin-top:6px"><button onclick="S.assignStorId=\''+it.id+'\';R()" style="width:100%;padding:7px;border-radius:8px;border:1px solid #bae6fd;background:'+(stlnk?'#f0f9ff':'#fff')+';color:#0c4a6e;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">'+stBtnLabel+'</button></div>';
+    }
+    // Перенос в обувь
     o+='<div style="margin-top:6px"><button onclick="moveToShoe(\''+it.id+'\')" style="width:100%;padding:6px;border-radius:8px;border:1px solid #ddd6fe;background:#f5f3ff;color:#6d28d9;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">👟 Это обувь → перенести</button></div>';
     if(S.toShoeId===it.id) o+=rToShoeForm(it);
   } else {
@@ -1119,6 +1126,8 @@ function addItem(){var n=gv("fn").trim();if(!n){ntf("Введи название
 function addShoe(){var n=gv("fsn").trim();if(!n){ntf("Введи название");return;}S.shoes.push({id:uid(),name:n,person:gv("fsp"),size:gv("fss"),loc:gv("fsl"),sea:gv("fsea"),photos:S.fphotos.slice()});S.form=false;S.fphotos=[];S.fdraft={};svs();R();ntf("Добавлено: "+n);}
 function addStor(){var n=gv("fstn").trim();if(!n){ntf("Введи название");return;}S.stor.push({id:uid(),name:n,loc:gv("fstl"),cont:gv("fstc"),photos:S.fphotos.slice(),adv:null});S.form=false;S.fphotos=[];S.fdraft={};svst();R();ntf("Добавлено: "+n);}
 function createInlineStor(){var n=gv("fnew_n").trim();if(!n){ntf("Введи название хранилища");return;}saveDraft();var newId=uid();S.stor.push({id:newId,name:n,loc:gv("fnew_l").trim(),cont:"",photos:[],adv:null});svst();S.fdraft=S.fdraft||{};S.fdraft.fst=newId;S.fNewStor=false;R();ntf("Хранилище создано");}
+function quickSetStor(itemId,storId){for(var i=0;i<S.items.length;i++){if(S.items[i].id===itemId){S.items[i].stor_id=storId||null;break;}}S.assignStorId=null;svi();R();ntf(storId?"Назначено хранилище":"Убрано из хранения");}
+function createStorFromCard(itemId){var n=gv("nsc_n").trim();if(!n){ntf("Введи название хранилища");return;}var newId=uid();S.stor.push({id:newId,name:n,loc:gv("nsc_l").trim(),cont:"",photos:[],adv:null});for(var i=0;i<S.items.length;i++){if(S.items[i].id===itemId){S.items[i].stor_id=newId;break;}}S.newStorInCard=null;S.assignStorId=null;svst();svi();R();ntf("Хранилище создано и назначено");}
 
 function openItemEdit(id){var it=S.items.find(function(x){return x.id===id;});if(!it)return;S.eid=id;S.fphotos=(it.photos||[]).slice();S.fdraft={};R();}
 function openShoeEdit(id){var sh=S.shoes.find(function(x){return x.id===id;});if(!sh)return;S.eid=id;S.fphotos=(sh.photos||[]).slice();S.fdraft={};R();}

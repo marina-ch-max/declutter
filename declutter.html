@@ -92,7 +92,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="notif" id="notif"></div>
 <div class="svbadge" id="svbadge">Сохранено</div>
 <script>
-var ACT=[{id:"sell",l:"Продать",c:"#d97706",b:"#fffbeb"},{id:"donate",l:"Отдать",c:"#7c3aed",b:"#f5f3ff"},{id:"later",l:"Разобрать",c:"#6b7280",b:"#f9fafb"},{id:"trash",l:"Выброс",c:"#dc2626",b:"#fef2f2"}];
+var ACT=[{id:"sell",l:"Продать",c:"#d97706",b:"#fffbeb"},{id:"donate",l:"Отдать",c:"#7c3aed",b:"#f5f3ff"},{id:"trash",l:"Выброс",c:"#dc2626",b:"#fef2f2"}];
 var ACT_DONE=[{id:"sold",l:"✅ Продано",c:"#15803d",b:"#dcfce7"},{id:"given",l:"✅ Отдано",c:"#6d28d9",b:"#ede9fe"},{id:"trashed",l:"🗑 Выброшено",c:"#9ca3af",b:"#f3f4f6"}];
 var SEA=[{id:"all",l:"Все"},{id:"summer",l:"Лето"},{id:"winter",l:"Зима"},{id:"demi",l:"Демисезон"},{id:"sport",l:"Спорт"}];
 var TIPS_SECTIONS=[
@@ -173,6 +173,7 @@ function ntf(m){var e=document.getElementById("notif");e.textContent=m;e.classLi
 function badge(){var e=document.getElementById("svbadge");e.classList.add("show");setTimeout(function(){e.classList.remove("show");},1500);}
 function compress(file,cb){var r=new FileReader();r.onload=function(ev){var img=new Image();img.onload=function(){var c=document.createElement("canvas"),MAX=900,w=img.width,h=img.height;if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);cb(c.toDataURL("image/jpeg",0.78));};img.src=ev.target.result;};r.readAsDataURL(file);}
 var S={tab:"home",myFilter:"items",actTab:"buy",ifl:"all",sfl:"all",items:ld("dcl2_items",[]),shoes:ld("dcl2_shoes",[]),stor:ld("dcl2_stor",[]),shopping:ld("dcl_shopping",[]),savedOrg:ld("dcl_savedorg",[]),form:false,ftype:null,fphotos:[],eid:null,scr:"main",ophotos:[],oadv:null,oload:false,ssearch:"",gquery:"",editIlist:null,tipsTab:"howto",fdraft:{}};
+(function migrateLater(){var changed=false;S.items.forEach(function(i){if(i.s==='later'){i.s=null;changed=true;}});if(changed)sv("dcl2_items",S.items);})();
 function svi(){sv("dcl2_items",S.items);badge();}
 function svs(){sv("dcl2_shoes",S.shoes);badge();}
 function svst(){sv("dcl2_stor",S.stor);badge();}
@@ -186,8 +187,8 @@ function rMyItems(){
   var f=S.myFilter||"items";
   var doneIds=["sold","given","trashed"];
   var activeItems=S.items.filter(function(i){return doneIds.indexOf(i.s)<0;});
-  var sell=0,don=0,tr=0,lat=0,done=0;
-  S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;else if(i.s==="later")lat++;else if(doneIds.indexOf(i.s)>=0)done++;});
+  var sell=0,don=0,tr=0,done=0;
+  S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;else if(doneIds.indexOf(i.s)>=0)done++;});
   var o=hdr("🧹 Мои вещи","");
   o+='<div style="display:flex;gap:8px;padding:10px 12px 8px;overflow-x:auto;scrollbar-width:none;background:#fff;border-bottom:1px solid #f1f5f9">';
   var doneShIds=["sold","given"];
@@ -202,7 +203,7 @@ function rMyItems(){
   if(f==="items"){
     var razborItems=activeItems.filter(function(i){return !i.stor_id && !i.s;});
     var inStorage=activeItems.filter(function(i){return i.stor_id && !i.s;});
-    var fl=[{id:"all",l:"На разбор ("+razborItems.length+")"},{id:"sell",l:"Продать ("+sell+")"},{id:"donate",l:"Отдать ("+don+")"},{id:"trash",l:"Выброс ("+tr+")"},{id:"later",l:"Разобрать ("+lat+")"},{id:"stored",l:"📦 В хранении ("+inStorage.length+")"},{id:"done",l:"✅ Готово ("+done+")"}];
+    var fl=[{id:"all",l:"На разбор ("+razborItems.length+")"},{id:"sell",l:"Продать ("+sell+")"},{id:"donate",l:"Отдать ("+don+")"},{id:"trash",l:"Выброс ("+tr+")"},{id:"stored",l:"📦 В хранении ("+inStorage.length+")"},{id:"done",l:"✅ Готово ("+done+")"}];
     var shown=S.ifl==="all"?razborItems:S.ifl==="done"?S.items.filter(function(i){return doneIds.indexOf(i.s)>=0;}):S.ifl==="stored"?inStorage:S.items.filter(function(i){return i.s===S.ifl;});
     o+='<div class="fsbar" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:8px 12px 4px">'+fl.map(function(f2){return '<button class="ft'+(S.ifl===f2.id?" act":"")+'" onclick="S.ifl=\''+f2.id+'\';R()">'+f2.l+'</button>';}).join("")+'</div>';
     o+='<button class="aibtn" onclick="S.scr=\'org\';S.oadv=null;S.ophotos=[];R()"><span style="font-size:24px">🤖</span><div><div style="font-size:13px;font-weight:700">Совет по организации</div><div style="font-size:11px;opacity:.8">Загрузи фото — ИИ подскажет как хранить</div></div></button>';
@@ -338,7 +339,7 @@ function rHome(){
   S.items.forEach(function(i){if(i.s==="sell")sell++;else if(i.s==="donate")don++;else if(i.s==="trash")tr++;});
   var done=S.items.filter(function(i){return i.stor_id||(actIds.indexOf(i.s)>=0)||(doneIds.indexOf(i.s)>=0);}).length;
   var messy=S.stor.filter(function(s){return s.status==="messy";});
-  var nd=S.items.filter(function(i){return !i.s||i.s==="later";});
+  var nd=S.items.filter(function(i){return !i.s;});
   var pct=ni>0?Math.round(done/ni*100):0;
   var isEmpty=!ni&&!ns&&!nst;
   var o=hdr("🏠 Дом","");
@@ -389,7 +390,7 @@ function rHome(){
     o+='<div style="background:#f1f5f9;border-radius:8px;height:8px;overflow:hidden;margin-bottom:8px">';
     o+='<div style="background:linear-gradient(90deg,#6366f1,#8b5cf6);height:100%;width:'+pct+'%;border-radius:8px;transition:width .3s"></div></div>';
     if(pct===0&&nd.length>0){
-      o+='<div style="font-size:12px;color:#94a3b8;line-height:1.4">Назначь хранилище или статус — <b>Продать / Отдать / Разобрать / Выброс</b> — и прогресс начнёт расти</div>';
+      o+='<div style="font-size:12px;color:#94a3b8;line-height:1.4">Назначь хранилище или статус — <b>Продать / Отдать / Выброс</b> — и прогресс начнёт расти</div>';
     } else {
       o+='<div style="display:flex;gap:12px;font-size:12px;color:#64748b;flex-wrap:wrap">';
       if(sell>0) o+='<span>💰 продать: <b>'+sell+'</b></span>';
@@ -490,7 +491,7 @@ function rItemCard(it){
   var o='<div class="card">';
   if(ph.length) o+='<div class="cphotos">'+ph.map(function(p){return '<img src="'+p+'">';}).join("")+'</div>';
   var stlnk=null;if(it.stor_id){for(var j=0;j<S.stor.length;j++){if(S.stor[j].id===it.stor_id){stlnk=S.stor[j];break;}}}
-  o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(it.name)+'</div>'+(it.desc?'<div class="cdesc">'+esc(it.desc)+'</div>':'')+(it.cond?'<div class="cdesc">Сост: '+esc(it.cond)+'</div>':'')+(stlnk?'<div class="cdesc" style="color:#0ea5e9">📦 '+esc(stlnk.name)+(stlnk.loc?' · '+esc(stlnk.loc):'')+'</div>':'')+'</div><div style="display:flex;align-items:center;margin-left:8px">'+(a?'<span class="cbadge" style="background:'+a.b+';color:'+a.c+';border-color:'+a.c+'44">'+a.l+'</span>':'')+'<button class="bsm" style="margin-left:4px" onclick="openItemEdit(\''+it.id+'\')">✏️</button><button class="bdel" onclick="delItem(\''+it.id+'\')">✕</button></div></div>';
+  o+='<div class="chead"><div style="flex:1;min-width:0"><div class="cname">'+esc(it.name)+'</div>'+(it.desc?'<div class="cdesc">'+esc(it.desc)+'</div>':'')+(it.cond?'<div class="cdesc">Сост: '+esc(it.cond)+'</div>':'')+(stlnk?'<div class="cdesc" style="color:#0ea5e9">📦 '+esc(stlnk.name)+(stlnk.loc?' · '+esc(stlnk.loc):'')+'</div>':'')+'</div><div style="display:flex;align-items:center;margin-left:8px"><button class="bsm" style="margin-left:4px" onclick="openItemEdit(\''+it.id+'\')">✏️</button><button class="bdel" onclick="delItem(\''+it.id+'\')">✕</button></div></div>';
   var isDone=["sold","given","trashed"].indexOf(it.s)>=0;
   // Вещь распределена в хранилище — показать бейдж
   if(it.stor_id&&!isDone&&it.s!=="sell"&&it.s!=="donate"&&it.s!=="trash"){
@@ -644,7 +645,7 @@ function rStorCard(st){
   return o;
 }
 function rStorForm(){var dr=S.fdraft||{};return '<div class="fwrap"><div class="ftitle">+ Место хранения</div>'+fps()+'<input id="fstn" placeholder="Название (нижний ящик комода...) *" value="'+(dr.fstn?esc(dr.fstn):'')+'" autocomplete="off">'+'<input id="fstl" placeholder="Где (спальня, коридор...)" value="'+(dr.fstl?esc(dr.fstl):'')+'" autocomplete="off">'+'<textarea id="fstc" placeholder="Что лежит (список)">'+(dr.fstc?esc(dr.fstc):'')+'</textarea><div class="rbtns">'+'<button class="bprim" onclick="addStor()">Добавить</button>'+'<button class="bghost" onclick="S.form=false;S.fphotos=[];S.fdraft={};R()">Отмена</button>'+'</div></div>';}
-function goTo(tab,id){if(tab==='items'){S.tab='myitems';S.myFilter='items';var it=null;for(var ii=0;ii<S.items.length;ii++){if(S.items[ii].id===id){it=S.items[ii];break;}}if(it){var doneIds=['sold','given','trashed'];if(doneIds.indexOf(it.s)>=0)S.ifl='done';else if(['sell','donate','trash','later'].indexOf(it.s)>=0)S.ifl=it.s;else if(it.stor_id)S.ifl='stored';else S.ifl='all';}}else if(tab==='shoes'){S.tab='myitems';S.myFilter='shoes';}else if(tab==='storage'){S.tab='myitems';S.myFilter='storage';}else if(tab==='shop'){S.tab='actions';S.actTab='buy';}else{S.tab=tab;}S.scr='main';S.highlight=id;R();setTimeout(function(){var el=document.getElementById('c'+id);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='3px solid #6366f1';setTimeout(function(){el.style.outline='';S.highlight=null;},1800);}},100);}
+function goTo(tab,id){if(tab==='items'){S.tab='myitems';S.myFilter='items';var it=null;for(var ii=0;ii<S.items.length;ii++){if(S.items[ii].id===id){it=S.items[ii];break;}}if(it){var doneIds=['sold','given','trashed'];if(doneIds.indexOf(it.s)>=0)S.ifl='done';else if(['sell','donate','trash'].indexOf(it.s)>=0)S.ifl=it.s;else if(it.stor_id)S.ifl='stored';else S.ifl='all';}}else if(tab==='shoes'){S.tab='myitems';S.myFilter='shoes';}else if(tab==='storage'){S.tab='myitems';S.myFilter='storage';}else if(tab==='shop'){S.tab='actions';S.actTab='buy';}else{S.tab=tab;}S.scr='main';S.highlight=id;R();setTimeout(function(){var el=document.getElementById('c'+id);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='3px solid #6366f1';setTimeout(function(){el.style.outline='';S.highlight=null;},1800);}},100);}
 
 function rOnboard(){
   var startFn="localStorage.setItem('dcl_onboarded','1');S.scr='main';S.tab='home';R();";
@@ -678,7 +679,7 @@ function rHelp(){
   '<div style="background:#ede9fe;border-radius:14px;padding:16px;margin-bottom:12px">'+
   '<div style="font-size:16px;font-weight:700;color:#5b21b6;margin-bottom:8px">📦 Чип «Разбор»</div>'+
   '<div style="font-size:14px;color:#4c1d95;line-height:1.6">'+
-  'Добавляй вещи с фото и описанием. Назначь хранилище — или статус: <b>Продать / Отдать / Разобрать / Выброс</b>.<br>'+
+  'Добавляй вещи с фото и описанием. Назначь хранилище — или статус: <b>Продать / Отдать / Выброс</b>.<br>'+
   'Когда вещь продана — нажми «✅ Продано», она уйдёт в архив.<br>'+
   'Кнопка <b>📝 Текст для Авито</b> в карточке вещи со статусом «Продать» генерирует объявление по ИИ.'+
   '</div></div>'+
@@ -726,7 +727,7 @@ function rTips(){
   var orgBtn='<div style="background:#ede9fe;border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:15px;font-weight:700;color:#5b21b6">🤖 ИИ-организатор</div><div style="font-size:12px;color:#7c3aed;margin-top:2px">Анализ всего дома по фото</div></div><button class="bprim" onclick="S.scr=\'org\';R()" style="padding:8px 14px;font-size:13px">Открыть</button></div>';
   var content="";
   if(S.tipsTab==="howto"){
-    content='<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#5b21b6;margin-bottom:8px">📦 Чип «Разбор»</div><div style="font-size:14px;color:#374151;line-height:1.6">Добавляй вещи с фото и описанием. Назначь хранилище или статус: <b>Продать / Отдать / Разобрать / Выброс</b>.<br>Когда вещь продана — нажми «✅ Продано», она уйдёт в архив.<br>Кнопка <b>📝 Текст для Авито</b> в карточке вещи со статусом «Продать» генерирует объявление по ИИ.</div></div>'
+    content='<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#5b21b6;margin-bottom:8px">📦 Чип «Разбор»</div><div style="font-size:14px;color:#374151;line-height:1.6">Добавляй вещи с фото и описанием. Назначь хранилище или статус: <b>Продать / Отдать / Выброс</b>.<br>Когда вещь продана — нажми «✅ Продано», она уйдёт в архив.<br>Кнопка <b>📝 Текст для Авито</b> в карточке вещи со статусом «Продать» генерирует объявление по ИИ.</div></div>'
       +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:8px">👟 Чип «Обувь»</div><div style="font-size:14px;color:#374151;line-height:1.6">Храни обувь с сезоном и размером. Значок 🟢/⚪ показывает, в сезоне ли пара.</div></div>'
       +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#166534;margin-bottom:8px">🗄️ Чип «Хранение»</div><div style="font-size:14px;color:#374151;line-height:1.6">Описывай шкафы, ящики, полки. Добавляй фото и инвентарный список.<br>Кнопка <b>📋 Список вещей</b> — ИИ распознаёт вещи на фото, потом можно отредактировать вручную.<br>Кнопка <b>🤖 ИИ-совет</b> — рекомендации по организации конкретного хранилища.</div></div>'
       +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#9f1239;margin-bottom:8px">🛒 Купить / Продать</div><div style="font-size:14px;color:#374151;line-height:1.6">Таб «Покупки» — список нужного с пометкой «куплено».<br>Таб «Продать» — все вещи и обувь на продажу с быстрым переходом к карточке. Объявление для Авито генерируется в карточке вещи.</div></div>'
@@ -792,7 +793,7 @@ function rAllItems(){
   if(!all.length) o+='<div class="empty"><div class="emi">📋</div><p>'+(q?"Ничего не найдено":"Нет вещей")+'</p></div>';
   all.forEach(function(it){
     var stlnk=null;if(it.stor_id){for(var j=0;j<S.stor.length;j++){if(S.stor[j].id===it.stor_id){stlnk=S.stor[j];break;}}}
-    var ACT2=[{id:"sell",l:"Продать",b:"#fef3c7",c:"#d97706"},{id:"donate",l:"Отдать",b:"#dbeafe",c:"#2563eb"},{id:"trash",l:"Выброс",b:"#fee2e2",c:"#dc2626"},{id:"later",l:"Разобрать",b:"#f3f4f6",c:"#6b7280"}];
+    var ACT2=[{id:"sell",l:"Продать",b:"#fef3c7",c:"#d97706"},{id:"donate",l:"Отдать",b:"#dbeafe",c:"#2563eb"},{id:"trash",l:"Выброс",b:"#fee2e2",c:"#dc2626"}];
     var act=null;for(var k=0;k<ACT2.length;k++){if(ACT2[k].id===it.s){act=ACT2[k];break;}}
     var ph=it.photos||[];
     o+='<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;align-items:flex-start">';

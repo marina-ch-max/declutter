@@ -575,12 +575,24 @@ function rStorCard(st){
   // AI кнопки
   o+='<div style="display:flex;gap:6px;margin-top:6px">'
     +'<button id="stb_'+st.id+'" onclick="doStorAdv(\''+st.id+'\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #e0e7ff;background:#eef2ff;color:#4f46e5;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">🤖 ИИ-совет</button>'
-    +'<button id="ilb_'+st.id+'" onclick="doStorList(\''+st.id+'\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #e0e7ff;background:#eef2ff;color:#4f46e5;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">📋 Инвентарь</button>'
+    +'<button id="ilb_'+st.id+'" onclick="doStorList(\''+st.id+'\')" style="flex:1;padding:7px;border-radius:8px;border:1px solid #e0e7ff;background:#eef2ff;color:#4f46e5;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">📋 Список вещей</button>'
     +'</div>';
   // Результат AI-совета
   if(st.adv) o+='<div style="margin-top:8px;background:#f8fafc;border-radius:10px;padding:10px 12px;font-size:13px;color:#334155;line-height:1.6">'+addCartBtns(md2html(st.adv),st.id)+'</div>';
-  // Инвентарь
-  if(st.ilist) o+='<div style="margin-top:6px;background:#f0fdf4;border-radius:10px;padding:10px 12px;font-size:13px;color:#14532d;line-height:1.6">'+md2html(st.ilist)+'</div>';
+  // Список вещей
+  if(S.editIlist===st.id){
+    o+='<div style="margin-top:6px;background:#f0fdf4;border-radius:10px;padding:10px 12px;border:1px solid #bbf7d0">'
+      +'<textarea id="ilt_'+st.id+'" style="width:100%;min-height:140px;border:1px solid #bbf7d0;border-radius:8px;padding:8px;font-size:13px;font-family:inherit;background:#fff;color:#14532d;line-height:1.6;outline:none;resize:vertical;box-sizing:border-box">'+esc(st.ilist||'')+'</textarea>'
+      +'<div style="display:flex;gap:6px;margin-top:8px">'
+      +'<button class="bprim" onclick="saveIlist(\''+st.id+'\')" style="flex:1;padding:7px;font-size:12px">Сохранить</button>'
+      +'<button class="bghost" onclick="S.editIlist=null;R()" style="padding:7px 12px;font-size:12px">Отмена</button>'
+      +'</div></div>';
+  } else if(st.ilist){
+    o+='<div style="margin-top:6px;background:#f0fdf4;border-radius:10px;padding:10px 12px;font-size:13px;color:#14532d;line-height:1.6;position:relative">'
+      +'<button onclick="S.editIlist=\''+st.id+'\';R()" style="position:absolute;top:6px;right:6px;background:#fff;border:1px solid #bbf7d0;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;color:#15803d;font-family:inherit">✏️ Изменить</button>'
+      +md2html(st.ilist)
+      +'</div>';
+  }
   // Вещи в этом хранилище
   var its=S.items.filter(function(i){return i.stor_id===st.id;});
   if(its.length){
@@ -650,7 +662,7 @@ function rHelp(){
   '<div style="font-size:14px;color:#14532d;line-height:1.6">'+
   'Описывай шкафы, ящики, полки. Добавляй фото и инвентарный список.<br>'+
   'Статус ✅/⚠️ отражает порядок в хранилище.<br>'+
-  'Кнопка <b>📋 Инвентарь</b> — ИИ распознаёт вещи на фото и собирает текстовый список.<br>'+
+  'Кнопка <b>📋 Список вещей</b> — ИИ распознаёт вещи на фото. Кнопка ✏️ позволяет отредактировать список вручную.<br>'+
   'Кнопка <b>🤖 ИИ-совет</b> — рекомендация по организации.'+
   '</div></div>'+
   '<div style="background:#fff1f2;border-radius:14px;padding:16px;margin-bottom:12px">'+
@@ -685,7 +697,7 @@ function rTips(){
   if(S.tipsTab==="howto"){
     content='<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#5b21b6;margin-bottom:8px">📦 Чип «Разбор»</div><div style="font-size:14px;color:#374151;line-height:1.6">Добавляй вещи с фото и описанием. Назначь хранилище или статус: <b>Продать / Отдать / Разобрать / Выброс</b>.<br>Когда вещь продана — нажми «✅ Продано», она уйдёт в архив.<br>Кнопка <b>📝 Текст для Авито</b> в карточке вещи со статусом «Продать» генерирует объявление по ИИ.</div></div>'
       +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:8px">👟 Чип «Обувь»</div><div style="font-size:14px;color:#374151;line-height:1.6">Храни обувь с сезоном и размером. Значок 🟢/⚪ показывает, в сезоне ли пара.</div></div>'
-      +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#166534;margin-bottom:8px">🗄️ Чип «Хранение»</div><div style="font-size:14px;color:#374151;line-height:1.6">Описывай шкафы, ящики, полки. Добавляй фото и инвентарный список.<br>Кнопка <b>📋 Инвентарь</b> — ИИ распознаёт вещи на фото.<br>Кнопка <b>🤖 ИИ-совет</b> — рекомендации по организации конкретного хранилища.</div></div>'
+      +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#166534;margin-bottom:8px">🗄️ Чип «Хранение»</div><div style="font-size:14px;color:#374151;line-height:1.6">Описывай шкафы, ящики, полки. Добавляй фото и инвентарный список.<br>Кнопка <b>📋 Список вещей</b> — ИИ распознаёт вещи на фото, потом можно отредактировать вручную.<br>Кнопка <b>🤖 ИИ-совет</b> — рекомендации по организации конкретного хранилища.</div></div>'
       +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#9f1239;margin-bottom:8px">🛒 Купить / Продать</div><div style="font-size:14px;color:#374151;line-height:1.6">Таб «Покупки» — список нужного с пометкой «куплено».<br>Таб «Продать» — все вещи и обувь на продажу с быстрым переходом к карточке. Объявление для Авито генерируется в карточке вещи.</div></div>'
       +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#0c4a6e;margin-bottom:8px">🤖 Без API-ключа</div><div style="font-size:14px;color:#374151;line-height:1.6">Нет ключа Anthropic? Нажми <b>📋 Скопировать промт</b> рядом с ИИ-кнопками — скопируй запрос и вставь в любой ИИ-чат: <a href="https://claude.ai" target="_blank" style="color:#6366f1">Claude</a>, ChatGPT, Gemini и др.</div></div>'
       +'<div class="tip-card"><div style="font-size:16px;font-weight:700;color:#374151;margin-bottom:8px">🔄 Синхронизация</div><div style="font-size:14px;color:#374151;line-height:1.6">В настройках (⚙️) → Экспорт JSON: скачайте всю базу.<br>Импорт: вставьте JSON или отсканируйте QR-код с другого устройства.</div></div>';
@@ -708,7 +720,7 @@ function rTips(){
       +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">📸 Фото — твой помощник</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Сфотографировал хранилище после уборки — теперь есть эталон. Если стало хуже, видно сразу. Фото в приложении помнит, как должно быть.</p></div>';
   } else if(S.tipsTab==="systems"){
     content='<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">📦 Группируй по категориям, не по комнатам</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Все инструменты в одном месте, все кабели вместе, все лекарства в одной аптечке. Ищешь инструмент — идёшь в одно место, а не по всей квартире.</p></div>'
-      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">🏷️ Подписывай хранилища</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Добавь хранилище в приложение с точным названием: «Полка в прихожей — верхняя» лучше, чем «Шкаф 1». Используй кнопку «📋 Инвентарь» для автоматического списка по фото.</p></div>'
+      +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">🏷️ Подписывай хранилища</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Добавь хранилище в приложение с точным названием: «Полка в прихожей — верхняя» лучше, чем «Шкаф 1». Используй кнопку «📋 Список вещей» для автоматического списка по фото.</p></div>'
       +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">🌟 Золотое правило: «Один вошёл — один вышел»</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Купил новую кружку — отдай старую. Это останавливает накопление. Применяй к одежде, книгам, кухонной утвари.</p></div>'
       +'<div class="tip-card"><div style="font-size:15px;font-weight:700;margin-bottom:6px">🗃️ Цифровой инвентарь</div><p style="font-size:14px;color:#374151;line-height:1.6;margin:0">Ценные вещи, электроника, документы — заноси в приложение с фото. При краже или потере будешь знать, что пропало. При переезде — что где лежало.</p></div>';
   } else if(S.tipsTab==="rooms"){
@@ -1198,7 +1210,7 @@ function doStorList(id){
   var btn=document.getElementById("ilb_"+id);if(btn){btn.disabled=true;btn.textContent="Анализирую...";}
   var st=null;for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){st=S.stor[i];break;}}
   if(!st||!st.photos||!st.photos.length){ntf("Сначала добавь фото к месту хранения");return;}
-  var pr="Внимательно изучи фото места хранения. Составь инвентарный список предметов.\n\nПравила:\n• Каждый предмет — отдельная строка, начинай с •\n• Называй ПРЕДМЕТ ЦЕЛИКОМ, не его части и детали: пиши 'лампа', а не 'лампа, абажур, провод, выключатель'\n• Не перечисляй поверхности конструкций: 'шкаф' а не 'боковая стенка шкафа'\n• Мелкие однородные вещи объединяй: 'набор инструментов' вместо перечисления каждого\n• Если одинаковых несколько — укажи количество: • Книги (≈8 шт)\n• Только список, без вступления и комментариев\n\nПиши по-русски.";
+  var pr="Внимательно изучи фото места хранения. Составь список предметов, которые РЕАЛЬНО ВИДНЫ на фото.\n\nСтрого:\n• Перечисляй ТОЛЬКО то, что физически видно на фото — не додумывай, не предполагай, не описывай типичную обстановку\n• Если на фото только экран монитора с картинкой — перечисли то, что видишь как объект (монитор), не то, что нарисовано на экране\n• Не добавляй предметы по принципу 'обычно рядом с этим бывает X'\n• Если фото нечёткое или предметов мало — список будет коротким, это нормально\n\nФормат:\n• Каждый предмет — отдельная строка, начинай с •\n• Называй ПРЕДМЕТ ЦЕЛИКОМ, не его части: пиши 'лампа', а не 'лампа, абажур, провод'\n• Мелкие однородные вещи объединяй: 'набор инструментов'\n• Если одинаковых несколько — укажи количество: • Книги (≈8 шт)\n• Только список, без вступления и комментариев\n\nПиши по-русски.";
   api(pts(st.photos,pr),800,function(t){for(var i=0;i<S.stor.length;i++){if(S.stor[i].id===id){S.stor[i].ilist=t;break;}}svst();R();ntf("Список готов!");},function(e){if(btn){btn.disabled=false;btn.textContent="Ошибка — повторить";}ntf("Ошибка: "+e);});
 }
 function buildPrompt(type,id){
